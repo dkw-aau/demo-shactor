@@ -1,0 +1,16 @@
+/* Import your application global css files here or add the styles directly to this file */
+
+#title {
+    text-align: center;
+    color: black;
+}
+
+.header {
+    text-align: center;
+    background-color: #e7ebee;
+}
+/*blue : #03a9f4*/
+
+#footer_credits_uni {
+    text-align: right;
+}
