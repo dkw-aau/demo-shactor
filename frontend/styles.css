@@ -14,3 +14,9 @@
 #footer_credits_uni {
     text-align: right;
 }
+
+#quality-indicator-progress-bar {
+    background-color: #fa7575;
+    height: 10px;
+}
+

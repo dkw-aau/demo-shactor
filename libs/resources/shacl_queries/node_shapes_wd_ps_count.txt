@@ -1,0 +1,7 @@
+# Query to get node shape of a specific class
+SELECT ?nodeShape ?targetClass (COUNT(?ps) AS ?countPs) WHERE {
+    ?nodeShape a <http://www.w3.org/ns/shacl#NodeShape> .
+    ?nodeShape <http://www.w3.org/ns/shacl#property> ?ps .
+    ?nodeShape <http://www.w3.org/ns/shacl#targetClass> ?targetClass .
+}
+GROUP BY ?nodeShape ?targetClass

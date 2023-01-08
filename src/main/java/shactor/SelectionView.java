@@ -21,9 +21,11 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import cs.Main;
 import cs.qse.filebased.Parser;
+import org.apache.commons.io.FileUtils;
 import shactor.utils.Type;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
 import java.util.ArrayList;
@@ -50,6 +52,8 @@ public class SelectionView extends LitTemplate {
     @Id("startShapesExtractionButton")
     private Button startShapesExtractionButton;
     
+    List<String> chosenClasses;
+    
     public SelectionView() {
         graphInfo.setVisible(false);
         completeShapesExtractionButton.setVisible(false);
@@ -61,6 +65,7 @@ public class SelectionView extends LitTemplate {
             setGraphInfo();
             notify("Graph Parsed Successfully!", NotificationVariant.LUMO_SUCCESS, Notification.Position.TOP_CENTER);
             setupGridInMultiSelectionMode();
+            searchField.setVisible(true);
         });
         
         completeShapesExtractionButton.addClickListener(buttonClickEvent -> {
@@ -85,12 +90,28 @@ public class SelectionView extends LitTemplate {
             CodeSource codeSource = Parser.class.getProtectionDomain().getCodeSource();
             File jarFile = new File(codeSource.getLocation().toURI().getPath());
             String jarDir = jarFile.getParentFile().getPath();
-            Main.setDataSetNameForJar("Graph");
+            String[] parts = IndexView.graphURL.split("/");
+            Main.setDataSetNameForJar(parts[parts.length - 1]);
             Main.setOutputFilePathForJar(jarDir + "/Output/");
             Main.setConfigDirPathForJar(jarDir + "/config/");
             Main.setResourcesPathForJar(jarDir + "/resources/");
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            
+            //Clean output directory
+            File[] filesInOutputDir = new File(jarDir + "/Output/").listFiles();
+            assert filesInOutputDir != null;
+            for (File file : filesInOutputDir) {
+                if (!file.getName().equals(".keep")) {
+                    boolean deleted = file.delete();
+                    if (deleted) {
+                        System.out.println("Deleted already existing file: " + file.getPath());
+                    }
+                }
+                if (file.isDirectory()) {
+                    FileUtils.forceDelete(file);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     
@@ -124,6 +145,16 @@ public class SelectionView extends LitTemplate {
         
         vaadinGrid.addSelectionListener(selection -> {
             //System.out.printf("Number of selected classes: %s%n", selection.getAllSelectedItems().size());
+            if (selection.getAllSelectedItems().size() == parser.classEntityCount.size()) {
+                System.out.println("Extract Shapes for All Classes");
+                chosenClasses = new ArrayList<>();
+            } else {
+                System.out.println("Extract Shapes for Chosen Classes");
+                chosenClasses = new ArrayList<>();
+                selection.getAllSelectedItems().forEach(item -> {
+                    chosenClasses.add(item.getName());
+                });
+            }
             completeShapesExtractionButton.setVisible(selection.getAllSelectedItems().size() > 0);
         });
         
@@ -154,15 +185,15 @@ public class SelectionView extends LitTemplate {
     }
     
     private void completeShapesExtraction() {
-        notify("Extracting Constraints Information. Please Wait!", NotificationVariant.LUMO_PRIMARY, Notification.Position.MIDDLE);
         parser.entityConstraintsExtraction();
-        
-        notify("Computing Support and Confidence. Please Wait!", NotificationVariant.LUMO_PRIMARY, Notification.Position.MIDDLE);
         parser.computeSupportConfidence();
         
-        notify("Designing SHACL Shapes. Please be patient!", NotificationVariant.LUMO_PRIMARY, Notification.Position.MIDDLE);
-        parser.extractSHACLShapes(false, false);
-        
+        if (chosenClasses.size() > 0) {
+            System.out.println(chosenClasses);
+            parser.extractSHACLShapes(true, chosenClasses);
+        } else {
+            parser.extractSHACLShapes(false, chosenClasses);
+        }
         completeShapesExtractionButton.getUI().ifPresent(ui -> ui.navigate("extraction-view"));
     }
     
@@ -209,6 +240,10 @@ public class SelectionView extends LitTemplate {
         layout.getThemeList().add("spacing-xs");
         
         return layout;
+    }
+    
+    public static Parser getParser() {
+        return parser;
     }
 }
 

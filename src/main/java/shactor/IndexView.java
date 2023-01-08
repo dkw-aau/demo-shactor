@@ -51,7 +51,4 @@ public class IndexView extends LitTemplate {
             graphEndpointButton.getUI().ifPresent(ui -> ui.navigate("first-phase-view"));
         });
     }
-    
-    
-
 }
