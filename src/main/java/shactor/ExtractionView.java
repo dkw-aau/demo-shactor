@@ -60,9 +60,13 @@ public class ExtractionView extends LitTemplate {
     private Grid<PS> propertyShapesGrid;
     @Id("propertyShapesGridInfo")
     private H5 propertyShapesGridInfo;
+    @Id("downloadPrunedShapesButton")
+    private Button downloadPrunedShapesButton;
+    
     
     static Parser parser;
     String currNodeShape;
+    
     
     public ExtractionView() {
         parser = SelectionView.getParser();
@@ -70,6 +74,8 @@ public class ExtractionView extends LitTemplate {
         shapesGrid.setVisible(false);
         propertyShapesGrid.setVisible(false);
         propertyShapesGridInfo.setVisible(false);
+        downloadPrunedShapesButton.setVisible(false);
+        
         downloadShapesButton.addClickListener(buttonClickEvent -> {});
         
         readShapesStatsButton.addClickListener(buttonClickEvent -> {});
@@ -88,6 +94,8 @@ public class ExtractionView extends LitTemplate {
                 List<NS> nodeShapes = Collections.unmodifiableList(parser.shapesExtractor.getNodeShapes());
                 applyPruningThresholds(nodeShapes, support, confidence);
                 setupNodeShapesGrid(nodeShapes, support, confidence);
+                downloadPrunedShapesButton.setText("Download SHACL Shapes Pruned with Support: " + support + " and Confidence: " + Math.round(confidence * 100) + "%");
+                downloadPrunedShapesButton.setVisible(true);
             }
         });
     }
@@ -150,13 +158,12 @@ public class ExtractionView extends LitTemplate {
         
         propertyShapesGrid.addColumn(PS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>PS</div>")).setResizable(true);
         //propertyShapesGrid.addColumn(PS::getNodeKind).setHeader("NodeKind");
-        propertyShapesGrid.addColumn(PS::getPath).setHeader("Path");
-        propertyShapesGrid.addColumn(PS::getDataTypeOrClass).setHeader("Data Type or Class");
+        //propertyShapesGrid.addColumn(PS::getDataTypeOrClass).setHeader("Data Type or Class");
         //propertyShapesGrid.addColumn(PS::getPruneFlag).setHeader("Prune Flag");
         propertyShapesGrid.addColumn(PS::getPath).setHeader("Path");
         propertyShapesGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ps) -> {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
-            button.addClickListener(e -> this.generateQueryForPropertyShape(ps));
+            button.addClickListener(e -> this.generateQueryForPropertyShape(ns, ps));
             button.setIcon(new Icon(VaadinIcon.BULLSEYE));
         })).setHeader(setHeaderWithInfoLogo("Generate SPARQL Query", "The generated SPARQL query will fetch the triples responsible for having chosen PS as part of NS"));
         
@@ -168,19 +175,20 @@ public class ExtractionView extends LitTemplate {
         propertyShapesGrid.setItems(ns.getPropertyShapes());
     }
     
-    private void generateQueryForPropertyShape(PS ps) {
+    private void generateQueryForPropertyShape(NS ns, PS ps) {
         Dialog dialog = new Dialog();
         dialog.getElement().setAttribute("aria-label", "Query");
         
         dialog.getHeader().add(createHeaderLayout());
         createFooter(dialog);
-        
-        VerticalLayout dialogLayout = createDialogLayout(ps.getLocalNameFromIri());
+        String sparqlQuery = extractSparqlQuery(ns, ps);
+        VerticalLayout dialogLayout = createDialogLayout(ps.getLocalNameFromIri(), sparqlQuery);
         dialog.add(dialogLayout);
         dialog.setModal(false);
         dialog.setDraggable(true);
         dialog.open();
     }
+    
     
     private void applyPruningThresholds(List<NS> nodeShapes, Integer support, Double confidence) {
         for (NS currNS : nodeShapes) {
@@ -213,6 +221,16 @@ public class ExtractionView extends LitTemplate {
         }
     }
     
+    
+    private String extractSparqlQuery(NS ns, PS ps) {
+        String query = "SELECT * WHERE { \n" +
+                "\t ?s a <CLASS> .\n" +
+                "\t ?s  <PROPERTY> ?o .\n" +
+                "} \n";
+        query = query.replace("CLASS", ns.getTargetClass().toString());
+        query = query.replace("PROPERTY", ps.getPath());
+        return query;
+    }
     
     // -------------------------   Helper Methods   -----------------------------
     
@@ -263,13 +281,14 @@ public class ExtractionView extends LitTemplate {
         return headline;
     }
     
-    private VerticalLayout createDialogLayout(String psName) {
+    private VerticalLayout createDialogLayout(String psName, String sparqlQuery) {
         Paragraph paragraph = new Paragraph("SHACTOR has generated the following SPARQL query to be executed on the provided Knowledge Graph. This query will fetch the triples responsible for extracting the following SHACL constraint:");
-        H6 nsTitle = new H6("NS: " + currNodeShape );
-        H6 psTitle = new H6("PS: " + psName );
-
+        H6 nsTitle = new H6("NS: " + currNodeShape);
+        H6 psTitle = new H6("PS: " + psName);
+        
         nsTitle.getStyle().set("margin-top", "0px");
         TextArea descriptionArea = new TextArea("SPARQL Query");
+        descriptionArea.setValue(sparqlQuery);
         
         VerticalLayout fieldLayout = new VerticalLayout(paragraph, nsTitle, psTitle, descriptionArea);
         fieldLayout.setSpacing(false);

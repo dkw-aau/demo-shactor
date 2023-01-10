@@ -28,7 +28,8 @@ let SelectionView = class SelectionView extends LitElement {
  </vaadin-horizontal-layout>
  <vaadin-vertical-layout class="content" style="width: 100%; flex-grow: 1; flex-shrink: 1; flex-basis: auto;" id="contentVerticalLayout">
   <h4 style="align-self: center; width: 80%; margin-bottom: 0%;">About:</h4>
-  <h5 style="width: 80%; margin-left: 10%; align-self: flex-start; margin-top: 0%;">SHACTOR will take you through different steps of shapes extraction and show information about the graph. Please begin by starting the process of shapes extraction:</h5>
+  <p style="margin-right: 10%; margin-left: 10%; align-self: stretch;">SHACTOR is a framework for extracting quality SHACL shapes from very large Knowledge Graphs (KGs), analyzing them to find spurious shapes constraints, and finding erroneous triples in the KG. The SHACL shapes represent prominent data patterns within KG but are likely to contain some spurious constraints extracted due to the presence of erroneous data in the KG. Given a KG having millions of triples and thousands of classes, SHACTOR parses the KG using our efficient and scalable shapes extraction algorithm and outputs SHACL shapes constraints. Further, it uses the concepts of support and confidence to prune the spurious shape constraints. You can use SHACTOR to extract, analyze, and clean SHACL shape constraints from very large KGs, it helps you find and correct errors in the KG by automatically generating SPARQL queries for your KG.</p>
+  <p style="margin-right: 10%; margin-left: 10%; align-self: stretch;">SHACTOR will take you through different steps of shapes extraction and show information about the graph. Please begin by starting the process of shapes extraction:</p>
   <vaadin-button id="startShapesExtractionButton" style="align-self: stretch; margin-left: 10%; margin-right: 10%;" tabindex="0">
     Start Shapes Extraction 
   </vaadin-button>
@@ -38,7 +39,7 @@ let SelectionView = class SelectionView extends LitElement {
   </vaadin-text-field>
   <vaadin-grid id="vaadinGrid" style="width: 80%; align-self: center; flex-grow: 0;" is-attached multi-sort-priority="prepend"></vaadin-grid>
   <vaadin-button theme="secondary" id="completeShapesExtractionButton" style="align-self: stretch; margin-left: 10%; margin-right: 10%;" tabindex="0">
-   Complete Shapes Extraction
+    Complete Shapes Extraction 
   </vaadin-button>
   <br>
  </vaadin-vertical-layout>

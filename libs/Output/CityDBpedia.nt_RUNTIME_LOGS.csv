@@ -1,4 +1,4 @@
-CityDBpedia.nt,firstPass,0,0,0,0,false,null
-CityDBpedia.nt,secondPhase,1,0,1,0,false,null
-CityDBpedia.nt,computeSupportConfidence,0,0,1,0,false,null
-CityDBpedia.nt,extractSHACLShapes:No Pruning,2,0,3,0,false,null
+CityDBpedia.nt,firstPass,1,0,4,0,false,null
+CityDBpedia.nt,secondPhase,2,0,6,0,false,null
+CityDBpedia.nt,computeSupportConfidence,0,0,6,0,false,null
+CityDBpedia.nt,extractSHACLShapes:No Pruning,3,0,9,0,false,null
