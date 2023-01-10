@@ -44,11 +44,11 @@ public class IndexView extends LitTemplate {
         uploadGraphButton.addClickListener(buttonClickEvent -> {
             Notification.show( "URL: " + graphUrl.getValue());
             graphURL = graphUrl.getValue();
-            graphEndpointButton.getUI().ifPresent(ui -> ui.navigate("first-phase-view"));
+            graphEndpointButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });
     
         graphEndpointButton.addClickListener(buttonClickEvent -> {
-            graphEndpointButton.getUI().ifPresent(ui -> ui.navigate("first-phase-view"));
+            graphEndpointButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });
     }
 }

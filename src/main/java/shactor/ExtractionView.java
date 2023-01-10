@@ -103,10 +103,10 @@ public class ExtractionView extends LitTemplate {
     private void setupNodeShapesGrid(List<NS> nodeShapes, Integer support, Double confidence) {
         shapesGrid.setVisible(true);
         shapesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        shapesGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
+        //shapesGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
         //shapesGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         
-        shapesGrid.addColumn(NS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>NS</div>"));
+        shapesGrid.addColumn(NS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>Node Shape</div>")).setResizable(true).setAutoWidth(true).setFlexGrow(0).setComparator(NS::getPruneFlag);
         shapesGrid.addColumn(NS::getTargetClass).setHeader("Target Class").setResizable(true);
         shapesGrid.addColumn(NS::getCountPropertyShapes).setHeader("Count PS");
         //shapesGrid.addColumn(NS::getPruneFlag).setHeader("To Prune");
@@ -132,7 +132,7 @@ public class ExtractionView extends LitTemplate {
             progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
             progressBar.setId("quality-indicator-progress-bar");
             double value = ns.getCountPropertyShapes() - ns.getCountPsWithPruneFlag();
-            System.out.println(value);
+            //System.out.println(value);
             progressBar.setValue(value / 100);
         })).setHeader(setHeaderWithInfoLogo("Quality Indicator", "This shows quality of NS in terms of PS left after pruning (green) and removed by pruning (red) provided user's support and confidence thresholds."));
         
@@ -153,14 +153,14 @@ public class ExtractionView extends LitTemplate {
         propertyShapesGrid.removeAllColumns();
         propertyShapesGrid.setVisible(true);
         
-        propertyShapesGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
+        //propertyShapesGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
         propertyShapesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         
-        propertyShapesGrid.addColumn(PS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>PS</div>")).setResizable(true);
+        propertyShapesGrid.addColumn(PS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>Property Shape</div>")).setResizable(true).setAutoWidth(true).setFlexGrow(0).setComparator(PS::getPruneFlag);
         //propertyShapesGrid.addColumn(PS::getNodeKind).setHeader("NodeKind");
         //propertyShapesGrid.addColumn(PS::getDataTypeOrClass).setHeader("Data Type or Class");
         //propertyShapesGrid.addColumn(PS::getPruneFlag).setHeader("Prune Flag");
-        propertyShapesGrid.addColumn(PS::getPath).setHeader("Path");
+        propertyShapesGrid.addColumn(PS::getPath).setHeader("Property Path");
         propertyShapesGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ps) -> {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
             button.addClickListener(e -> this.generateQueryForPropertyShape(ns, ps));
