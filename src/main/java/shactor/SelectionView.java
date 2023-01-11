@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -52,7 +53,9 @@ public class SelectionView extends LitTemplate {
     @Id("startShapesExtractionButton")
     private Button startShapesExtractionButton;
     
-    List<String> chosenClasses;
+    public static List<String> chosenClasses;
+    public static Boolean isFilteredClasses = false;
+    public static HashMap<String, String> defaultShapesModelStats;
     
     public SelectionView() {
         graphInfo.setVisible(false);
@@ -189,10 +192,14 @@ public class SelectionView extends LitTemplate {
         parser.computeSupportConfidence();
         
         if (chosenClasses.size() > 0) {
+            isFilteredClasses = true;
             System.out.println(chosenClasses);
             parser.extractSHACLShapes(true, chosenClasses);
+            defaultShapesModelStats = parser.shapesExtractor.getCurrentShapesModelStats();
         } else {
+            isFilteredClasses = false;
             parser.extractSHACLShapes(false, chosenClasses);
+            defaultShapesModelStats = parser.shapesExtractor.getCurrentShapesModelStats();
         }
         completeShapesExtractionButton.getUI().ifPresent(ui -> ui.navigate("extraction-view"));
     }

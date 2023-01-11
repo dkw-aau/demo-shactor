@@ -1,0 +1,419 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://shaclshapes.org/CityShape> rdf:type <http://www.w3.org/ns/shacl#NodeShape> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/areaCodeCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/areaLandCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/areaTotalCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/areaWaterCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/countryCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/elevationCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/foundingDateCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/governmentTypeCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/homepageCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/instanceTypeCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/labelCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/mottoCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/nameCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/nickCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/originalNameCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/politicalLeaderCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/populationDensityCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/populationTotalCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/postalCodeCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/seeAlsoCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/subdivisionCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/timeZoneCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/typeCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/utcOffsetCityShapeProperty> ;
+  <http://www.w3.org/ns/shacl#targetClass> <http://dbpedia.org/ontology/City> .
+
+<http://shaclshapes.org/SettlementShape> rdf:type <http://www.w3.org/ns/shacl#NodeShape> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/areaCodeSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/areaTotalSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/countrySettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/elevationSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/instanceTypeSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/labelSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/nameSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/politicalLeaderSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/populationTotalSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/postalCodeSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/subdivisionSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/timeZoneSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/utcOffsetSettlementShapeProperty> ;
+  <http://www.w3.org/ns/shacl#targetClass> <http://dbpedia.org/ontology/Settlement> .
+
+<http://shaclshapes.org/TownShape> rdf:type <http://www.w3.org/ns/shacl#NodeShape> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/countryTownShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/instanceTypeTownShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/labelTownShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/nameTownShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/subdivisionTownShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/typeTownShapeProperty> ;
+  <http://www.w3.org/ns/shacl#targetClass> <http://dbpedia.org/ontology/Town> .
+
+<http://shaclshapes.org/VillageShape> rdf:type <http://www.w3.org/ns/shacl#NodeShape> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/countryVillageShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/instanceTypeVillageShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/labelVillageShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/nameVillageShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/populationTotalVillageShapeProperty> ;
+  <http://www.w3.org/ns/shacl#property> <http://shaclshapes.org/subdivisionVillageShapeProperty> ;
+  <http://www.w3.org/ns/shacl#targetClass> <http://dbpedia.org/ontology/Village> .
+
+<http://shaclshapes.org/areaCodeCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 6.5792E-1 ;
+  <http://shaclshapes.org/support> "13459"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:string ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/areaCode> .
+
+<http://shaclshapes.org/areaCodeSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 7.0588E-1 ;
+  <http://shaclshapes.org/support> "12"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:string ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/areaCode> .
+
+<http://shaclshapes.org/areaLandCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 5.1176E-1 ;
+  <http://shaclshapes.org/support> "10469"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:double ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/areaLand> .
+
+<http://shaclshapes.org/areaTotalCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 7.1951E-1 ;
+  <http://shaclshapes.org/support> "14719"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:double ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/areaTotal> .
+
+<http://shaclshapes.org/areaTotalSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 7.6471E-1 ;
+  <http://shaclshapes.org/support> "13"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:double ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/areaTotal> .
+
+<http://shaclshapes.org/areaWaterCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 4.969E-1 ;
+  <http://shaclshapes.org/support> "10165"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:double ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/areaWater> .
+
+<http://shaclshapes.org/countryCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 6.0542E-1 ;
+  <http://shaclshapes.org/support> "12385"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/country> .
+
+<http://shaclshapes.org/countrySettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "17"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/country> .
+
+<http://shaclshapes.org/countryTownShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/country> .
+
+<http://shaclshapes.org/countryVillageShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/country> .
+
+<http://shaclshapes.org/elevationCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 6.891E-1 ;
+  <http://shaclshapes.org/support> "14097"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:double ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/elevation> .
+
+<http://shaclshapes.org/elevationSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 9.4118E-1 ;
+  <http://shaclshapes.org/support> "16"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:double ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/elevation> .
+
+<http://shaclshapes.org/foundingDateCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1.2045E-1 ;
+  <http://shaclshapes.org/support> "2464"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:date ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/foundingDate> .
+
+<http://shaclshapes.org/governmentTypeCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1.3037E-1 ;
+  <http://shaclshapes.org/support> "2667"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/governmentType> .
+
+<http://shaclshapes.org/homepageCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 3.8994E-1 ;
+  <http://shaclshapes.org/support> "7977"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://xmlns.com/foaf/0.1/homepage> .
+
+<http://shaclshapes.org/instanceTypeCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "20457"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#in> ( <http://dbpedia.org/ontology/City> ) ;
+  <http://www.w3.org/ns/shacl#path> rdf:type .
+
+<http://shaclshapes.org/instanceTypeSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "17"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#in> ( <http://dbpedia.org/ontology/Settlement> ) ;
+  <http://www.w3.org/ns/shacl#path> rdf:type .
+
+<http://shaclshapes.org/instanceTypeTownShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#in> ( <http://dbpedia.org/ontology/Town> ) ;
+  <http://www.w3.org/ns/shacl#path> rdf:type .
+
+<http://shaclshapes.org/instanceTypeVillageShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#in> ( <http://dbpedia.org/ontology/Village> ) ;
+  <http://www.w3.org/ns/shacl#path> rdf:type .
+
+<http://shaclshapes.org/labelCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 9.998E-1 ;
+  <http://shaclshapes.org/support> "20453"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> rdf:langString ;
+  <http://www.w3.org/ns/shacl#path> rdfs:label .
+
+<http://shaclshapes.org/labelSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "17"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> rdf:langString ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> rdfs:label .
+
+<http://shaclshapes.org/labelTownShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> rdf:langString ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> rdfs:label .
+
+<http://shaclshapes.org/labelVillageShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> rdf:langString ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> rdfs:label .
+
+<http://shaclshapes.org/mottoCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1.2025E-1 ;
+  <http://shaclshapes.org/support> "2460"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:string ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/motto> .
+
+<http://shaclshapes.org/nameCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 9.2677E-1 ;
+  <http://shaclshapes.org/support> "18959"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> rdf:langString ;
+  <http://www.w3.org/ns/shacl#path> <http://xmlns.com/foaf/0.1/name> .
+
+<http://shaclshapes.org/nameSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "17"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> rdf:langString ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://xmlns.com/foaf/0.1/name> .
+
+<http://shaclshapes.org/nameTownShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> rdf:langString ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://xmlns.com/foaf/0.1/name> .
+
+<http://shaclshapes.org/nameVillageShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> rdf:langString ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://xmlns.com/foaf/0.1/name> .
+
+<http://shaclshapes.org/nickCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1.1131E-1 ;
+  <http://shaclshapes.org/support> "2277"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> rdf:langString ;
+  <http://www.w3.org/ns/shacl#path> <http://xmlns.com/foaf/0.1/nick> .
+
+<http://shaclshapes.org/originalNameCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1.3184E-1 ;
+  <http://shaclshapes.org/support> "2697"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> rdf:langString ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/originalName> .
+
+<http://shaclshapes.org/politicalLeaderCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 4.639E-1 ;
+  <http://shaclshapes.org/support> "9490"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/politicalLeader> .
+
+<http://shaclshapes.org/politicalLeaderSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 8.2353E-1 ;
+  <http://shaclshapes.org/support> "14"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/politicalLeader> .
+
+<http://shaclshapes.org/populationDensityCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 5.5424E-1 ;
+  <http://shaclshapes.org/support> "11338"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:double ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/populationDensity> .
+
+<http://shaclshapes.org/populationTotalCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 9.2599E-1 ;
+  <http://shaclshapes.org/support> "18943"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:nonNegativeInteger ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/populationTotal> .
+
+<http://shaclshapes.org/populationTotalSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "17"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:nonNegativeInteger ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/populationTotal> .
+
+<http://shaclshapes.org/populationTotalVillageShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:nonNegativeInteger ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/populationTotal> .
+
+<http://shaclshapes.org/postalCodeCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 6.8495E-1 ;
+  <http://shaclshapes.org/support> "14012"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:string ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/postalCode> .
+
+<http://shaclshapes.org/postalCodeSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 7.6471E-1 ;
+  <http://shaclshapes.org/support> "13"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:string ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/postalCode> .
+
+<http://shaclshapes.org/seeAlsoCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1.1805E-1 ;
+  <http://shaclshapes.org/support> "2415"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> rdfs:seeAlso .
+
+<http://shaclshapes.org/subdivisionCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 9.8177E-1 ;
+  <http://shaclshapes.org/support> "20084"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/subdivision> .
+
+<http://shaclshapes.org/subdivisionSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "17"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/subdivision> .
+
+<http://shaclshapes.org/subdivisionTownShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/subdivision> .
+
+<http://shaclshapes.org/subdivisionVillageShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/subdivision> .
+
+<http://shaclshapes.org/timeZoneCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 9.1211E-1 ;
+  <http://shaclshapes.org/support> "18659"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/timeZone> .
+
+<http://shaclshapes.org/timeZoneSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 9.4118E-1 ;
+  <http://shaclshapes.org/support> "16"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/timeZone> .
+
+<http://shaclshapes.org/typeCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 6.9345E-1 ;
+  <http://shaclshapes.org/support> "14186"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/type> .
+
+<http://shaclshapes.org/typeTownShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 1E0 ;
+  <http://shaclshapes.org/support> "11"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  <http://www.w3.org/ns/shacl#minCount> 1 ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/type> .
+
+<http://shaclshapes.org/utcOffsetCityShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://www.w3.org/ns/shacl#or> ( [
+    <http://shaclshapes.org/confidence> 2.3395E-1 ;
+    <http://shaclshapes.org/support> "4786"^^xsd:int ;
+    <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#IRI> ;
+  ] [
+    <http://shaclshapes.org/confidence> 6.9409E-1 ;
+    <http://shaclshapes.org/support> "14199"^^xsd:int ;
+    <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+    <http://www.w3.org/ns/shacl#datatype> xsd:string ;
+  ] ) ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/utcOffset> .
+
+<http://shaclshapes.org/utcOffsetSettlementShapeProperty> rdf:type <http://www.w3.org/ns/shacl#PropertyShape> ;
+  <http://shaclshapes.org/confidence> 7.6471E-1 ;
+  <http://shaclshapes.org/support> "13"^^xsd:int ;
+  <http://www.w3.org/ns/shacl#NodeKind> <http://www.w3.org/ns/shacl#Literal> ;
+  <http://www.w3.org/ns/shacl#datatype> xsd:string ;
+  <http://www.w3.org/ns/shacl#path> <http://dbpedia.org/ontology/utcOffset> .
+
+
