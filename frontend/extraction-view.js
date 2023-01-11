@@ -68,6 +68,9 @@ let ExtractionView = class ExtractionView extends LitElement {
    <vaadin-grid id="shapesGrid" style="margin-right: 10%; align-self: stretch; margin-left: 10%; flex-grow: 0; margin-top: 2%;" is-attached multi-sort-priority="prepend"></vaadin-grid>
    <h5 id="propertyShapesGridInfo" style="margin-left: 10%; margin-bottom: 0%;">Heading 5</h5>
    <vaadin-grid id="propertyShapesGrid" style="align-self: stretch; margin-left: 10%; margin-right: 10%; flex-grow: 0;" is-attached multi-sort-priority="prepend"></vaadin-grid>
+   <vaadin-button theme="primary" id="downloadSelectedShapesButton" style="align-self: stretch; margin-left: 10%; margin-right: 10%;" tabindex="0">
+    Download Selected Shapes
+   </vaadin-button>
   </vaadin-vertical-layout>
   <vaadin-horizontal-layout class="footer" style="width: 100%; flex-basis: var(--lumo-size-l); flex-shrink: 0; background-color: var(--lumo-contrast-10pct);">
    <h6 style="align-self: center; margin: var(--lumo-space-l);">Credits: Kashif Rabbani, Matteo Lissandrini, Katja Hose</h6>

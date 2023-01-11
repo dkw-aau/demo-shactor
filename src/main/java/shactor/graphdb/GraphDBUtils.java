@@ -29,14 +29,14 @@ public class GraphDBUtils {
         this.kbManager = new KBManagement();
         this.repository = kbManager.initGraphDBRepository();
         this.repositoryConnection = repository.getConnection();
-        AppConfiguration appConfiguration = new AppConfiguration();
+        //AppConfiguration appConfiguration = new AppConfiguration();
     }
     
     public GraphDBUtils(String repositoryUrl, String repositoryName) {
         this.kbManager = new KBManagement();
         this.repository = kbManager.initGraphDBRepository(repositoryUrl, repositoryName);
         this.repositoryConnection = repository.getConnection();
-        AppConfiguration appConfiguration = new AppConfiguration();
+        //AppConfiguration appConfiguration = new AppConfiguration();
     }
     
     public ValueFactory getValueFactory() {
