@@ -37,7 +37,10 @@ public class IndexView extends LitTemplate {
         vaadinSelect.setValue("DBpedia");
         
         continueButton.addClickListener(buttonClickEvent -> {
-            graphURL = "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt";
+            //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt";
+            // Server: /home/ubuntu/data/dbpedia_ml.nt
+            graphURL = "/home/ubuntu/data/dbpedia_ml.nt";
+    
             continueButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });
         

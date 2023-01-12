@@ -49,17 +49,17 @@ let ExtractionView = class ExtractionView extends LitElement {
      <vaadin-horizontal-layout style="align-self: stretch;">
       <vaadin-text-field label="Support" placeholder="10" id="supportTextField" style="margin-right: 2%; flex-grow: 0;" type="text"></vaadin-text-field>
       <vaadin-text-field label="Confidence (Percentage %)" placeholder="25" type="text" id="confidenceTextField" style="margin-right: 2%; flex-grow: 0; flex-shrink: 1; width: 20%;"></vaadin-text-field>
-      <vaadin-button id="startPruningButton" style="flex-grow: 0; flex-shrink: 1; align-self: flex-end; margin-right: 2%;" tabindex="0" theme="primary">
+      <vaadin-button id="startPruningButton" style="flex-grow: 0; flex-shrink: 1; align-self: flex-end; margin-right: 2%;" tabindex="0" theme="secondary">
         Analyze Shapes 
       </vaadin-button>
-      <vaadin-button theme="primary" id="downloadPrunedShapesButton" style="align-self: flex-end; flex-shrink: 1; flex-grow: 0;" tabindex="0">
+      <vaadin-button theme="secondary" id="downloadPrunedShapesButton" style="align-self: flex-end; flex-shrink: 1; flex-grow: 0;" tabindex="0">
         Download Reliable Shapes 
       </vaadin-button>
      </vaadin-horizontal-layout>
     </vaadin-vertical-layout>
     <vaadin-chart type="column" tooltip="" id="knowledgeGraphStatsPieChart" style="flex-grow: 0; flex-shrink: 0; width: 35%; align-self: baseline;" additional-options=""></vaadin-chart>
    </vaadin-horizontal-layout>
-   <vaadin-horizontal-layout style="align-self: stretch; margin-left: 10%; margin-right: 10%; flex-shrink: 1; flex-grow: 1; margin-bottom: 0%; align-items: stretch; flex-wrap: nowrap;">
+   <vaadin-horizontal-layout style="align-self: stretch; margin-left: 5%; margin-right: 5%; flex-shrink: 1; flex-grow: 1; margin-bottom: 0%; align-items: stretch; flex-wrap: nowrap;" theme="spacing">
     <vaadin-chart type="pie" tooltip="" id="defaultShapesStatsPieChart" style="align-self: center; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
     <vaadin-chart type="pie" tooltip="" id="shapesStatsBySupportPieChart" style="align-self: center; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
     <vaadin-chart type="pie" tooltip="" id="shapesStatsByConfidencePieChart" style="align-self: center; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
@@ -68,7 +68,7 @@ let ExtractionView = class ExtractionView extends LitElement {
    <vaadin-grid id="shapesGrid" style="margin-right: 10%; align-self: stretch; margin-left: 10%; flex-grow: 0; margin-top: 2%;" is-attached multi-sort-priority="prepend"></vaadin-grid>
    <h5 id="propertyShapesGridInfo" style="margin-left: 10%; margin-bottom: 0%;">Heading 5</h5>
    <vaadin-grid id="propertyShapesGrid" style="align-self: stretch; margin-left: 10%; margin-right: 10%; flex-grow: 0;" is-attached multi-sort-priority="prepend"></vaadin-grid>
-   <vaadin-button theme="primary" id="downloadSelectedShapesButton" style="align-self: stretch; margin-left: 10%; margin-right: 10%;" tabindex="0">
+   <vaadin-button theme="secondary" id="downloadSelectedShapesButton" style="align-self: stretch; margin-left: 10%; margin-right: 10%;" tabindex="0">
     Download Selected Shapes
    </vaadin-button>
   </vaadin-vertical-layout>

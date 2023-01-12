@@ -61,6 +61,11 @@ export class IndexView extends LitElement {
   <vaadin-button theme="primary" id="graphEndpointButton" style="align-self: flex-start; margin-left: 25%;" tabindex="0">
     Connect 
   </vaadin-button>
+  <h6 style="margin-left: 25%;">Or, if you already have SHACL shapes, upload them here to analyze with SHACTOR</h6>
+  <vaadin-text-field label="Enter Shapes File URL (in .TTL format)" style="align-self: center; width: 50%; margin: var(--lumo-space-s); padding: var(--lumo-space-m);" type="text"></vaadin-text-field>
+  <vaadin-button theme="primary" style="margin-left: 25%;" tabindex="0">
+   Upload Shapes
+  </vaadin-button>
  </vaadin-vertical-layout>
  <vaadin-horizontal-layout class="footer" style="width: 100%; flex-basis: var(--lumo-size-l); flex-shrink: 0; background-color: var(--lumo-contrast-10pct);">
   <h6 style="align-self: center; margin: var(--lumo-space-l);">Credits: Kashif Rabbani, Matteo Lissandrini, Katja Hose</h6>

@@ -8,7 +8,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.*;
 import com.vaadin.flow.component.charts.model.style.SolidColor;
-import com.vaadin.flow.component.charts.themes.*;
 import com.vaadin.flow.component.charts.model.style.Style;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -36,11 +35,11 @@ import cs.qse.common.structure.NS;
 import cs.qse.common.structure.PS;
 import cs.qse.common.structure.ShaclOrListItem;
 import cs.qse.filebased.Parser;
+import shactor.utils.Colors;
 import shactor.utils.GraphExplorer;
 import shactor.utils.PruningUtil;
 import shactor.utils.Triple;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -51,7 +50,6 @@ import java.util.List;
 @Route("/extraction-view")
 public class ExtractionView extends LitTemplate {
     
-    private final PruningUtil pruningUtil = new PruningUtil();
     @Id("contentVerticalLayout")
     private VerticalLayout contentVerticalLayout;
     @Id("downloadShapesButton")
@@ -90,12 +88,10 @@ public class ExtractionView extends LitTemplate {
     @Id("shapesStatsByBothPieChart")
     private Chart shapesStatsByBothPieChart;
     
-    
+    private final PruningUtil pruningUtil = new PruningUtil();
     static Parser parser;
     String currNodeShape;
     GraphExplorer graphExplorer;
-
-    
     
     public ExtractionView() {
         setupKnowledgeGraphStatsChart();
@@ -127,12 +123,17 @@ public class ExtractionView extends LitTemplate {
                 List<NS> nodeShapes = parser.shapesExtractor.getNodeShapes();
                 
                 pruningUtil.applyPruningFlags(nodeShapes, support, confidence);
+                pruningUtil.getDefaultStats(nodeShapes);
+                pruningUtil.getStatsBySupport(nodeShapes);
+                pruningUtil.getStatsByConfidence(nodeShapes);
+                pruningUtil.getStatsByBoth(nodeShapes);
+                
                 parser.extractSHACLShapesWithPruning(SelectionView.isFilteredClasses, confidence, support, SelectionView.chosenClasses); // extract shapes with pruning
                 
-                setupPieChartsData(defaultShapesStatsPieChart, pruningUtil.getDefaultStats(nodeShapes), "Default Shapes Analysis");
-                setupPieChartsData(shapesStatsBySupportPieChart, pruningUtil.getStatsBySupport(nodeShapes), "Shapes Analysis by Support");
-                setupPieChartsData(shapesStatsByConfidencePieChart, pruningUtil.getStatsByConfidence(nodeShapes), "Shapes Analysis by Confidence");
-                setupPieChartsData(shapesStatsByBothPieChart, pruningUtil.getStatsByBoth(nodeShapes), "Shapes Analysis by Support and Confidence");
+                setupPieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault());
+                setupPieChart(shapesStatsBySupportPieChart, pruningUtil.getStatsBySupport(), support);
+                setupPieChart(shapesStatsByConfidencePieChart, pruningUtil.getStatsByConfidence(), confidence);
+                setupPieChart(shapesStatsByBothPieChart, pruningUtil.getStatsByBoth(), support, confidence);
                 
                 defaultShapesStatsPieChart.drawChart();
                 shapesStatsBySupportPieChart.drawChart();
@@ -164,7 +165,7 @@ public class ExtractionView extends LitTemplate {
         labels.setStyle(style);
         xAxis.setLabels(labels);
         conf.addxAxis(xAxis);
-    
+        
         YAxis yAxis = new YAxis();
         Labels labelsYaxis = new Labels();
         labelsYaxis.setStyle(style);
@@ -186,7 +187,7 @@ public class ExtractionView extends LitTemplate {
         dataLabels.setEnabled(true);
         
         PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
-        plotOptionsColumn.setColor(new SolidColor("#58508d"));
+        plotOptionsColumn.setColor(new SolidColor(Colors.LC_COLOR));
         Style styleFont = new Style();
         styleFont.setFontSize("16px");
         styleFont.setColor(new SolidColor("#041E42"));
@@ -195,19 +196,111 @@ public class ExtractionView extends LitTemplate {
         series.setPlotOptions(plotOptionsColumn);
         conf.addSeries(series);
         
-    
         
         knowledgeGraphStatsPieChart.drawChart();
     }
     
-    private void setupPieChartsData(Chart chart, HashMap<String, String> statsMap, String title) {
+    private void setupPieChartsDataWithDefaultStats(Chart chart, HashMap<String, String> statsMap) {
         Configuration conf = chart.getConfiguration();
-        conf.setTitle(title);
+        conf.setTitle("Default Shapes Analysis");
         DataSeries series = new DataSeries();
-        series.add(new DataSeriesItem("NS " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")), new SolidColor("#003f5c")));
-        series.add(new DataSeriesItem("PS " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")), new SolidColor("#58508d")));
-        series.add(new DataSeriesItem("Literal PSc " + statsMap.get("COUNT_LC"), Integer.parseInt(statsMap.get("COUNT_LC")), new SolidColor("#bc5090")));
-        series.add(new DataSeriesItem("Non-Literal PSc " + statsMap.get("COUNT_CC"), Integer.parseInt(statsMap.get("COUNT_CC")), new SolidColor("#ff6361")));
+        series.add(new DataSeriesItem("NS : " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")), new SolidColor(Colors.NS_COLOR)));
+        series.add(new DataSeriesItem("PS : " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")), new SolidColor(Colors.PS_COLOR)));
+        series.add(new DataSeriesItem("Literal PSc : " + statsMap.get("COUNT_LC"), Integer.parseInt(statsMap.get("COUNT_LC")), new SolidColor(Colors.LC_COLOR)));
+        series.add(new DataSeriesItem("Non-Literal PSc : " + statsMap.get("COUNT_CC"), Integer.parseInt(statsMap.get("COUNT_CC")), new SolidColor(Colors.CC_COLOR)));
+        conf.setSeries(series);
+        conf.getChart().setStyledMode(true);
+        PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
+        Style style = new Style();
+        style.setFontSize("12px");
+        plotOptionsPie.getDataLabels().setStyle(style);
+        series.setPlotOptions(plotOptionsPie);
+    }
+    
+    private void setupPieChart(Chart chart, HashMap<String, String> statsMap, Integer support) {
+        Configuration conf = chart.getConfiguration();
+        conf.setTitle("Shapes Analysis by Support");
+        DataSeries series = new DataSeries();
+        
+        int ns_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_NS")) - Integer.parseInt(statsMap.get("COUNT_NS"));
+        series.add(new DataSeriesItem("NS > " + support + " = " + ns_green, ns_green, new SolidColor(Colors.NS_COLOR)));
+        series.add(new DataSeriesItem("NS < " + support + " = " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")), new SolidColor(Colors.NS_COLOR_RED)));
+        
+        int ps_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_PS")) - Integer.parseInt(statsMap.get("COUNT_PS"));
+        series.add(new DataSeriesItem("PS > " + support + " = " + ps_green, ps_green, new SolidColor(Colors.PS_COLOR)));
+        series.add(new DataSeriesItem("PS < " + support + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")), new SolidColor(Colors.PS_COLOR_RED)));
+        
+        int literal_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_LC")) - Integer.parseInt(statsMap.get("COUNT_LC"));
+        series.add(new DataSeriesItem("Literal PSc > " + support + " = " + literal_green, literal_green, new SolidColor(Colors.LC_COLOR)));
+        series.add(new DataSeriesItem("Literal PSc < " + support + " = " + statsMap.get("COUNT_LC"), Integer.parseInt(statsMap.get("COUNT_LC")), new SolidColor(Colors.LC_COLOR_RED)));
+        
+        int nonLiteral_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_CC")) - Integer.parseInt(statsMap.get("COUNT_CC"));
+        series.add(new DataSeriesItem("Non-Literal PSc > " + support + " = " + nonLiteral_green, nonLiteral_green, new SolidColor(Colors.CC_COLOR)));
+        series.add(new DataSeriesItem("Non-Literal PSc < " + support + " = " + statsMap.get("COUNT_CC"), Integer.parseInt(statsMap.get("COUNT_CC")), new SolidColor(Colors.CC_COLOR_RED)));
+        
+        conf.setSeries(series);
+        conf.getChart().setStyledMode(true);
+        PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
+        Style style = new Style();
+        style.setFontSize("12px");
+        plotOptionsPie.getDataLabels().setStyle(style);
+        series.setPlotOptions(plotOptionsPie);
+    }
+    
+    private void setupPieChart(Chart chart, HashMap<String, String> statsMap, Double confidence) {
+        Configuration conf = chart.getConfiguration();
+        conf.setTitle("Shapes Analysis by Confidence");
+        DataSeries series = new DataSeries();
+        int c = (int) (confidence * 100);
+        String confPercent = c + "%";
+        int ns_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_NS")) - Integer.parseInt(statsMap.get("COUNT_NS"));
+        series.add(new DataSeriesItem("NS > " + confPercent + " = " + ns_green, ns_green, new SolidColor(Colors.NS_COLOR)));
+        series.add(new DataSeriesItem("NS < " + confPercent + " = " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")), new SolidColor(Colors.NS_COLOR_RED)));
+        
+        int ps_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_PS")) - Integer.parseInt(statsMap.get("COUNT_PS"));
+        series.add(new DataSeriesItem("PS > " + confPercent + " = " + ps_green, ps_green, new SolidColor(Colors.PS_COLOR)));
+        series.add(new DataSeriesItem("PS < " + confPercent + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")), new SolidColor(Colors.PS_COLOR_RED)));
+        
+        int literal_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_LC")) - Integer.parseInt(statsMap.get("COUNT_LC"));
+        series.add(new DataSeriesItem("Literal PSc > " + confPercent + " = " + literal_green, literal_green, new SolidColor(Colors.LC_COLOR)));
+        series.add(new DataSeriesItem("Literal PSc < " + confPercent + " = " + statsMap.get("COUNT_LC"), Integer.parseInt(statsMap.get("COUNT_LC")), new SolidColor(Colors.LC_COLOR_RED)));
+        
+        int nonLiteral_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_CC")) - Integer.parseInt(statsMap.get("COUNT_CC"));
+        series.add(new DataSeriesItem("Non-Literal PSc > " + confPercent + " = " + nonLiteral_green, nonLiteral_green, new SolidColor(Colors.CC_COLOR)));
+        series.add(new DataSeriesItem("Non-Literal PSc < " + confPercent + " = " + statsMap.get("COUNT_CC"), Integer.parseInt(statsMap.get("COUNT_CC")), new SolidColor(Colors.CC_COLOR_RED)));
+        
+        conf.setSeries(series);
+        conf.getChart().setStyledMode(true);
+        PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
+        Style style = new Style();
+        style.setFontSize("12px");
+        plotOptionsPie.getDataLabels().setStyle(style);
+        series.setPlotOptions(plotOptionsPie);
+    }
+    
+    private void setupPieChart(Chart chart, HashMap<String, String> statsMap, Integer support, Double confidence) {
+        Configuration conf = chart.getConfiguration();
+        conf.setTitle("Shapes Analysis by Support and Confidence");
+        DataSeries series = new DataSeries();
+        int c = (int) (confidence * 100);
+        String confPercent = c + "%";
+    
+        int ns_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_NS")) - Integer.parseInt(statsMap.get("COUNT_NS"));
+        series.add(new DataSeriesItem("NS > " + "(" + support + ", " + confPercent + ") " + " = " + ns_green, ns_green, new SolidColor(Colors.NS_COLOR)));
+        series.add(new DataSeriesItem("NS < " + "(" + support + ", " + confPercent + ") " + " = " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")), new SolidColor(Colors.NS_COLOR_RED)));
+    
+        int ps_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_PS")) - Integer.parseInt(statsMap.get("COUNT_PS"));
+        series.add(new DataSeriesItem("PS > " + "(" + support + ", " + confPercent + ") " + " = " + ps_green, ps_green, new SolidColor(Colors.PS_COLOR)));
+        series.add(new DataSeriesItem("PS < " + "(" + support + ", " + confPercent + ") " + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")), new SolidColor(Colors.PS_COLOR_RED)));
+    
+        int literal_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_LC")) - Integer.parseInt(statsMap.get("COUNT_LC"));
+        series.add(new DataSeriesItem("Literal PSc > " + "(" + support + ", " + confPercent + ") " + " = " + literal_green, literal_green, new SolidColor(Colors.LC_COLOR)));
+        series.add(new DataSeriesItem("Literal PSc < " + "(" + support + ", " + confPercent + ") " + " = " + statsMap.get("COUNT_LC"), Integer.parseInt(statsMap.get("COUNT_LC")), new SolidColor(Colors.LC_COLOR_RED)));
+    
+        int nonLiteral_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_CC")) - Integer.parseInt(statsMap.get("COUNT_CC"));
+        series.add(new DataSeriesItem("Non-Literal PSc > " + "(" + support + ", " + confPercent + ") " + " = " + nonLiteral_green, nonLiteral_green, new SolidColor(Colors.CC_COLOR)));
+        series.add(new DataSeriesItem("Non-Literal PSc < " + "(" + support + ", " + confPercent + ") " + " = " + statsMap.get("COUNT_CC"), Integer.parseInt(statsMap.get("COUNT_CC")), new SolidColor(Colors.CC_COLOR_RED)));
+    
         conf.setSeries(series);
         conf.getChart().setStyledMode(true);
         PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
@@ -246,7 +339,7 @@ public class ExtractionView extends LitTemplate {
             progressBar.setId("quality-indicator-progress-bar");
             //double psCountGreen = ns.getCountPropertyShapes() - ns.getCountPsWithPruneFlag();
             //progressBar.setValue(psCountGreen / ns.getCountPropertyShapes());
-            double psCountGreen =  ns.getCountPropertyShapes()  - ns.getCountPsWithSupportPruneFlag();
+            double psCountGreen = ns.getCountPropertyShapes() - ns.getCountPsWithSupportPruneFlag();
             System.out.println(ns.getLocalNameFromIri());
             System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithSupportPruneFlag() + " = " + psCountGreen);
             System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
@@ -254,14 +347,13 @@ public class ExtractionView extends LitTemplate {
         })).setHeader(setHeaderWithInfoLogo(
                 "Quality Indicator for PS (by Support)",
                 "This shows quality of NS in terms of PS left after pruning (green) and removed by pruning (red) provided user's support and confidence thresholds.")).setResizable(true).setAutoWidth(true).setFlexGrow(0);
-    
-    
-    
+        
+        
         shapesGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ns) -> {
             progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
             progressBar.setId("quality-indicator-progress-bar");
-            double psCountGreen =  ns.getCountPropertyShapes()  - ns.getCountPsWithConfidencePruneFlag();
-    
+            double psCountGreen = ns.getCountPropertyShapes() - ns.getCountPsWithConfidencePruneFlag();
+            
             System.out.println(ns.getLocalNameFromIri());
             System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithConfidencePruneFlag() + " = " + psCountGreen);
             System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
@@ -270,9 +362,8 @@ public class ExtractionView extends LitTemplate {
         })).setHeader(setHeaderWithInfoLogo(
                 "Quality Indicator for PS (by Confidence)",
                 "This shows quality of NS in terms of PS left after pruning (green) and removed by pruning (red) provided user's support and confidence thresholds.")).setResizable(true).setAutoWidth(true).setFlexGrow(0);
-    
-    
-    
+        
+        
         shapesGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ns) -> {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
             button.addClickListener(e -> this.setupPropertyShapesGrid(ns));
@@ -286,9 +377,9 @@ public class ExtractionView extends LitTemplate {
         });
         
         shapesGrid.setItems(nodeShapes);
-    
+        
         shapesGrid.addSelectionListener(selection -> {
-           System.out.printf("Number of selected classes: %s%n", selection.getAllSelectedItems().size());
+            System.out.printf("Number of selected classes: %s%n", selection.getAllSelectedItems().size());
             downloadSelectedShapesButton.setVisible(true);
         });
     }
@@ -303,6 +394,7 @@ public class ExtractionView extends LitTemplate {
         propertyShapesGrid.removeAllColumns();
         propertyShapesGrid.setVisible(true);
         
+        propertyShapesGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         propertyShapesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES); //LUMO_COMPACT
         propertyShapesGrid.addColumn(PS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>Property Shape</div>")).setResizable(true).setAutoWidth(true).setFlexGrow(0).setComparator(PS::getPruneFlag);
         propertyShapesGrid.addColumn(PS::getPath).setHeader("Property Path");
@@ -379,7 +471,6 @@ public class ExtractionView extends LitTemplate {
         dialog.setDraggable(true);
         dialog.open();
     }
-    
     
     private String extractSparqlQuery(NS ns, PS ps) {
         String selectQuery = """

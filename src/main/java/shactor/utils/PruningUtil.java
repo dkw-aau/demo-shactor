@@ -11,15 +11,36 @@ import java.util.List;
 public class PruningUtil implements Serializable {
     public PruningUtil() {}
     
-    public HashMap<String, String>  getStatsBySupport(List<NS> nodeShapes) {
-        HashMap<String, String> statsMap = new HashMap<String, String>();
+    HashMap<String, String> statsBySupport;
+    HashMap<String, String> statsByConfidence;
+    HashMap<String, String> statsByBoth;
+    HashMap<String, String> statsDefault;
+    
+    public HashMap<String, String> getStatsBySupport() {
+        return statsBySupport;
+    }
+    
+    public HashMap<String, String> getStatsByConfidence() {
+        return statsByConfidence;
+    }
+    
+    public HashMap<String, String> getStatsByBoth() {
+        return statsByBoth;
+    }
+    
+    public HashMap<String, String> getStatsDefault() {
+        return statsDefault;
+    }
+    
+    public void getStatsBySupport(List<NS> nodeShapes) {
+        statsBySupport = new HashMap<>();
         int countNs = 0;
         int countPs = 0;
         int literalCount = 0;
         int nonLiteralCount = 0;
         
         for (NS ns : nodeShapes) {
-            countPs += ns.getCountPscWithSupportPruneFlag() + ns.getCountPsWithSupportPruneFlag();
+            countPs += ns.getCountPsWithSupportPruneFlag();
             if (ns.getPruneFlag()) {
                 countNs++;
             }
@@ -37,17 +58,16 @@ public class PruningUtil implements Serializable {
                 }
             }
         }
+    
+        statsBySupport.put("COUNT_NS", String.valueOf(countNs));
+        statsBySupport.put("COUNT_PS", String.valueOf(countPs));
+        statsBySupport.put("COUNT_LC", String.valueOf(literalCount));
+        statsBySupport.put("COUNT_CC", String.valueOf(nonLiteralCount));
         
-        statsMap.put("COUNT_NS", String.valueOf(countNs));
-        statsMap.put("COUNT_PS", String.valueOf(countPs));
-        statsMap.put("COUNT_LC", String.valueOf(literalCount));
-        statsMap.put("COUNT_CC", String.valueOf(nonLiteralCount));
-        
-        return statsMap;
     }
     
-    public HashMap<String, String>  getStatsByConfidence(List<NS> nodeShapes) {
-        HashMap<String, String> statsMap = new HashMap<>();
+    public void   getStatsByConfidence(List<NS> nodeShapes) {
+        statsByConfidence = new HashMap<>();
         int countNs = 0;
         int countPs = 0;
         
@@ -55,7 +75,7 @@ public class PruningUtil implements Serializable {
         int nonLiteralCount = 0;
         
         for (NS ns : nodeShapes) {
-            countPs += ns.getCountPscWithConfidencePruneFlag() + ns.getCountPsWithConfidencePruneFlag();
+            countPs += ns.getCountPsWithConfidencePruneFlag();
             if (ns.getPruneFlag()) {
                 countNs++;
             }
@@ -73,16 +93,15 @@ public class PruningUtil implements Serializable {
                 }
             }
         }
-        
-        statsMap.put("COUNT_NS", String.valueOf(countNs));
-        statsMap.put("COUNT_PS", String.valueOf(countPs));
-        statsMap.put("COUNT_LC", String.valueOf(literalCount));
-        statsMap.put("COUNT_CC", String.valueOf(nonLiteralCount));
-        return statsMap;
+    
+        statsByConfidence.put("COUNT_NS", String.valueOf(countNs));
+        statsByConfidence.put("COUNT_PS", String.valueOf(countPs));
+        statsByConfidence.put("COUNT_LC", String.valueOf(literalCount));
+        statsByConfidence.put("COUNT_CC", String.valueOf(nonLiteralCount));
     }
     
-    public HashMap<String, String>  getStatsByBoth(List<NS> nodeShapes) {
-        HashMap<String, String> statsMap = new HashMap<>();
+    public void  getStatsByBoth(List<NS> nodeShapes) {
+        statsByBoth = new HashMap<>();
         int countNs = 0;
         int countPs = 0;
         
@@ -90,7 +109,7 @@ public class PruningUtil implements Serializable {
         int nonLiteralCount = 0;
         
         for (NS ns : nodeShapes) {
-            countPs += ns.getCountPscWithPruneFlag() + ns.getCountPsWithPruneFlag();
+            countPs +=  ns.getCountPsWithPruneFlag();
             if (ns.getPruneFlag()) {
                 countNs++;
             }
@@ -108,16 +127,16 @@ public class PruningUtil implements Serializable {
                 }
             }
         }
-        
-        statsMap.put("COUNT_NS", String.valueOf(countNs));
-        statsMap.put("COUNT_PS", String.valueOf(countPs));
-        statsMap.put("COUNT_LC", String.valueOf(literalCount));
-        statsMap.put("COUNT_CC", String.valueOf(nonLiteralCount));
-        return statsMap;
+    
+        statsByBoth.put("COUNT_NS", String.valueOf(countNs));
+        statsByBoth.put("COUNT_PS", String.valueOf(countPs));
+        statsByBoth.put("COUNT_LC", String.valueOf(literalCount));
+        statsByBoth.put("COUNT_CC", String.valueOf(nonLiteralCount));
+
     }
     
-    public HashMap<String, String>  getDefaultStats(List<NS> nodeShapes) {
-        HashMap<String, String> statsMap = new HashMap<>();
+    public void  getDefaultStats(List<NS> nodeShapes) {
+        statsDefault = new HashMap<>();
         int countNs = nodeShapes.size();
         int countPs = 0;
         
@@ -140,13 +159,12 @@ public class PruningUtil implements Serializable {
                 }
             }
         }
+    
+        statsDefault.put("COUNT_NS", String.valueOf(countNs));
+        statsDefault.put("COUNT_PS", String.valueOf(countPs));
+        statsDefault.put("COUNT_LC", String.valueOf(literalCount));
+        statsDefault.put("COUNT_CC", String.valueOf(nonLiteralCount));
         
-        statsMap.put("COUNT_NS", String.valueOf(countNs));
-        statsMap.put("COUNT_PS", String.valueOf(countPs));
-        statsMap.put("COUNT_LC", String.valueOf(literalCount));
-        statsMap.put("COUNT_CC", String.valueOf(nonLiteralCount));
-        
-        return statsMap;
     }
     
     public void applyPruningFlags(List<NS> nodeShapes, Integer support, Double confidence) {
