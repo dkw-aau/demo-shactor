@@ -57,10 +57,10 @@ export class ExtractionView extends LitElement {
     <vaadin-chart type="column" tooltip="" id="knowledgeGraphStatsPieChart" style="flex-grow: 0; flex-shrink: 0; width: 35%; align-self: baseline;" additional-options=""></vaadin-chart>
    </vaadin-horizontal-layout>
    <vaadin-horizontal-layout style="align-self: stretch; margin-left: 5%; margin-right: 5%; flex-shrink: 1; flex-grow: 1; margin-bottom: 0%; align-items: stretch; flex-wrap: nowrap;" theme="spacing">
-    <vaadin-chart type="pie" tooltip="" id="defaultShapesStatsPieChart" style="align-self: center; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
-    <vaadin-chart type="pie" tooltip="" id="shapesStatsBySupportPieChart" style="align-self: center; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
-    <vaadin-chart type="pie" tooltip="" id="shapesStatsByConfidencePieChart" style="align-self: center; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
-    <vaadin-chart type="pie" tooltip="" id="shapesStatsByBothPieChart" style="align-self: center; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
+    <vaadin-chart type="pie" tooltip="" id="defaultShapesStatsPieChart" style="align-self: stretch; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
+    <vaadin-chart type="pie" tooltip="" id="shapesStatsBySupportPieChart" style="align-self: stretch; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
+    <vaadin-chart type="pie" tooltip="" id="shapesStatsByConfidencePieChart" style="align-self: stretch; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
+    <vaadin-chart type="pie" tooltip="" id="shapesStatsByBothPieChart" style="align-self: stretch; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
    </vaadin-horizontal-layout>
    <vaadin-grid id="shapesGrid" style="margin-right: 10%; align-self: stretch; margin-left: 10%; flex-grow: 0; margin-top: 2%;" is-attached multi-sort-priority="prepend"></vaadin-grid>
    <h5 id="propertyShapesGridInfo" style="margin-left: 10%; margin-bottom: 0%;">Heading 5</h5>
