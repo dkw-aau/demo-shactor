@@ -212,7 +212,7 @@ public class ExtractionView extends LitTemplate {
         conf.getChart().setStyledMode(true);
         PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
         Style style = new Style();
-        style.setFontSize("16px");
+        style.setFontSize("12px");
         plotOptionsPie.getDataLabels().setStyle(style);
         series.setPlotOptions(plotOptionsPie);
     }
