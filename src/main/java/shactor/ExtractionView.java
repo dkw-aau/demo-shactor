@@ -164,6 +164,14 @@ public class ExtractionView extends LitTemplate {
         labels.setStyle(style);
         xAxis.setLabels(labels);
         conf.addxAxis(xAxis);
+    
+        YAxis yAxis = new YAxis();
+        Labels labelsYaxis = new Labels();
+        labelsYaxis.setStyle(style);
+        yAxis.setLabels(labelsYaxis);
+        yAxis.setTitle("Count");
+        yAxis.getTitle().setStyle(style);
+        conf.addyAxis(yAxis);
         
         Legend legend = new Legend();
         legend.setEnabled(false);
@@ -186,9 +194,8 @@ public class ExtractionView extends LitTemplate {
         plotOptionsColumn.setDataLabels(dataLabels);
         series.setPlotOptions(plotOptionsColumn);
         conf.addSeries(series);
-        YAxis y = new YAxis();
-        y.setTitle("Count");
-        conf.addyAxis(y);
+        
+    
         
         knowledgeGraphStatsPieChart.drawChart();
     }
@@ -238,13 +245,14 @@ public class ExtractionView extends LitTemplate {
             progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
             progressBar.setId("quality-indicator-progress-bar");
             //double psCountGreen = ns.getCountPropertyShapes() - ns.getCountPsWithPruneFlag();
-            //System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithPruneFlag() + " = " + psCountGreen);
-            //System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
             //progressBar.setValue(psCountGreen / ns.getCountPropertyShapes());
             double psCountGreen =  ns.getCountPropertyShapes()  - ns.getCountPsWithSupportPruneFlag();
+            System.out.println(ns.getLocalNameFromIri());
+            System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithSupportPruneFlag() + " = " + psCountGreen);
+            System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
             progressBar.setValue(psCountGreen / ns.getCountPropertyShapes());
         })).setHeader(setHeaderWithInfoLogo(
-                "Quality Indicator in terms of PS (by Support)",
+                "Quality Indicator for PS (by Support)",
                 "This shows quality of NS in terms of PS left after pruning (green) and removed by pruning (red) provided user's support and confidence thresholds.")).setResizable(true).setAutoWidth(true).setFlexGrow(0);
     
     
@@ -252,10 +260,15 @@ public class ExtractionView extends LitTemplate {
         shapesGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ns) -> {
             progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
             progressBar.setId("quality-indicator-progress-bar");
-            double psCountGreen =  ns.getCountPropertyShapes()  - ns.getCountPscWithConfidencePruneFlag();
+            double psCountGreen =  ns.getCountPropertyShapes()  - ns.getCountPsWithConfidencePruneFlag();
+    
+            System.out.println(ns.getLocalNameFromIri());
+            System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithConfidencePruneFlag() + " = " + psCountGreen);
+            System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
+            
             progressBar.setValue(psCountGreen / ns.getCountPropertyShapes());
         })).setHeader(setHeaderWithInfoLogo(
-                "Quality Indicator in terms of PS (by Confidence)",
+                "Quality Indicator for PS (by Confidence)",
                 "This shows quality of NS in terms of PS left after pruning (green) and removed by pruning (red) provided user's support and confidence thresholds.")).setResizable(true).setAutoWidth(true).setFlexGrow(0);
     
     
