@@ -154,10 +154,10 @@ public class ExtractionView extends LitTemplate {
         conf.getChart().setType(ChartType.COLUMN);
         
         XAxis xAxis = new XAxis();
-        xAxis.setCategories("Triples", "Literals", "Objects", "Subjects", "Entities", "Properties", "Classes");
+        xAxis.setCategories("Triples", "Objects", "Literals", "Subjects", "Entities", "Properties", "Classes");
         
         Labels labels = new Labels();
-        labels.setRotation(-45);
+        //labels.setRotation(-45);
         labels.setAlign(HorizontalAlign.CENTER);
         Style style = new Style();
         style.setFontSize("16px");
@@ -177,12 +177,11 @@ public class ExtractionView extends LitTemplate {
         Legend legend = new Legend();
         legend.setEnabled(false);
         conf.setLegend(legend);
-        
         //Tooltip tooltip = new Tooltip();
         //tooltip.setFormatter("'<b>'+ this.x +'</b><br/>'+'Population in 2008: '" + "+ Highcharts.numberFormat(this.y, 1) +' millions'");
         //conf.setTooltip(tooltip);
         
-        ListSeries series = new ListSeries("Data", 52000000, 28000000, 19000000, 15000000, 5000000, 1323, 427);
+        ListSeries series = new ListSeries("Data", 52281114, 19357319, 15269876, 15141546, 5823566, 1323, 427);
         DataLabels dataLabels = new DataLabels();
         dataLabels.setEnabled(true);
         
@@ -397,9 +396,12 @@ public class ExtractionView extends LitTemplate {
         propertyShapesGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         propertyShapesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES); //LUMO_COMPACT
         propertyShapesGrid.addColumn(PS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>Property Shape</div>")).setResizable(true).setAutoWidth(true).setFlexGrow(0).setComparator(PS::getPruneFlag);
-        propertyShapesGrid.addColumn(PS::getPath).setHeader("Property Path");
+        propertyShapesGrid.addColumn(PS::getPath).setHeader("Property Path").setResizable(true).setAutoWidth(true).setFlexGrow(0);;
         propertyShapesGrid.addColumn(PS::getSupport).setHeader("Support").setResizable(true).setAutoWidth(true).setFlexGrow(0).setSortable(true);
         propertyShapesGrid.addColumn(PS::getConfidenceInPercentage).setHeader("Confidence").setResizable(true).setAutoWidth(true).setFlexGrow(0).setComparator(PS::getConfidence);
+    
+        propertyShapesGrid.addColumn(PS::getNodeKind).setHeader("NodeKind");
+        propertyShapesGrid.addColumn(PS::getDataTypeOrClass).setHeader("Data Type or Class");
         
         propertyShapesGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ps) -> {
             progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
@@ -454,8 +456,7 @@ public class ExtractionView extends LitTemplate {
         
         propertyShapesGrid.setItems(ns.getPropertyShapes());
         
-        //propertyShapesGrid.addColumn(PS::getNodeKind).setHeader("NodeKind");
-        //propertyShapesGrid.addColumn(PS::getDataTypeOrClass).setHeader("Data Type or Class");
+  
     }
     
     private void generateQueryForPropertyShape(NS ns, PS ps) {
@@ -483,6 +484,7 @@ public class ExtractionView extends LitTemplate {
         String constructQuery = """
                 CONSTRUCT WHERE { \s
                 \t ?s a <CLASS> . \s
+                \t  ?s a ?types. \s
                 \t ?s <PROPERTY> ?o . \s
                 } \s
                 """;
@@ -496,6 +498,29 @@ public class ExtractionView extends LitTemplate {
     
     private void queryGraph(String query) {
         List<Triple> tripleList = graphExplorer.runQuery(query);
+        for (Triple triple : tripleList) {
+            if(triple.getPredicate().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")){
+                triple.setPredicate("rdf:type");
+            }
+            if(triple.getPredicate().contains("http://dbpedia.org/ontology/")){
+                triple.setPredicate(triple.getPredicate().replace("http://dbpedia.org/ontology/", "dbo:"));
+            }
+    
+            if(triple.getObject().contains("http://dbpedia.org/ontology/")){
+                triple.setObject(triple.getObject().replace("http://dbpedia.org/ontology/", "dbo:"));
+            }
+            
+            if(triple.getSubject().contains("http://dbpedia.org/resource/")){
+                triple.setSubject(triple.getSubject().replace("http://dbpedia.org/resource/", "dbr:"));
+            }
+            if(triple.getObject().contains("http://dbpedia.org/resource/")){
+                triple.setObject(triple.getObject().replace("http://dbpedia.org/resource/", "dbr:"));
+            }
+            
+            if(triple.getObject().contains("http://www.w3.org/2002/07/owl#")){
+                triple.setObject(triple.getObject().replace("http://www.w3.org/2002/07/owl#", "owl:"));
+            }
+        }
         createDialogueToShowTriples(tripleList);
     }
     
