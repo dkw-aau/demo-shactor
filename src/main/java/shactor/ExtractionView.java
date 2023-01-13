@@ -400,8 +400,8 @@ public class ExtractionView extends LitTemplate {
         propertyShapesGrid.addColumn(PS::getSupport).setHeader("Support").setResizable(true).setAutoWidth(true).setFlexGrow(0).setSortable(true);
         propertyShapesGrid.addColumn(PS::getConfidenceInPercentage).setHeader("Confidence").setResizable(true).setAutoWidth(true).setFlexGrow(0).setComparator(PS::getConfidence);
     
-        propertyShapesGrid.addColumn(PS::getNodeKind).setHeader("NodeKind");
-        propertyShapesGrid.addColumn(PS::getDataTypeOrClass).setHeader("Data Type or Class");
+        //propertyShapesGrid.addColumn(PS::getNodeKind).setHeader("NodeKind");
+        //propertyShapesGrid.addColumn(PS::getDataTypeOrClass).setHeader("Data Type or Class");
         
         propertyShapesGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ps) -> {
             progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
