@@ -158,7 +158,7 @@ public class ExtractionView extends LitTemplate {
         
         Labels labels = new Labels();
         labels.setRotation(-45);
-        labels.setAlign(HorizontalAlign.RIGHT);
+        labels.setAlign(HorizontalAlign.CENTER);
         Style style = new Style();
         style.setFontSize("16px");
         style.setColor(new SolidColor("#041E42"));
@@ -212,7 +212,7 @@ public class ExtractionView extends LitTemplate {
         conf.getChart().setStyledMode(true);
         PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
         Style style = new Style();
-        style.setFontSize("12px");
+        style.setFontSize("16px");
         plotOptionsPie.getDataLabels().setStyle(style);
         series.setPlotOptions(plotOptionsPie);
     }
@@ -242,7 +242,7 @@ public class ExtractionView extends LitTemplate {
         conf.getChart().setStyledMode(true);
         PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
         Style style = new Style();
-        style.setFontSize("12px");
+        style.setFontSize("16px");
         plotOptionsPie.getDataLabels().setStyle(style);
         series.setPlotOptions(plotOptionsPie);
     }
@@ -253,9 +253,9 @@ public class ExtractionView extends LitTemplate {
         DataSeries series = new DataSeries();
         int c = (int) (confidence * 100);
         String confPercent = c + "%";
-        int ns_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_NS")) - Integer.parseInt(statsMap.get("COUNT_NS"));
-        series.add(new DataSeriesItem("NS > " + confPercent + " = " + ns_green, ns_green, new SolidColor(Colors.NS_COLOR)));
-        series.add(new DataSeriesItem("NS < " + confPercent + " = " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")), new SolidColor(Colors.NS_COLOR_RED)));
+        //int ns_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_NS")) - Integer.parseInt(statsMap.get("COUNT_NS"));
+        //series.add(new DataSeriesItem("NS > " + confPercent + " = " + ns_green, ns_green, new SolidColor(Colors.NS_COLOR)));
+        //series.add(new DataSeriesItem("NS < " + confPercent + " = " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")), new SolidColor(Colors.NS_COLOR_RED)));
         
         int ps_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_PS")) - Integer.parseInt(statsMap.get("COUNT_PS"));
         series.add(new DataSeriesItem("PS > " + confPercent + " = " + ps_green, ps_green, new SolidColor(Colors.PS_COLOR)));
@@ -273,7 +273,7 @@ public class ExtractionView extends LitTemplate {
         conf.getChart().setStyledMode(true);
         PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
         Style style = new Style();
-        style.setFontSize("12px");
+        style.setFontSize("16px");
         plotOptionsPie.getDataLabels().setStyle(style);
         series.setPlotOptions(plotOptionsPie);
     }
@@ -305,7 +305,7 @@ public class ExtractionView extends LitTemplate {
         conf.getChart().setStyledMode(true);
         PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
         Style style = new Style();
-        style.setFontSize("12px");
+        style.setFontSize("16px");
         plotOptionsPie.getDataLabels().setStyle(style);
         series.setPlotOptions(plotOptionsPie);
     }
@@ -419,7 +419,7 @@ public class ExtractionView extends LitTemplate {
                 assert item != null;
                 progressBar.setValue(item.getConfidence());
             }
-        })).setHeader(setHeaderWithInfoLogo("Quality Indicator (by Confidence)", " This shows"));
+        })).setHeader(setHeaderWithInfoLogo("Quality Indicator (by Confidence)", " This shows")).setResizable(true).setAutoWidth(true).setFlexGrow(0);
         
         
         propertyShapesGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ps) -> {
