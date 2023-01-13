@@ -33,7 +33,7 @@ export class ExtractionView extends LitElement {
      <p style="align-self: flex-start; margin-top: 0%;">SHACTOR has extracted SHACL shapes for the chosen classes. You have the following options:</p>
      <vaadin-horizontal-layout style="align-self: stretch;">
       <vaadin-button id="downloadShapesButton" style="margin-right: var(--lumo-space-l);" tabindex="0">
-        Download SHACL Shapes 
+       Download All Shapes
       </vaadin-button>
       <vaadin-button tabindex="0" id="readShapesStatsButton" style="margin-right: var(--lumo-space-l);">
         Read Shapes Statistics 
