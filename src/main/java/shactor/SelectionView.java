@@ -1,12 +1,15 @@
 package shactor;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -17,18 +20,21 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.template.Id;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import cs.Main;
 import cs.qse.filebased.Parser;
 import org.apache.commons.io.FileUtils;
 import shactor.utils.Type;
+import shactor.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
@@ -50,36 +56,36 @@ public class SelectionView extends LitTemplate {
     private Grid<Type> vaadinGrid;
     @Id("searchField")
     private TextField searchField;
-    @Id("startShapesExtractionButton")
-    private Button startShapesExtractionButton;
+    @Id("footerLeftImage")
+    private Image footerLeftImage;
+    @Id("footerRightImage")
+    private Image footerRightImage;
+    @Id("graphStatsCheckBox")
+    private Checkbox graphStatsCheckBox;
     
     public static List<String> chosenClasses;
     public static Boolean isFilteredClasses = false;
     public static HashMap<String, String> defaultShapesModelStats;
+
     
     public SelectionView() {
+        Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
         graphInfo.setVisible(false);
-        completeShapesExtractionButton.setVisible(false);
+        completeShapesExtractionButton.setEnabled(false);
         searchField.setVisible(false);
         vaadinGrid.setVisible(false);
         
-        startShapesExtractionButton.addClickListener(buttonClickEvent -> {
-            beginParsing();
-            setGraphInfo();
-            notify("Graph Parsed Successfully!", NotificationVariant.LUMO_SUCCESS, Notification.Position.TOP_CENTER);
-            setupGridInMultiSelectionMode();
-            searchField.setVisible(true);
-        });
+        //startShapesExtractionButton.addClickListener(buttonClickEvent -> {
+        beginParsing();
+        setGraphInfo();
+        Utils.notify("Graph Parsed Successfully!", NotificationVariant.LUMO_SUCCESS, Notification.Position.TOP_CENTER);
+        setupGridInMultiSelectionMode();
+        searchField.setVisible(true);
+        //});
         
         completeShapesExtractionButton.addClickListener(buttonClickEvent -> {
             completeShapesExtraction();
         });
-    }
-    
-    private static void notify(String message, NotificationVariant notificationVariant, Notification.Position position) {
-        Notification notification = Notification.show(message);
-        notification.addThemeVariants(notificationVariant);
-        notification.setPosition(position);
     }
     
     private static void beginParsing() {
@@ -123,8 +129,8 @@ public class SelectionView extends LitTemplate {
         //vaadinGrid = new Grid<>(Type.class, false); do not initialize again if you have added it from the designer.
         vaadinGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         //vaadinGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        vaadinGrid.addColumn(Type::getName).setHeader("Class").setSortable(true);
-        vaadinGrid.addColumn(Type::getInstanceCount).setHeader("Class Instance Count").setSortable(true);
+        vaadinGrid.addColumn(Type::getName).setHeader(new Html("<div style='font-weight: bold;'>Class IRI</div>")).setSortable(true);
+        vaadinGrid.addColumn(Type::getInstanceCount).setHeader(new Html("<div style='font-weight: bold;'>Clas Instance Count</div>")).setSortable(true);
         
         List<Type> classes = getClasses();
         vaadinGrid.setItems(classes);
@@ -158,7 +164,7 @@ public class SelectionView extends LitTemplate {
                     chosenClasses.add(item.getName());
                 });
             }
-            completeShapesExtractionButton.setVisible(selection.getAllSelectedItems().size() > 0);
+            completeShapesExtractionButton.setEnabled(selection.getAllSelectedItems().size() > 0);
         });
         
     }
@@ -173,6 +179,7 @@ public class SelectionView extends LitTemplate {
             t.setInstanceCount(v);
             types.add(t);
         });
+        types.sort((d1, d2) -> d2.getInstanceCount() - d1.getInstanceCount());
         return types;
     }
     
@@ -201,6 +208,7 @@ public class SelectionView extends LitTemplate {
             parser.extractSHACLShapes(false, chosenClasses);
             defaultShapesModelStats = parser.shapesExtractor.getCurrentShapesModelStats();
         }
+        Utils.notifyMessage(graphStatsCheckBox.getValue().toString());
         completeShapesExtractionButton.getUI().ifPresent(ui -> ui.navigate("extraction-view"));
     }
     

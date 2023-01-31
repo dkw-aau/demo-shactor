@@ -1,10 +1,11 @@
 import {LitElement, html, css, customElement} from 'lit-element';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-vertical-layout.js';
-import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/grid/src/vaadin-grid.js';
 import '@vaadin/text-field/src/vaadin-text-field.js';
-import '@polymer/iron-icon/iron-icon.js';
 import '@vaadin/button/src/vaadin-button.js';
+import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
+import '@polymer/iron-icon/iron-icon.js';
+import '@vaadin/checkbox/src/vaadin-checkbox.js';
 
 @customElement('selection-view')
 export class SelectionView extends LitElement {
@@ -24,26 +25,36 @@ export class SelectionView extends LitElement {
   <h3 id="title" style="align-self: center; flex-grow: 1; padding: var(--lumo-space-s); flex-shrink: 1; text-align:center">SHACTOR : SHapes ExtrACTOR from very large Knowledge Graphs</h3>
  </vaadin-horizontal-layout>
  <vaadin-vertical-layout class="content" style="width: 100%; flex-grow: 1; flex-shrink: 1; flex-basis: auto;" id="contentVerticalLayout">
-  <h4 style="align-self: center; width: 80%; margin-bottom: 0%;">About:</h4>
-  <p style="margin-right: 10%; margin-left: 10%; align-self: stretch;">SHACTOR is a framework for extracting quality SHACL shapes from very large Knowledge Graphs (KGs), analyzing them to find spurious shapes constraints, and finding erroneous triples in the KG. The SHACL shapes represent prominent data patterns within KG but are likely to contain some spurious constraints extracted due to the presence of erroneous data in the KG. Given a KG having millions of triples and thousands of classes, SHACTOR parses the KG using our efficient and scalable shapes extraction algorithm and outputs SHACL shapes constraints. Further, it uses the concepts of support and confidence to prune the spurious shape constraints. You can use SHACTOR to extract, analyze, and clean SHACL shape constraints from very large KGs, it helps you find and correct errors in the KG by automatically generating SPARQL queries for your KG.</p>
-  <p style="margin-right: 10%; margin-left: 10%; align-self: stretch;">SHACTOR will take you through different steps of shapes extraction and show information about the graph. Please begin by starting the process of shapes extraction:</p>
-  <vaadin-button id="startShapesExtractionButton" style="align-self: stretch; margin-left: 10%; margin-right: 10%;" tabindex="0">
-    Start Shapes Extraction 
-  </vaadin-button>
+  <h4 style="align-self: center; width: 80%; margin-bottom: 0%;">SHACTOR (Step 2/3)</h4>
+  <p style="margin-right: 10%; margin-left: 10%; align-self: stretch;">SHACTOR will take you through different steps of shapes extraction and show information about each step. Here you can see the information about first phase:</p>
   <h5 id="graphInfo" style="align-self: center; width: 80%;">graphInfo</h5>
-  <vaadin-text-field placeholder="Filter Classes" id="searchField" style="width: 80%; align-self: flex-start; margin-left: 10%;" type="text">
+  <vaadin-text-field placeholder="Search Class Names" id="searchField" style="width: 80%; align-self: flex-start; margin-left: 10%;" type="text">
    <iron-icon icon="lumo:search" slot="prefix"></iron-icon>
   </vaadin-text-field>
+  <h6 style="align-self: center; width: 80%;">Table showing classes along with instance count of each class extracted in the first phase of shapes extraction.</h6>
   <vaadin-grid id="vaadinGrid" style="width: 80%; align-self: center; flex-grow: 0;" is-attached multi-sort-priority="prepend"></vaadin-grid>
-  <vaadin-button theme="secondary" id="completeShapesExtractionButton" style="align-self: stretch; margin-left: 10%; margin-right: 10%;" tabindex="0">
-    Complete Shapes Extraction 
+  <vaadin-checkbox id="graphStatsCheckBox" style="width: 80%; align-self: center;" type="checkbox" value="on">
+   Compute statistics of the graph? (It can take a bit longer)
+  </vaadin-checkbox>
+  <vaadin-button theme="primary" id="completeShapesExtractionButton" style="align-self: flex-start; margin-left: 10%; margin-right: 10%; flex-grow: 1;" tabindex="0">
+   Go to Next Step
   </vaadin-button>
   <br>
+  <br>
  </vaadin-vertical-layout>
- <vaadin-horizontal-layout class="footer" style="width: 100%; flex-basis: var(--lumo-size-l); flex-shrink: 0; background-color: var(--lumo-contrast-10pct);">
-  <h6 style="align-self: center; margin: var(--lumo-space-l);">Credits: Kashif Rabbani, Matteo Lissandrini, Katja Hose</h6>
-  <h6 id="footer_credits_uni" style="align-self: center; margin: var(--lumo-space-l); flex-grow: 1; padding: var(--lumo-space-m);"> Aalborg University, Denmark</h6>
- </vaadin-horizontal-layout>
+ <vaadin-vertical-layout theme="spacing" style="width: 100%; height: 100%;">
+  <div id="footer" style="flex-grow: 0; align-self: stretch; flex-shrink: 0;">
+   <div id="footerImageLeftDiv">
+    <img id="footerLeftImage">
+   </div>
+   <div id="footerAboutDiv">
+    <p id="footerAboutParagraph">Authors: Kashif Rabbani, Matteo Lissandrini, and Katja Hose</p>
+   </div>
+   <div id="footerImageRightDiv">
+    <img id="footerRightImage">
+   </div>
+  </div>
+ </vaadin-vertical-layout>
 </vaadin-vertical-layout>
 `;
     }
