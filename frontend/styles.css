@@ -20,3 +20,50 @@
     background-color: #fa7575;
     height: 10px;
 }
+
+#footerHorizontalDiv {
+    position: relative;
+}
+
+#footer {
+    background-color: rgba(231, 235, 238, 0.31);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+
+#footerImageLeftDiv {
+}
+
+#footerImageRightDiv {
+}
+
+#footerLeftImage {
+    width: 5%;
+    float: left;
+}
+
+#footerRightImage {
+    width: 5%;
+    float: right;
+}
+
+
+#footerAboutDiv {
+    margin: auto;
+    width: 50%;
+    /*border: 1px solid green;*/
+    padding: 30px;
+    text-align: center;
+    position: fixed;
+    left: 25%;
+    right: 25%;
+}
+
+
+#footerAboutParagraph {
+    float: inside;
+    font-weight: normal;
+}
