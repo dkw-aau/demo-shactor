@@ -29,6 +29,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLink;
 import cs.qse.common.structure.NS;
 import cs.qse.common.structure.PS;
 import cs.qse.common.structure.ShaclOrListItem;
@@ -129,7 +130,7 @@ public class ExtractionView extends LitTemplate {
         
         startPruningButton.addClickListener(buttonClickEvent -> {
             if (supportTextField.getValue().isEmpty() || confidenceTextField.getValue().isEmpty()) {
-                notify("Please enter valid values!", NotificationVariant.LUMO_ERROR, Notification.Position.TOP_CENTER);
+                Utils.notify("Please enter valid values!", NotificationVariant.LUMO_ERROR, Notification.Position.TOP_CENTER);
             } else {
                 beginPruning();
             }
@@ -312,7 +313,10 @@ public class ExtractionView extends LitTemplate {
         
         propertyShapesGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ps) -> {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
-            button.addClickListener(e -> this.generateQueryForPropertyShape(ns, ps));
+            //button.addClickListener(e -> this.generateQueryForPropertyShape(ns, ps));
+            RouterLink link = new RouterLink("ps-view", PsView.class);
+            button.addClickListener(e -> button.getUI().ifPresent(ui -> ui.getPage().open(link.getHref())));
+            
             button.setIcon(new Icon(VaadinIcon.EXTERNAL_LINK));
             button.setText("Analyze");
         })).setHeader(setHeaderWithInfoLogo("Action", "The generated SPARQL query will fetch the triples responsible for having chosen PS as part of NS"));
@@ -366,17 +370,6 @@ public class ExtractionView extends LitTemplate {
     
     // -------------------------   Grids Helper Methods   -----------------------------
     
-    private static void setClassNameToHighlightNodeShapesInRed(Grid<NS> shapesGrid) {
-        shapesGrid.setClassNameGenerator(ns -> {
-            if (ns.getPruneFlag()) {return "prune";} else {return "no-prune";}
-        });
-    }
-    
-    private void setClassNameToHighlightPropertyShapesInRed(Grid<PS> propertyShapesGrid) {
-        propertyShapesGrid.setClassNameGenerator(ps -> {
-            if (ps.getPruneFlag()) {return "prune";} else {return "no-prune";}
-        });
-    }
     
     private List<NS> negative(List<NS> ns) {
         List<NS> list = new ArrayList<>();
@@ -426,6 +419,32 @@ public class ExtractionView extends LitTemplate {
         return ps;
     }
     
+    private static Component setHeaderWithInfoLogo(String headerTitle, String headerDetails) {
+        Span span = new Span(headerTitle);
+        Icon icon = VaadinIcon.INFO_CIRCLE.create();
+        icon.getElement().setAttribute("title", headerDetails);
+        icon.getStyle().set("height", "var(--lumo-font-size-m)").set("color", "var(--lumo-contrast-70pct)").set("margin-right", "10px");
+        
+        HorizontalLayout layout = new HorizontalLayout(span, icon);
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setSpacing(false);
+        
+        return layout;
+    }
+    
+    private static void setClassNameToHighlightNodeShapesInRed(Grid<NS> shapesGrid) {
+        shapesGrid.setClassNameGenerator(ns -> {
+            if (ns.getPruneFlag()) {return "prune";} else {return "no-prune";}
+        });
+    }
+    
+    private void setClassNameToHighlightPropertyShapesInRed(Grid<PS> propertyShapesGrid) {
+        propertyShapesGrid.setClassNameGenerator(ps -> {
+            if (ps.getPruneFlag()) {return "prune";} else {return "no-prune";}
+        });
+    }
+    
+    
     private void generateQueryForPropertyShape(NS ns, PS ps) {
         Dialog dialog = new Dialog();
         dialog.getElement().setAttribute("aria-label", "Query");
@@ -463,71 +482,11 @@ public class ExtractionView extends LitTemplate {
     }
     
     
-    private void queryGraph(String query) {
-        List<Triple> tripleList = graphExplorer.runQuery(query);
-        for (Triple triple : tripleList) {
-            if (triple.getPredicate().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
-                triple.setPredicate("rdf:type");
-            }
-            if (triple.getPredicate().contains("http://dbpedia.org/ontology/")) {
-                triple.setPredicate(triple.getPredicate().replace("http://dbpedia.org/ontology/", "dbo:"));
-            }
-            
-            if (triple.getObject().contains("http://dbpedia.org/ontology/")) {
-                triple.setObject(triple.getObject().replace("http://dbpedia.org/ontology/", "dbo:"));
-            }
-            
-            if (triple.getSubject().contains("http://dbpedia.org/resource/")) {
-                triple.setSubject(triple.getSubject().replace("http://dbpedia.org/resource/", "dbr:"));
-            }
-            if (triple.getObject().contains("http://dbpedia.org/resource/")) {
-                triple.setObject(triple.getObject().replace("http://dbpedia.org/resource/", "dbr:"));
-            }
-            
-            if (triple.getObject().contains("http://www.w3.org/2002/07/owl#")) {
-                triple.setObject(triple.getObject().replace("http://www.w3.org/2002/07/owl#", "owl:"));
-            }
-        }
-        createDialogueToShowTriples(tripleList);
-    }
-    
     // -------------------------   Helper Methods   -----------------------------
-    
-    private Icon createStatusIcon(String status) {
-        boolean isAvailable = "true".equals(status);
-        Icon icon;
-        if (isAvailable) {
-            icon = VaadinIcon.CHECK.create();
-            icon.getElement().getThemeList().add("badge success");
-        } else {
-            icon = VaadinIcon.CLOSE_SMALL.create();
-            icon.getElement().getThemeList().add("badge error");
-        }
-        icon.getStyle().set("padding", "var(--lumo-space-xs");
-        return icon;
-    }
-    
-    private static Component setHeaderWithInfoLogo(String headerTitle, String headerDetails) {
-        Span span = new Span(headerTitle);
-        Icon icon = VaadinIcon.INFO_CIRCLE.create();
-        icon.getElement().setAttribute("title", headerDetails);
-        icon.getStyle().set("height", "var(--lumo-font-size-m)").set("color", "var(--lumo-contrast-70pct)").set("margin-right", "10px");
-        
-        HorizontalLayout layout = new HorizontalLayout(span, icon);
-        layout.setAlignItems(FlexComponent.Alignment.CENTER);
-        layout.setSpacing(false);
-        
-        return layout;
-    }
-    
-    private static void notify(String message, NotificationVariant notificationVariant, Notification.Position position) {
-        Notification notification = Notification.show(message);
-        notification.addThemeVariants(notificationVariant);
-        notification.setPosition(position);
-    }
     
     
     // -------------------------   Dialogue Methods   -----------------------------
+    
     
     private H2 createHeaderLayout(String title) {
         H2 headline = new H2("SPARQL Query to Extract Triples for " + title);
@@ -607,4 +566,48 @@ public class ExtractionView extends LitTemplate {
     private void generateQueryToRemoveTriple(Triple triple) {
         System.out.println("Hi, I will remove this triple: " + triple.toString());
     }
+    
+    private Icon createStatusIcon(String status) {
+        boolean isAvailable = "true".equals(status);
+        Icon icon;
+        if (isAvailable) {
+            icon = VaadinIcon.CHECK.create();
+            icon.getElement().getThemeList().add("badge success");
+        } else {
+            icon = VaadinIcon.CLOSE_SMALL.create();
+            icon.getElement().getThemeList().add("badge error");
+        }
+        icon.getStyle().set("padding", "var(--lumo-space-xs");
+        return icon;
+    }
+    
+    
+    private void queryGraph(String query) {
+        List<Triple> tripleList = graphExplorer.runQuery(query);
+        for (Triple triple : tripleList) {
+            if (triple.getPredicate().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+                triple.setPredicate("rdf:type");
+            }
+            if (triple.getPredicate().contains("http://dbpedia.org/ontology/")) {
+                triple.setPredicate(triple.getPredicate().replace("http://dbpedia.org/ontology/", "dbo:"));
+            }
+            
+            if (triple.getObject().contains("http://dbpedia.org/ontology/")) {
+                triple.setObject(triple.getObject().replace("http://dbpedia.org/ontology/", "dbo:"));
+            }
+            
+            if (triple.getSubject().contains("http://dbpedia.org/resource/")) {
+                triple.setSubject(triple.getSubject().replace("http://dbpedia.org/resource/", "dbr:"));
+            }
+            if (triple.getObject().contains("http://dbpedia.org/resource/")) {
+                triple.setObject(triple.getObject().replace("http://dbpedia.org/resource/", "dbr:"));
+            }
+            
+            if (triple.getObject().contains("http://www.w3.org/2002/07/owl#")) {
+                triple.setObject(triple.getObject().replace("http://www.w3.org/2002/07/owl#", "owl:"));
+            }
+        }
+        createDialogueToShowTriples(tripleList);
+    }
+    
 }
