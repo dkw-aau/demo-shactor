@@ -3,6 +3,8 @@ package shactor.utils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -51,6 +53,7 @@ public class Utils {
         //radioGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
         radioGroup.setLabel(label);
         radioGroup.setItems(items);
+        radioGroup.setValue(items.get(0));
         return radioGroup;
     }
     
@@ -76,5 +79,11 @@ public class Utils {
     public   static void setFooterImagesPath(Image footerLeftImage, Image footerRightImage) {
         footerLeftImage.setSrc("./images/DKW-Logo.png");
         footerRightImage.setSrc("./images/aau.png");
+    }
+    
+    public static void setIconForButtonWithToolTip(Button button, VaadinIcon icon, String toolTip) {
+        button.setIcon(new Icon(icon));
+        button.setText("");
+        button.setTooltipText(toolTip);
     }
 }

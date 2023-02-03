@@ -17,7 +17,7 @@
 }
 
 #quality-indicator-progress-bar {
-    background-color: #fa7575;
+    background-color: #f6a03c;
     height: 10px;
 }
 
@@ -41,12 +41,14 @@
 }
 
 #footerLeftImage {
-    width: 5%;
+    /*border: 2px solid red;*/
+    width: 100px;
     float: left;
 }
 
 #footerRightImage {
-    width: 5%;
+    /*border: 2px solid red;*/
+    width: 100px;
     float: right;
 }
 
@@ -66,4 +68,21 @@
 #footerAboutParagraph {
     float: inside;
     font-weight: normal;
+}
+
+
+#contentMainLayout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#contentFooter {
+    /*background-color: rgba(231, 235, 238, 0.31);*/
+    /*border: 5px solid green;*/
+    text-align: center!important;
+    display: flex!important;
+    flex: 1!important;
+    align-items: flex-end!important;
+    margin-bottom: 10px;
 }

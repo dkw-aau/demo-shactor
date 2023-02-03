@@ -30,8 +30,6 @@ public class IndexView extends LitTemplate {
     
     @Id("tabSheet")
     private TabSheet tabSheet;
-    @Id("footer")
-    private Div footer;
     @Id("footerImageLeftDiv")
     private Div footerImageLeftDiv;
     @Id("footerImageRightDiv")
@@ -45,6 +43,7 @@ public class IndexView extends LitTemplate {
     public IndexView() {
         Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
+        tabSheet.addThemeVariants(TabSheetVariant.LUMO_BORDERED);
         tabSheet.add("Use Existing Datasets", getTabOneLayout());
         tabSheet.add("Upload Graph", getTabTwoLayout());
         tabSheet.add("Connect to SPARQL Endpoint", getTabThreeLayout());
