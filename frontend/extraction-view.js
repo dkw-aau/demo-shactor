@@ -10,10 +10,11 @@ import '@vaadin/grid/src/vaadin-grid.js';
 import '@vaadin/vertical-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/text-field/src/vaadin-text-field.js';
-import '@vaadin/button/src/vaadin-button.js';
 import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/charts/src/vaadin-chart.js';
 import '@vaadin/radio-group/src/vaadin-radio-group.js';
+import '@vaadin/button/src/vaadin-button.js';
+import '@polymer/iron-icon/iron-icon.js';
 let ExtractionView = class ExtractionView extends LitElement {
     static get styles() {
         return css `
@@ -45,6 +46,9 @@ let ExtractionView = class ExtractionView extends LitElement {
       <vaadin-button tabindex="0" style="margin-right: var(--lumo-space-l);" id="readShactorLogsButton" theme="primary">
         Read SHACTOR Logs 
       </vaadin-button>
+      <vaadin-button theme="primary" aria-label="Add new" id="taxonomyVisualizationButton" tabindex="0">
+       <iron-icon icon="lumo:plus"></iron-icon>
+      </vaadin-button>
      </vaadin-horizontal-layout>
      <h5 style="margin-bottom: 0%; align-self: stretch;">You can set the Confidence and Support thresholds to analyze shapes.</h5>
      <vaadin-horizontal-layout style="align-self: stretch;">
@@ -71,6 +75,7 @@ let ExtractionView = class ExtractionView extends LitElement {
    <vaadin-radio-group id="vaadinRadioGroup" style="align-self: stretch; margin-left: 5%; margin-right: 5%;"></vaadin-radio-group>
    <vaadin-grid id="shapesGrid" style="margin-right: 5%; align-self: stretch; margin-left: 5%; flex-grow: 0;" is-attached multi-sort-priority="prepend"></vaadin-grid>
    <h5 id="propertyShapesGridInfo" style="margin-left: 5%; margin-bottom: 0%; align-self: stretch;">Property Shapes Analysis</h5>
+   <vaadin-radio-group id="psVaadinRadioGroup" style="margin-right: 5%; margin-left: 5%;"></vaadin-radio-group>
    <vaadin-grid id="propertyShapesGrid" style="align-self: stretch; margin-left: 5%; margin-right: 5%; flex-grow: 0;" is-attached multi-sort-priority="prepend"></vaadin-grid>
    <vaadin-button theme="primary" id="downloadSelectedShapesButton" style="align-self: center; margin-left: 5%; margin-right: 5%;" tabindex="0">
      Download Selected Shapes 

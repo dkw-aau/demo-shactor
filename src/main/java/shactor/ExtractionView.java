@@ -96,6 +96,10 @@ public class ExtractionView extends LitTemplate {
     private H2 headingNodeShapesAnalysis;
     @Id("vaadinRadioGroup")
     private RadioButtonGroup<String> vaadinRadioGroup;
+    @Id("psVaadinRadioGroup")
+    private RadioButtonGroup<String> psVaadinRadioGroup;
+    @Id("taxonomyVisualizationButton")
+    private Button taxonomyVisualizationButton;
     
     
     public ExtractionView() {
@@ -105,6 +109,7 @@ public class ExtractionView extends LitTemplate {
         graphExplorer = new GraphExplorer("http://10.92.0.34:7200/", "DBPEDIA_ML");
         downloadSelectedShapesButton.setVisible(false);
         vaadinRadioGroup.setVisible(false);
+        psVaadinRadioGroup.setVisible(false);
         headingPieCharts.setVisible(false);
         headingNodeShapesAnalysis.setVisible(false);
         shapesGrid.setVisible(false);
@@ -115,10 +120,12 @@ public class ExtractionView extends LitTemplate {
         Utils.setIconForButtonWithToolTip(downloadShapesButton, VaadinIcon.DOWNLOAD, "Download Shapes");
         Utils.setIconForButtonWithToolTip(readShapesStatsButton, VaadinIcon.BAR_CHART, "Read Shapes Statistics");
         Utils.setIconForButtonWithToolTip(readShactorLogsButton, VaadinIcon.TIMER, "Read SHACTOR extraction logs");
+        Utils.setIconForButtonWithToolTip(taxonomyVisualizationButton, VaadinIcon.FILE_TREE, "Visualize Shapes Taxonomy");
         
         downloadShapesButton.addClickListener(buttonClickEvent -> {});
         readShapesStatsButton.addClickListener(buttonClickEvent -> {});
         readShactorLogsButton.addClickListener(buttonClickEvent -> {});
+        taxonomyVisualizationButton.addClickListener(buttonClickEvent -> {});
         
         startPruningButton.addClickListener(buttonClickEvent -> {
             if (supportTextField.getValue().isEmpty() || confidenceTextField.getValue().isEmpty()) {
@@ -160,14 +167,13 @@ public class ExtractionView extends LitTemplate {
         
         setupNodeShapesGrid(nodeShapes.get(), support, confidence);
         //downloadPrunedShapesButton.setText("Download Reliable Shapes Pruned with Support: " + support + " and Confidence: " + Math.round(confidence * 100) + "%");
-        setupNodeShapesFilterRadioGroup();
-        vaadinRadioGroup.setVisible(true);
-        downloadPrunedShapesButton.setVisible(true);
         
+        downloadPrunedShapesButton.setVisible(true);
+        setupFilterRadioGroup(vaadinRadioGroup);
+        vaadinRadioGroup.setVisible(true);
         vaadinRadioGroup.addValueChangeListener(listener -> {
             System.out.println(listener.getValue());
             if (vaadinRadioGroup.getValue().equals("Above")) {
-                
                 shapesGrid.setItems(positive(nodeShapes.get()));
                 shapesGrid.getDataProvider().refreshAll();
             }
@@ -182,11 +188,10 @@ public class ExtractionView extends LitTemplate {
                 shapesGrid.setItems(nodeShapes.get());
                 shapesGrid.getDataProvider().refreshAll();
             }
-            
         });
     }
     
-    private void setupNodeShapesFilterRadioGroup() {
+    private void setupFilterRadioGroup(RadioButtonGroup<String> vaadinRadioGroup) {
         vaadinRadioGroup.setItems("All", "Above", "Below");
         vaadinRadioGroup.setValue("All");
     }
@@ -255,8 +260,8 @@ public class ExtractionView extends LitTemplate {
         
         //setClassNameToHighlightNodeShapesInRed(shapesGrid);
         
+        nodeShapes.sort((d1, d2) -> d2.getSupport() - d1.getSupport());
         shapesGrid.setItems(nodeShapes);
-        
         shapesGrid.addSelectionListener(selection -> {
             System.out.printf("Number of selected classes: %s%n", selection.getAllSelectedItems().size());
             downloadSelectedShapesButton.setVisible(true);
@@ -333,13 +338,29 @@ public class ExtractionView extends LitTemplate {
             }
         }
         
-        propertyShapesGrid.setItems(ns.getPropertyShapes());
-    }
-    
-    private void setClassNameToHighlightPropertyShapesInRed(Grid<PS> propertyShapesGrid) {
-        propertyShapesGrid.setClassNameGenerator(ps -> {
-            if (ps.getPruneFlag()) {return "prune";} else {return "no-prune";}
+        setupFilterRadioGroup(psVaadinRadioGroup);
+        psVaadinRadioGroup.setVisible(true);
+        psVaadinRadioGroup.addValueChangeListener(listener -> {
+            System.out.println(listener.getValue());
+            if (psVaadinRadioGroup.getValue().equals("Above")) {
+                propertyShapesGrid.setItems(positivePs(ns.getPropertyShapes()));
+                propertyShapesGrid.getDataProvider().refreshAll();
+            }
+            
+            if (psVaadinRadioGroup.getValue().equals("Below")) {
+                propertyShapesGrid.setItems(negativePs(ns.getPropertyShapes()));
+                propertyShapesGrid.getDataProvider().refreshAll();
+            }
+            
+            if (psVaadinRadioGroup.getValue().equals("All")) {
+                System.out.println("Default");
+                propertyShapesGrid.setItems(ns.getPropertyShapes());
+                propertyShapesGrid.getDataProvider().refreshAll();
+            }
         });
+        
+        ns.getPropertyShapes().sort((d1, d2) -> d2.getSupport() - d1.getSupport());
+        propertyShapesGrid.setItems(ns.getPropertyShapes());
     }
     
     
@@ -351,20 +372,58 @@ public class ExtractionView extends LitTemplate {
         });
     }
     
-    private List<NS> negative(List<NS> nodeShapes) {
-        nodeShapes = nodeShapes.stream().filter(NS::getPruneFlag).toList();
-        return nodeShapes;
+    private void setClassNameToHighlightPropertyShapesInRed(Grid<PS> propertyShapesGrid) {
+        propertyShapesGrid.setClassNameGenerator(ps -> {
+            if (ps.getPruneFlag()) {return "prune";} else {return "no-prune";}
+        });
     }
     
-    private List<NS> positive(List<NS> nodeShapes) {
+    private List<NS> negative(List<NS> ns) {
         List<NS> list = new ArrayList<>();
-        for (NS nodeShape : nodeShapes) {
+        for (NS nodeShape : ns) {
+            if (nodeShape.getPruneFlag()) {
+                list.add(nodeShape);
+            }
+        }
+        ns = list;
+        ns.sort((d1, d2) -> d2.getSupport() - d1.getSupport());
+        return ns;
+    }
+    
+    private List<NS> positive(List<NS> ns) {
+        List<NS> list = new ArrayList<>();
+        for (NS nodeShape : ns) {
             if (!nodeShape.getPruneFlag()) {
                 list.add(nodeShape);
             }
         }
-        nodeShapes = list;
-        return nodeShapes;
+        ns = list;
+        ns.sort((d1, d2) -> d2.getSupport() - d1.getSupport());
+        return ns;
+    }
+    
+    private List<PS> negativePs(List<PS> ps) {
+        List<PS> list = new ArrayList<>();
+        for (PS nodeShape : ps) {
+            if (nodeShape.getPruneFlag()) {
+                list.add(nodeShape);
+            }
+        }
+        ps = list;
+        ps.sort((d1, d2) -> d2.getSupport() - d1.getSupport());
+        return ps;
+    }
+    
+    private List<PS> positivePs(List<PS> ps) {
+        List<PS> list = new ArrayList<>();
+        for (PS nodeShape : ps) {
+            if (!nodeShape.getPruneFlag()) {
+                list.add(nodeShape);
+            }
+        }
+        ps = list;
+        ps.sort((d1, d2) -> d2.getSupport() - d1.getSupport());
+        return ps;
     }
     
     private void generateQueryForPropertyShape(NS ns, PS ps) {
