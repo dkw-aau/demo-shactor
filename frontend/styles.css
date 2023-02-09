@@ -80,9 +80,13 @@
 #contentFooter {
     /*background-color: rgba(231, 235, 238, 0.31);*/
     /*border: 5px solid green;*/
-    text-align: center!important;
-    display: flex!important;
-    flex: 1!important;
-    align-items: flex-end!important;
+    text-align: center !important;
+    display: flex !important;
+    flex: 1 !important;
+    align-items: flex-end !important;
     margin-bottom: 10px;
+}
+
+#textPrefixTextField {
+    font-weight: bold;
 }
