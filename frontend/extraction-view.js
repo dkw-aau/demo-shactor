@@ -72,9 +72,11 @@ let ExtractionView = class ExtractionView extends LitElement {
     <vaadin-chart type="pie" tooltip="" id="shapesStatsByBothPieChart" style="align-self: flex-start; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
    </vaadin-horizontal-layout>
    <h2 id="headingNodeShapesAnalysis" style="margin-left: 5%;">Node Shapes Analysis</h2>
+   <p id="nsGridRadioButtonInfo" style="margin-left: 5%;">All: Show all node shapes, Below : Show node shapes having support/confidence lower than specified threshold, Above: Show node shapes having support/confidence above than specified threshold.</p>
    <vaadin-radio-group id="vaadinRadioGroup" style="align-self: stretch; margin-left: 5%; margin-right: 5%;"></vaadin-radio-group>
    <vaadin-grid id="shapesGrid" style="margin-right: 5%; align-self: stretch; margin-left: 5%; flex-grow: 0;" is-attached multi-sort-priority="prepend"></vaadin-grid>
    <h5 id="propertyShapesGridInfo" style="margin-left: 5%; margin-bottom: 0%; align-self: stretch;">Property Shapes Analysis</h5>
+   <p id="psGridRadioButtonInfo" style="margin-left: 5%;">All: Show all property shapes, Below : Show property shapes having support/confidence lower than specified threshold, Above: Show property shapes having support/confidence above than specified threshold.</p>
    <vaadin-radio-group id="psVaadinRadioGroup" style="margin-right: 5%; margin-left: 5%;"></vaadin-radio-group>
    <vaadin-grid id="propertyShapesGrid" style="align-self: stretch; margin-left: 5%; margin-right: 5%; flex-grow: 0;" is-attached multi-sort-priority="prepend"></vaadin-grid>
    <vaadin-button theme="primary" id="downloadSelectedShapesButton" style="align-self: center; margin-left: 5%; margin-right: 5%;" tabindex="0">

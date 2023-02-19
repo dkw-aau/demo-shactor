@@ -22,4 +22,9 @@ public class GraphExplorer {
         }
         return tripleList;
     }
+
+
+    public List<BindingSet> runSelectQuery(String query) {
+        return graphDBUtils.runSelectQuery(query);
+    }
 }

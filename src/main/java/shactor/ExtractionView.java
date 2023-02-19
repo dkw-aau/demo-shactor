@@ -1,31 +1,26 @@
 package shactor;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.dialog.DialogVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.littemplate.LitTemplate;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.progressbar.ProgressBarVariant;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.template.Id;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
@@ -34,14 +29,15 @@ import cs.qse.common.structure.NS;
 import cs.qse.common.structure.PS;
 import cs.qse.common.structure.ShaclOrListItem;
 import cs.qse.filebased.Parser;
-import shactor.utils.*;
-
-import static shactor.utils.ChartsUtil.*;
-import static shactor.utils.Utils.setHeaderWithInfoLogo;
+import shactor.utils.PruningUtil;
+import shactor.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static shactor.utils.ChartsUtil.*;
+import static shactor.utils.Utils.setHeaderWithInfoLogo;
 
 
 @Tag("extraction-view")
@@ -102,17 +98,22 @@ public class ExtractionView extends LitTemplate {
     private RadioButtonGroup<String> psVaadinRadioGroup;
     @Id("taxonomyVisualizationButton")
     private Button taxonomyVisualizationButton;
-
+    @Id("psGridRadioButtonInfo")
+    private Paragraph psGridRadioButtonInfo;
+    @Id("nsGridRadioButtonInfo")
+    private Paragraph nsGridRadioButtonInfo;
     static PS currPS;
     static NS currNS;
     static Integer support;
     static Double confidence;
 
+
     public ExtractionView() {
         setupKnowledgeGraphStatsChart(knowledgeGraphStatsPieChart);
         //Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
         parser = SelectionView.getParser();
-
+        psGridRadioButtonInfo.setVisible(false);
+        nsGridRadioButtonInfo.setVisible(false);
         downloadSelectedShapesButton.setVisible(false);
         vaadinRadioGroup.setVisible(false);
         psVaadinRadioGroup.setVisible(false);
@@ -167,7 +168,6 @@ public class ExtractionView extends LitTemplate {
         setupPieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault(), pruningUtil);
         setupPieChart(shapesStatsBySupportPieChart, pruningUtil.getStatsBySupport(), support, pruningUtil);
         setupPieChart(shapesStatsByConfidencePieChart, pruningUtil.getStatsByConfidence(), confidence, pruningUtil);
-        ;
         setupPieChart(shapesStatsByBothPieChart, pruningUtil.getStatsByBoth(), support, confidence, pruningUtil);
 
         defaultShapesStatsPieChart.drawChart();
@@ -206,17 +206,18 @@ public class ExtractionView extends LitTemplate {
     // -------------------------   Setup Grids   -----------------------------
     private void setupNodeShapesGrid(List<NS> nodeShapes, Integer support, Double confidence) {
         shapesGrid.setVisible(true);
+        nsGridRadioButtonInfo.setVisible(true);
         shapesGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         shapesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         //shapesGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
         //shapesGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
-        shapesGrid.addColumn(NS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>Node Shape</div>")).setResizable(true).setAutoWidth(true).setComparator(NS::getPruneFlag);
-        shapesGrid.addColumn(NS::getTargetClass).setHeader("Target Class").setResizable(true).setResizable(true).setAutoWidth(true);
-        shapesGrid.addColumn(NS::getSupport).setHeader("Support").setResizable(true).setAutoWidth(true).setSortable(true);
-        shapesGrid.addColumn(NS::getCountPropertyShapes).setHeader("Count PS").setResizable(true).setAutoWidth(true);
-        //shapesGrid.addColumn(NS::getCountPsWithPruneFlag).setHeader("PS > (Supp: " + support + ", Conf: " + confidence + ")").setResizable(true);
-        //shapesGrid.addColumn(NS::getCountPscWithPruneFlag).setHeader("PSc > (Supp: " + support + ", Conf: " + confidence + ")").setResizable(true);
+        shapesGrid.addColumn(NS::getLocalNameFromIri).setHeader(Utils.boldHeader("Node Shape")).setResizable(true).setAutoWidth(true).setComparator(NS::getPruneFlag);
+        shapesGrid.addColumn(NS::getTargetClass).setHeader(Utils.boldHeader("Target Class")).setResizable(true).setResizable(true).setAutoWidth(true);
+        shapesGrid.addColumn(NS::getSupport).setHeader(Utils.boldHeader("Support")).setResizable(true).setAutoWidth(true).setSortable(true);
+        shapesGrid.addColumn(NS::getCountPropertyShapes).setHeader(Utils.boldHeader("Count PS")).setResizable(true).setAutoWidth(true);
+        //shapesGrid.addColumn(NS::getCountPsWithPruneFlag).setHeader(Utils.boldHeader("PS > (Supp: " + support + ", Conf: " + confidence + ")").setResizable(true);
+        //shapesGrid.addColumn(NS::getCountPscWithPruneFlag).setHeader(Utils.boldHeader("PSc > (Supp: " + support + ", Conf: " + confidence + ")").setResizable(true);
         
         /*shapesGrid.addComponentColumn(ns -> createStatusIcon(String.valueOf(ns.getPruneFlag()))).setTooltipGenerator(ns -> {
             String val = "NS Support > (Support, Confidence) thresholds. Should not be removed";
@@ -224,7 +225,7 @@ public class ExtractionView extends LitTemplate {
                 val = "NS Support < (Support, Confidence) thresholds. Should be removed";
             }
             return val;
-        }).setHeader("Prune NS");*/
+        }).setHeader(Utils.boldHeader("Prune NS");*/
 
 
         shapesGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ns) -> {
@@ -233,13 +234,13 @@ public class ExtractionView extends LitTemplate {
             //double psCountGreen = ns.getCountPropertyShapes() - ns.getCountPsWithPruneFlag();
             //progressBar.setValue(psCountGreen / ns.getCountPropertyShapes());
             double psCountGreen = ns.getCountPropertyShapes() - ns.getCountPsWithSupportPruneFlag();
-            System.out.println(ns.getLocalNameFromIri());
-            System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithSupportPruneFlag() + " = " + psCountGreen);
-            System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
+            //System.out.println(ns.getLocalNameFromIri());
+            //System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithSupportPruneFlag() + " = " + psCountGreen);
+            //System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
             progressBar.setValue(psCountGreen / ns.getCountPropertyShapes());
-        })).setHeader(setHeaderWithInfoLogo(
+        })).setHeader((setHeaderWithInfoLogo(
                 "PS Quality (by Support)",
-                "This shows quality of NS in terms of PS left after pruning (green) and removed by pruning (red) provided user's support and confidence thresholds.")).setResizable(true).setAutoWidth(true);
+                "This shows quality of NS in terms of PS left after pruning (green) and removed by pruning (red) provided user's support and confidence thresholds."))).setResizable(true).setAutoWidth(true);
 
 
         shapesGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ns) -> {
@@ -247,9 +248,9 @@ public class ExtractionView extends LitTemplate {
             progressBar.setId("quality-indicator-progress-bar");
             double psCountGreen = ns.getCountPropertyShapes() - ns.getCountPsWithConfidencePruneFlag();
 
-            System.out.println(ns.getLocalNameFromIri());
-            System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithConfidencePruneFlag() + " = " + psCountGreen);
-            System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
+            //System.out.println(ns.getLocalNameFromIri());
+            //System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithConfidencePruneFlag() + " = " + psCountGreen);
+            //System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
 
             progressBar.setValue(psCountGreen / ns.getCountPropertyShapes());
         })).setHeader(setHeaderWithInfoLogo(
@@ -282,7 +283,7 @@ public class ExtractionView extends LitTemplate {
 
     private void setupPropertyShapesGrid(NS ns) {
         if (ns == null) return;
-
+        psGridRadioButtonInfo.setVisible(true);
         currNodeShape = ns.getLocalNameFromIri();
         propertyShapesGridInfo.setVisible(true);
         propertyShapesGridInfo.setText("Property Shapes Analysis for " + currNodeShape);
@@ -293,14 +294,14 @@ public class ExtractionView extends LitTemplate {
         propertyShapesGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         propertyShapesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES); //LUMO_COMPACT
 
-        propertyShapesGrid.addColumn(PS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>Property Shape</div>")).setResizable(true).setAutoWidth(true).setComparator(PS::getPruneFlag);
-        propertyShapesGrid.addColumn(PS::getPath).setHeader("Property Path").setResizable(true).setAutoWidth(true);
+        propertyShapesGrid.addColumn(PS::getLocalNameFromIri).setHeader(Utils.boldHeader("Property Shape")).setResizable(true).setAutoWidth(true).setComparator(PS::getPruneFlag);
+        propertyShapesGrid.addColumn(PS::getPath).setHeader(Utils.boldHeader("Property Path")).setResizable(true).setAutoWidth(true);
 
-        propertyShapesGrid.addColumn(PS::getSupport).setHeader("Support").setResizable(true).setAutoWidth(true).setSortable(true);
-        propertyShapesGrid.addColumn(PS::getConfidenceInPercentage).setHeader("Confidence").setResizable(true).setAutoWidth(true).setComparator(PS::getConfidence);
+        propertyShapesGrid.addColumn(PS::getSupport).setHeader(Utils.boldHeader("Support")).setResizable(true).setAutoWidth(true).setSortable(true);
+        propertyShapesGrid.addColumn(PS::getConfidenceInPercentage).setHeader(Utils.boldHeader("Confidence")).setResizable(true).setAutoWidth(true).setComparator(PS::getConfidence);
 
-        //propertyShapesGrid.addColumn(PS::getNodeKind).setHeader("NodeKind");
-        //propertyShapesGrid.addColumn(PS::getDataTypeOrClass).setHeader("Data Type or Class");
+        //propertyShapesGrid.addColumn(PS::getNodeKind).setHeader(Utils.boldHeader("NodeKind");
+        //propertyShapesGrid.addColumn(PS::getDataTypeOrClass).setHeader(Utils.boldHeader("Data Type or Class");
 
         propertyShapesGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ps) -> {
             progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);

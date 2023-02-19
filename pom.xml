@@ -135,6 +135,18 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.vaadin.componentfactory</groupId>
+            <artifactId>network</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.vaadin.olli</groupId>
+            <artifactId>file-download-wrapper</artifactId>
+            <version>6.0.0</version>
+        </dependency>
+
         <!--Adding Jar as dependency-->
         <dependency>
             <groupId>dk.aau.cs.relweb</groupId>

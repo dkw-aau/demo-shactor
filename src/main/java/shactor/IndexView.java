@@ -60,7 +60,9 @@ public class IndexView extends LitTemplate {
         vl.add(rbg);
         continueButton.addClickListener(buttonClickEvent -> {
             Utils.notifyMessage(rbg.getValue().toString());
-            graphURL = "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt";
+            //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt";
+            graphURL = "/Users/kashifrabbani/Documents/GitHub/data/DBpedia/DBpediaCityAndTown.nt";
+
             // Server: /home/ubuntu/data/dbpedia_ml.nt
             //graphURL = "/home/ubuntu/data/dbpedia_ml.nt";
             continueButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));

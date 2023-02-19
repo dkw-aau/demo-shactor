@@ -3,8 +3,8 @@ import '@vaadin/vaadin-ordered-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/grid/src/vaadin-grid.js';
 import '@vaadin/text-area/src/vaadin-text-area.js';
-import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/button/src/vaadin-button.js';
+import '@polymer/iron-icon/iron-icon.js';
 
 @customElement('ps-view')
 export class PsView extends LitElement {
@@ -23,14 +23,19 @@ export class PsView extends LitElement {
  <vaadin-horizontal-layout class="header" style="width: 100%; flex-basis: var(--lumo-size-l); flex-shrink: 0; background-color: var(--lumo-contrast-10pct);">
   <h3 id="title" style="align-self: stretch; flex-grow: 1; flex-shrink: 1; text-align:center;">SHACTOR : SHapes ExtrACTOR from very large Knowledge Graphs</h3>
  </vaadin-horizontal-layout>
- <vaadin-vertical-layout class="content" style="width: 90%; flex-grow: 1; flex-shrink: 1; flex-basis: auto; margin-left: 5%; margin-right: 5%;">
+ <vaadin-vertical-layout style="width: 90%; flex-grow: 1; flex-shrink: 1; flex-basis: auto; margin-left: 5%; margin-right: 5%;" id="contentVerticalLayout">
   <h4 style="align-self: center;">PS Analysis Dashboard</h4>
   <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayout" style="align-self: stretch;"></vaadin-horizontal-layout>
   <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayoutTwo" style="align-self: stretch;"></vaadin-horizontal-layout>
   <h4>Selected Property Shape Info:</h4>
-  <vaadin-grid style="align-self: stretch; flex-grow: 0; height: 15%; flex-shrink: 0;" is-attached multi-sort-priority="prepend" id="psConstraintsGrid"></vaadin-grid>
+  <p>This property shape has following constraints where you can check conformance of each constraint with the graph. We show support and confidence of each PS constraint along with options to retrieve or edit the entities corresponding to each constraints.</p>
+  <vaadin-grid style="align-self: stretch; flex-grow: 0; flex-shrink: 1; max-height: 15%;" is-attached multi-sort-priority="prepend" id="psConstraintsGrid"></vaadin-grid>
+  <vaadin-grid id="psOrItemsConstraintsGrid" style="flex-grow: 0; flex-shrink: 1; align-self: stretch; max-height: 15%;" is-attached multi-sort-priority="prepend"></vaadin-grid>
   <h4>Property Shape Syntax (SHACL)</h4>
-  <vaadin-text-area label="SHACL Syntax" id="psSyntaxTextArea" style="align-self: stretch;"></vaadin-text-area>
+  <vaadin-text-area label="Edit SHACL Syntax" id="psSyntaxTextArea" style="align-self: stretch; flex-grow: 0;"></vaadin-text-area>
+  <vaadin-button theme="icon" aria-label="Add new" id="copySyntaxButton" tabindex="0">
+   <iron-icon icon="lumo:plus"></iron-icon>
+  </vaadin-button>
   <h4>Actions</h4>
   <vaadin-horizontal-layout theme="spacing" style="align-self: stretch;">
    <div style="width: 33%; align-self: flex-end;">
@@ -53,7 +58,10 @@ export class PsView extends LitElement {
    </div>
   </vaadin-horizontal-layout>
  </vaadin-vertical-layout>
- <vaadin-horizontal-layout class="footer" style="width: 100%; flex-basis: var(--lumo-size-l); flex-shrink: 0; background-color: var(--lumo-contrast-10pct);"></vaadin-horizontal-layout>
+ <br>
+ <vaadin-horizontal-layout class="footer" style="width: 100%; flex-basis: var(--lumo-size-l); flex-shrink: 0; background-color: var(--lumo-contrast-10pct);">
+  <h6 style="flex-shrink: 1; align-self: center; flex-grow: 1;text-align:center;">Authors: Kashif Rabbani, Matteo Lissandrini, and Katja Hose</h6>
+ </vaadin-horizontal-layout>
 </vaadin-vertical-layout>
 `;
   }

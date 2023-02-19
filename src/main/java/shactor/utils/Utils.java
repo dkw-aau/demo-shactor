@@ -1,6 +1,7 @@
 package shactor.utils;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Image;
@@ -15,9 +16,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -90,7 +91,7 @@ public class Utils {
         notification.setPosition(Notification.Position.MIDDLE);
     }
 
-    public   static void setFooterImagesPath(Image footerLeftImage, Image footerRightImage) {
+    public static void setFooterImagesPath(Image footerLeftImage, Image footerRightImage) {
         footerLeftImage.setSrc("./images/DKW-Logo.png");
         footerRightImage.setSrc("./images/aau.png");
     }
@@ -103,7 +104,7 @@ public class Utils {
 
 
     public static Component setHeaderWithInfoLogo(String headerTitle, String headerDetails) {
-        Span span = new Span(headerTitle);
+        Span span = new Span(Utils.boldHeader(headerTitle));
         Icon icon = VaadinIcon.INFO_CIRCLE.create();
         icon.getElement().setAttribute("title", headerDetails);
         icon.getStyle().set("height", "var(--lumo-font-size-m)").set("color", "var(--lumo-contrast-70pct)").set("margin-right", "10px");
@@ -127,5 +128,20 @@ public class Utils {
         }
         icon.getStyle().set("padding", "var(--lumo-space-xs");
         return icon;
+    }
+
+
+    public static LinkedHashMap<String, Integer> sortMapDescending(HashMap<String, Integer> map) {
+        return map.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+    }
+
+    public static Html boldHeader(String label) {
+        return new Html("<div style='font-weight: bold;'>" + label + "</div>");
     }
 }
