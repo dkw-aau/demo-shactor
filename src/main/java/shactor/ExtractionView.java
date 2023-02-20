@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.charts.Chart;
+import com.vaadin.flow.component.charts.model.style.ButtonTheme;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.Grid;
@@ -16,6 +17,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.littemplate.LitTemplate;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.progressbar.ProgressBarVariant;
@@ -25,13 +27,19 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.StreamResource;
 import cs.qse.common.structure.NS;
 import cs.qse.common.structure.PS;
 import cs.qse.common.structure.ShaclOrListItem;
 import cs.qse.filebased.Parser;
+import org.apache.commons.io.FileUtils;
+import org.vaadin.olli.FileDownloadWrapper;
 import shactor.utils.PruningUtil;
 import shactor.utils.Utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -48,8 +56,7 @@ public class ExtractionView extends LitTemplate {
 
     @Id("contentVerticalLayout")
     private VerticalLayout contentVerticalLayout;
-    @Id("downloadShapesButton")
-    private Button downloadShapesButton;
+
     @Id("readShapesStatsButton")
     private Button readShapesStatsButton;
     @Id("readShactorLogsButton")
@@ -87,6 +94,7 @@ public class ExtractionView extends LitTemplate {
     private final PruningUtil pruningUtil = new PruningUtil();
     static Parser parser;
     String currNodeShape;
+    String prunedFileAddress = "";
 
     @Id("headingPieCharts")
     private H2 headingPieCharts;
@@ -106,6 +114,8 @@ public class ExtractionView extends LitTemplate {
     static NS currNS;
     static Integer support;
     static Double confidence;
+    @Id("actionButtonsHorizontalLayout")
+    private HorizontalLayout actionButtonsHorizontalLayout;
 
 
     public ExtractionView() {
@@ -124,13 +134,12 @@ public class ExtractionView extends LitTemplate {
         propertyShapesGridInfo.setVisible(false);
         downloadPrunedShapesButton.setVisible(false);
 
-        Utils.setIconForButtonWithToolTip(downloadShapesButton, VaadinIcon.DOWNLOAD, "Download Shapes");
+        configureDefaultShapesDownloadButton();
         Utils.setIconForButtonWithToolTip(readShapesStatsButton, VaadinIcon.BAR_CHART, "Read Shapes Statistics");
         Utils.setIconForButtonWithToolTip(readShactorLogsButton, VaadinIcon.TIMER, "Read SHACTOR extraction logs");
         Utils.setIconForButtonWithToolTip(taxonomyVisualizationButton, VaadinIcon.FILE_TREE, "Visualize Shapes Taxonomy");
 
-        downloadShapesButton.addClickListener(buttonClickEvent -> {
-        });
+
         readShapesStatsButton.addClickListener(buttonClickEvent -> {
         });
         readShactorLogsButton.addClickListener(buttonClickEvent -> {
@@ -145,6 +154,22 @@ public class ExtractionView extends LitTemplate {
                 beginPruning();
             }
         });
+    }
+
+    private void configureDefaultShapesDownloadButton() {
+        Button button = new Button();
+        Utils.setIconForButtonWithToolTip(button, VaadinIcon.DOWNLOAD, "Download Shapes");
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        FileDownloadWrapper buttonWrapper;
+        try {
+            File file = new File(SelectionView.getDefaultShapesOutputFileAddress());
+            ByteArrayInputStream stream = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
+            buttonWrapper = new FileDownloadWrapper(new StreamResource(file.getName(), () -> stream));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        buttonWrapper.wrapComponent(button);
+        actionButtonsHorizontalLayout.add(buttonWrapper);
     }
 
     private void beginPruning() {
@@ -162,7 +187,7 @@ public class ExtractionView extends LitTemplate {
         pruningUtil.getStatsByConfidence(nodeShapes.get());
         pruningUtil.getStatsByBoth(nodeShapes.get());
 
-        parser.extractSHACLShapesWithPruning(SelectionView.isFilteredClasses, confidence, support, SelectionView.chosenClasses); // extract shapes with pruning
+        this.prunedFileAddress = parser.extractSHACLShapesWithPruning(SelectionView.isFilteredClasses, confidence, support, SelectionView.chosenClasses); // extract shapes with pruning
         headingPieCharts.setVisible(true);
         headingNodeShapesAnalysis.setVisible(true);
         setupPieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault(), pruningUtil);

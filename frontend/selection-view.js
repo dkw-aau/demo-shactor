@@ -35,12 +35,12 @@ let SelectionView = class SelectionView extends LitElement {
    <iron-icon icon="lumo:search" slot="prefix"></iron-icon>
   </vaadin-text-field>
   <h6 style="align-self: center; width: 80%;">Table showing classes along with instance count of each class extracted in the first phase of shapes extraction.</h6>
-  <vaadin-grid id="vaadinGrid" style="width: 80%; align-self: center; flex-grow: 0;" is-attached multi-sort-priority="prepend"></vaadin-grid>
+  <vaadin-grid id="vaadinGrid" style="width: 80%; align-self: center; flex-grow: 1;" is-attached multi-sort-priority="prepend"></vaadin-grid>
   <vaadin-checkbox id="graphStatsCheckBox" style="width: 80%; align-self: center;" type="checkbox" value="on">
-   Compute statistics of the graph? (It can take a bit longer)
+    Compute statistics of the graph? (It can take a bit longer) 
   </vaadin-checkbox>
   <vaadin-button theme="primary" id="completeShapesExtractionButton" style="align-self: flex-start; margin-left: 10%; margin-right: 10%; flex-grow: 1;" tabindex="0">
-   Go to Next Step
+    Go to Next Step 
   </vaadin-button>
   <br>
   <br>

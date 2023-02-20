@@ -67,7 +67,8 @@ public class SelectionView extends LitTemplate {
     public static Boolean isFilteredClasses = false;
     public static HashMap<String, String> defaultShapesModelStats;
 
-    
+
+    public static String defaultShapesOutputFileAddress = "";
     public SelectionView() {
         Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
         graphInfo.setVisible(false);
@@ -201,11 +202,11 @@ public class SelectionView extends LitTemplate {
         if (chosenClasses.size() > 0) {
             isFilteredClasses = true;
             System.out.println(chosenClasses);
-            parser.extractSHACLShapes(true, chosenClasses);
+            this.defaultShapesOutputFileAddress = parser.extractSHACLShapes(true, chosenClasses);
             defaultShapesModelStats = parser.shapesExtractor.getCurrentShapesModelStats();
         } else {
             isFilteredClasses = false;
-            parser.extractSHACLShapes(false, chosenClasses);
+            this.defaultShapesOutputFileAddress = parser.extractSHACLShapes(false, chosenClasses);
             defaultShapesModelStats = parser.shapesExtractor.getCurrentShapesModelStats();
         }
         Utils.notifyMessage(graphStatsCheckBox.getValue().toString());
@@ -260,6 +261,11 @@ public class SelectionView extends LitTemplate {
     public static Parser getParser() {
         return parser;
     }
+
+    public static String getDefaultShapesOutputFileAddress() {
+        return defaultShapesOutputFileAddress;
+    }
+
 }
 
 

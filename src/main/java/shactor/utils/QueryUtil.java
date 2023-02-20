@@ -52,10 +52,10 @@ public class QueryUtil {
     // For NON-Literal Type PS
     public static String buildQueryToExtractObjectsHavingUndefinedShClass(String type, String property) {
         String query = """
-                SELECT DISTINCT ?o WHERE { \s
+                SELECT DISTINCT ?val WHERE { \s
                 	?s a <CLASS> . \s
-                	?s <PROPERTY> ?o .
-                  FILTER NOT EXISTS {?o a ?objType. }
+                	?s <PROPERTY> ?val .
+                  FILTER NOT EXISTS {?val a ?objType. }
                 }
                 """;
         query = query.replace("CLASS", type);
@@ -66,15 +66,16 @@ public class QueryUtil {
 
     public static String buildQueryToExtractEntitiesHavingSpecificShClass(String type, String property, String shClassType) {
         String query = """
-                SELECT DISTINCT ?s  WHERE { \s
-                	?s a <CLASS> . \s
-                	?s <PROPERTY> ?o .
+                SELECT DISTINCT ?val  WHERE { \s
+                	?val a <CLASS> . \s
+                	?val <PROPERTY> ?o .
                 	?o a <OBJECT_TYPE> . \s
                 }
                 """;
         query = query.replace("CLASS", type);
         query = query.replace("PROPERTY", property);
-        query = query.replace("OBJECT_TYPE", property);
+        query = query.replace("OBJECT_TYPE", shClassType);
+        System.out.println(query);
         return query;
     }
 
@@ -83,13 +84,6 @@ public class QueryUtil {
 
     // ********************* OTHER QUERIES *********************
     public static String extractSparqlQuery(NS ns, PS ps) {
-        String selectQuery = """
-                SELECT ?s ?p ?o WHERE {\s
-                \t BIND( <PROPERTY> AS ?p) .\s
-                \t ?s a <CLASS> .
-                \t ?s  ?p ?o .
-                }\s
-                """;
         String constructQuery = """
                 CONSTRUCT WHERE { \s
                 \t ?s a <CLASS> . \s

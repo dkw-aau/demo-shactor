@@ -10,35 +10,27 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.dialog.DialogVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H6;
-import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.littemplate.LitTemplate;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.progressbar.ProgressBar;
-import com.vaadin.flow.component.progressbar.ProgressBarVariant;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.template.Id;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import com.vaadin.flow.router.RouterLink;
 import cs.qse.common.structure.NS;
 import cs.qse.common.structure.PS;
 import cs.qse.common.structure.ShaclOrListItem;
 import cs.utils.Constants;
-import cs.validation.QseSHACLValidator;
 import de.atextor.turtle.formatter.FormattingStyle;
 import de.atextor.turtle.formatter.TurtleFormatter;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.*;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
@@ -47,19 +39,15 @@ import org.apache.jena.shacl.validation.ReportEntry;
 import org.apache.jena.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.SHACL;
 import org.eclipse.rdf4j.query.BindingSet;
-import shactor.utils.GraphExplorer;
-import shactor.utils.QueryUtil;
-import shactor.utils.Triple;
-import shactor.utils.Utils;
+import shactor.utils.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
-import static shactor.utils.Utils.setHeaderWithInfoLogo;
+import static shactor.utils.Utils.*;
 
 /**
  * A Designer generated component for the ps-view template.
@@ -94,6 +82,8 @@ public class PsView extends LitTemplate {
     private Button buttonC;
     @Id("copySyntaxButton")
     private Button copySyntaxButton;
+    @Id("statusHorizontalLayout")
+    private HorizontalLayout statusHorizontalLayout;
 
     NS nodeShape;
     PS propertyShape;
@@ -110,8 +100,9 @@ public class PsView extends LitTemplate {
         setupNodeShapeInfo(infoHorizontalLayout);
         setupPropertyShapeInfo(infoHorizontalLayoutTwo);
         setupTypesScopeOfPs(infoHorizontalLayoutTwo);
-        setupGrid();
+        setupStatus(statusHorizontalLayout);
         setupTextArea();
+        setupGrid();
         setupActionButtons();
     }
 
@@ -122,12 +113,27 @@ public class PsView extends LitTemplate {
         vl.add(Utils.getReadOnlyTextField("Target Class: ", nodeShape.getTargetClass().toString()));
     }
 
-    private void setupPropertyShapeInfo(HorizontalLayout vl) {
+    private void setupPropertyShapeInfo(HorizontalLayout hl) {
         //vl.add(new H4("Property Shape (PS) Info:"));
-        vl.add(Utils.getReadOnlyTextField("PS PATH: ", propertyShape.getPath()));
-        vl.add(Utils.getReadOnlyTextField("PS IRI: ", nodeShape.getIri().toString()));
-        vl.add(Utils.getReadOnlyTextField("Support Threshold: ", ExtractionView.getSupport().toString()));
-        vl.add(Utils.getReadOnlyTextField("Confidence Threshold: ", ExtractionView.getConfidence() * 100 + "%"));
+        hl.add(Utils.getReadOnlyTextField("PS PATH: ", propertyShape.getPath()));
+        hl.add(Utils.getReadOnlyTextField("PS IRI: ", nodeShape.getIri().toString()));
+        hl.add(Utils.getReadOnlyTextField("Support Threshold: ", ExtractionView.getSupport().toString()));
+        hl.add(Utils.getReadOnlyTextField("Confidence Threshold: ", ExtractionView.getConfidence() * 100 + "%"));
+    }
+
+    private void setupStatus(HorizontalLayout hl) {
+        if (propertyShape.getPruneFlag()) {
+            Span status = new Span(createIcon(VaadinIcon.FILE_REMOVE), new H4("To be Pruned!"));
+            status.getElement().getThemeList().add("badge error");
+            status.setSizeFull();
+            status.setHeightFull();
+            hl.add(status);
+        } else {
+            Span status = new Span(createIcon(VaadinIcon.FLAG), new H4("Not to be Pruned!"));
+            status.getElement().getThemeList().add("badge success");
+            status.setSizeFull();
+            hl.add(status);
+        }
     }
 
     private void setupTypesScopeOfPs(HorizontalLayout hl) {
@@ -169,11 +175,12 @@ public class PsView extends LitTemplate {
     private void setupGrid() {
         if (propertyShape.getHasOrList()) {
             psConstraintsGrid.setVisible(false);
-            //psOrItemsConstraintsGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER); //LUMO_COMPACT
-            psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getNodeKind).setHeader(Utils.boldHeader("Node Kind")).setResizable(true).setAutoWidth(true);
-            psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getDataTypeOrClass).setHeader(Utils.boldHeader("SHACL CLASS")).setResizable(true).setAutoWidth(true);
-            psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getSupport).setHeader(Utils.boldHeader("Support")).setResizable(true).setAutoWidth(true).setSortable(true);
-            psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getConfidenceInPercentage).setHeader(Utils.boldHeader("Confidence")).setResizable(true).setAutoWidth(true).setComparator(ShaclOrListItem::getConfidence);
+
+            psOrItemsConstraintsGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES); //LUMO_COMPACT
+            psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getNodeKind).setHeader(Utils.boldHeader("sh:NodeKind")).setResizable(true).setAutoWidth(true);
+            psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getDataTypeOrClass).setHeader(Utils.boldHeader("sh:Class (Object Type)")).setResizable(true).setAutoWidth(true);
+            psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getSupport).setHeader(Utils.boldHeader("Support")).setResizable(true).setAutoWidth(false).setSortable(true);
+            psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getConfidenceInPercentage).setHeader(Utils.boldHeader("Confidence")).setResizable(true).setAutoWidth(false).setComparator(ShaclOrListItem::getConfidence);
 
             for (ShaclOrListItem item : propertyShape.getShaclOrListItems()) {
                 if (item.getDataTypeOrClass() == null) {
@@ -184,31 +191,46 @@ public class PsView extends LitTemplate {
             psOrItemsConstraintsGrid.addColumn(new ComponentRenderer<>(Button::new, (button, shaclOrListItem) -> {
                 button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
                 button.addClickListener(e -> {
-                    //TODO
-                    Utils.notifyMessage("TODO");
+                    List<BindingSet> output;
+                    if (shaclOrListItem.getDataTypeOrClass().equals("Undefined")) {
+                        output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractObjectsHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
+                    } else {
+                        output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), shaclOrListItem.getDataTypeOrClass()));
+                    }
+                    createDialogueToShowEntities(output);
                 });
-                button.setIcon(new Icon(VaadinIcon.LIST));
-                button.setText("Show Entities");
+                if (shaclOrListItem.getDataTypeOrClass().equals("Undefined")) {
+                    button.setIcon(new Icon(VaadinIcon.LIST));
+                    button.setText("Show entities having undefined object types");
+                } else {
+                    button.setIcon(new Icon(VaadinIcon.LIST));
+                    button.setText("Show Entities having specified object type");
+                }
+
             })).setHeader(setHeaderWithInfoLogo("Action", "blah blah"));
-
-
             psOrItemsConstraintsGrid.setItems(propertyShape.getShaclOrListItems());
-
         } else {
             psOrItemsConstraintsGrid.setVisible(false);
             //psConstraintsGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER); //LUMO_COMPACT
             //psConstraintsGrid.addColumn(PS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>Property Shape</div>")).setResizable(true).setAutoWidth(true).setComparator(PS::getPruneFlag);
             psConstraintsGrid.addColumn(PS::getPath).setHeader(Utils.boldHeader("Property Path")).setResizable(true).setAutoWidth(true);
-            psConstraintsGrid.addColumn(PS::getNodeKind).setHeader(Utils.boldHeader("Node Kind")).setResizable(true).setAutoWidth(true);
-            psConstraintsGrid.addColumn(PS::getDataTypeOrClass).setHeader(Utils.boldHeader("Data Type")).setResizable(true).setAutoWidth(true);
+            psConstraintsGrid.addColumn(PS::getNodeKind).setHeader(Utils.boldHeader("sh:NodeKind")).setResizable(true).setAutoWidth(true);
+            psConstraintsGrid.addColumn(PS::getDataTypeOrClass).setHeader(Utils.boldHeader("sh:datatype")).setResizable(true).setAutoWidth(true);
             psConstraintsGrid.addColumn(PS::getSupport).setHeader(Utils.boldHeader("Support")).setResizable(true).setAutoWidth(true).setSortable(true);
             psConstraintsGrid.addColumn(PS::getConfidenceInPercentage).setHeader(Utils.boldHeader("Confidence")).setResizable(true).setAutoWidth(true).setComparator(PS::getConfidence);
 
             psConstraintsGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ps) -> {
                 button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
                 button.addClickListener(e -> {
-                    //TODO
-                    Utils.notifyMessage("TODO");
+                    List<BindingSet> output;
+                    if (ps.getDataTypeOrClass().equals("Undefined")) {
+                        Utils.notifyMessage("Undefined " + ps.getDataTypeOrClass());
+                        //output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractObjectsHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
+                    } else {
+                        Utils.notifyMessage("Defined " + ps.getDataTypeOrClass());
+                        //output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), ps.getDataTypeOrClass()));
+                    }
+                    //createDialogueToShowEntities(output);
                 });
                 button.setIcon(new Icon(VaadinIcon.LIST));
                 button.setText("Show Entities");
@@ -255,7 +277,7 @@ public class PsView extends LitTemplate {
 
     private void setupActionButtons() {
         //Button A
-        buttonA.addClickListener(e -> this.generateQueryForPropertyShape(nodeShape, propertyShape));
+        buttonA.addClickListener(e -> this.generateDialogWithQueryForPropertyShape(nodeShape, propertyShape));
 
         //Button B
         buttonB.addClickListener(e -> this.validateEntitiesData(nodeShape, propertyShape));
@@ -271,6 +293,11 @@ public class PsView extends LitTemplate {
         ValidationReport report = ShaclValidator.get().validate(shapes, dataGraph);
 
         ShLib.printReport(report);
+        if (report.conforms()) {
+            notifyMessage("Conforms!");
+        } else {
+            notifyError("Does not conforms");
+        }
         for (ReportEntry re : ShaclValidator.get().validate(shapes, dataGraph).getEntries()) {
             String line = re.source() + "|" + re.focusNode() + "|" + re.resultPath() + "|" + re.value() + "|" + re.sourceConstraintComponent() + "|" + re.message();
             System.out.println(line);
@@ -279,7 +306,7 @@ public class PsView extends LitTemplate {
 
     // -------------------------    Methods   -----------------------------
 
-    private void generateQueryForPropertyShape(NS ns, PS ps) {
+    private void generateDialogWithQueryForPropertyShape(NS ns, PS ps) {
         Dialog dialog = new Dialog();
         dialog.getElement().setAttribute("aria-label", "Query");
         String sparqlQuery = QueryUtil.extractSparqlQuery(ns, ps);
@@ -429,7 +456,7 @@ public class PsView extends LitTemplate {
         dialog.setHeaderTitle("Triples");
 
         //dialog.getFooter().add(createFilterButton(dialog));
-        VerticalLayout dialogLayout = createDialogContentForShowingTriples(dialog, tripleList);
+        VerticalLayout dialogLayout = createDialogContentForShowingTriples(tripleList);
         dialog.add(dialogLayout);
         dialog.setDraggable(true);
         dialog.setResizable(true);
@@ -437,7 +464,41 @@ public class PsView extends LitTemplate {
         dialog.open();
     }
 
-    private VerticalLayout createDialogContentForShowingTriples(Dialog dialog, List<Triple> tripleList) {
+
+    private void createDialogueToShowEntities(List<BindingSet> tripleList) {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Entities");
+        //dialog.getFooter().add(createFilterButton(dialog));
+        VerticalLayout dialogLayout = createDialogContentForShowingEntities(tripleList);
+        dialog.add(dialogLayout);
+        dialog.setDraggable(true);
+        dialog.setResizable(true);
+        dialog.addThemeVariants(DialogVariant.LUMO_NO_PADDING);
+        dialog.open();
+    }
+
+    private VerticalLayout createDialogContentForShowingEntities(List<BindingSet> tripleList) {
+        List<Triple> subjectList = new ArrayList<>();
+        tripleList.forEach(bindings -> {
+            subjectList.add(new Triple(bindings.getBinding("val").getValue().stringValue(), "", ""));
+        });
+
+        Grid<Triple> grid = new Grid<>(Triple.class, false);
+
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        grid.addColumn(Triple::getSubject).setHeader("Entity IRI").setResizable(true).setSortable(true);
+        grid.getStyle().set("width", "1500px").set("max-width", "100%");
+        grid.setItems(subjectList);
+
+        VerticalLayout dialogLayout = new VerticalLayout(grid);
+        dialogLayout.setPadding(false);
+        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        dialogLayout.getStyle().set("min-width", "1500px").set("max-width", "100%").set("height", "100%");
+
+        return dialogLayout;
+    }
+
+    private VerticalLayout createDialogContentForShowingTriples(List<Triple> tripleList) {
         Grid<Triple> grid = new Grid<>(Triple.class, false);
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.addColumn(Triple::getSubject).setHeader("Subject").setResizable(true).setSortable(true);
@@ -501,5 +562,11 @@ public class PsView extends LitTemplate {
                 triple.setObject(triple.getObject().replace("http://www.w3.org/2002/07/owl#", "owl:"));
             }
         }
+    }
+
+    private Icon createIcon(VaadinIcon vaadinIcon) {
+        Icon icon = vaadinIcon.create();
+        icon.getStyle().set("padding", "var(--lumo-space-xs");
+        return icon;
     }
 }

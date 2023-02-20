@@ -13,8 +13,8 @@ import '@vaadin/text-field/src/vaadin-text-field.js';
 import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/charts/src/vaadin-chart.js';
 import '@vaadin/radio-group/src/vaadin-radio-group.js';
-import '@vaadin/button/src/vaadin-button.js';
 import '@polymer/iron-icon/iron-icon.js';
+import '@vaadin/button/src/vaadin-button.js';
 let ExtractionView = class ExtractionView extends LitElement {
     static get styles() {
         return css `
@@ -36,10 +36,7 @@ let ExtractionView = class ExtractionView extends LitElement {
     <vaadin-vertical-layout theme="spacing" style="flex-grow: 0; flex-shrink: 0; width: 65%;">
      <h5 style="margin-bottom: 0%;">Shapes Analysis and Knowledge Graph Cleaning</h5>
      <p style="align-self: flex-start; margin-top: 0%;">SHACTOR has extracted SHACL shapes for the chosen classes. You have the following options:</p>
-     <vaadin-horizontal-layout style="align-self: stretch;">
-      <vaadin-button id="downloadShapesButton" style="margin-right: var(--lumo-space-l);" tabindex="0" theme="primary">
-        Download All Shapes 
-      </vaadin-button>
+     <vaadin-horizontal-layout style="align-self: stretch;" id="actionButtonsHorizontalLayout">
       <vaadin-button tabindex="0" id="readShapesStatsButton" style="margin-right: var(--lumo-space-l);" theme="primary">
         Read Shapes Statistics 
       </vaadin-button>

@@ -5,6 +5,7 @@ import '@vaadin/grid/src/vaadin-grid.js';
 import '@vaadin/text-area/src/vaadin-text-area.js';
 import '@vaadin/button/src/vaadin-button.js';
 import '@polymer/iron-icon/iron-icon.js';
+import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
 
 @customElement('ps-view')
 export class PsView extends LitElement {
@@ -27,6 +28,7 @@ export class PsView extends LitElement {
   <h4 style="align-self: center;">PS Analysis Dashboard</h4>
   <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayout" style="align-self: stretch;"></vaadin-horizontal-layout>
   <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayoutTwo" style="align-self: stretch;"></vaadin-horizontal-layout>
+  <vaadin-horizontal-layout id="statusHorizontalLayout" style="align-self: stretch;"></vaadin-horizontal-layout>
   <h4>Selected Property Shape Info:</h4>
   <p>This property shape has following constraints where you can check conformance of each constraint with the graph. We show support and confidence of each PS constraint along with options to retrieve or edit the entities corresponding to each constraints.</p>
   <vaadin-grid style="align-self: stretch; flex-grow: 0; flex-shrink: 1; max-height: 15%;" is-attached multi-sort-priority="prepend" id="psConstraintsGrid"></vaadin-grid>
@@ -36,24 +38,27 @@ export class PsView extends LitElement {
   <vaadin-button theme="icon" aria-label="Add new" id="copySyntaxButton" tabindex="0">
    <iron-icon icon="lumo:plus"></iron-icon>
   </vaadin-button>
-  <h4>Actions</h4>
+  <h4>Other possible actions:</h4>
   <vaadin-horizontal-layout theme="spacing" style="align-self: stretch;">
-   <div style="width: 33%; align-self: flex-end;">
-    <p>Generate SPARQL query to get entities (triples) extracting this property shape constraint. </p>
+   <div style="width: 33%; align-self: flex-start;">
+    <h5>Entities of PS</h5>
+    <p>Fetch all entities (as triples) extracting this PS:</p>
     <vaadin-button tabindex="0" theme="primary" id="buttonA">
-      Execute Query 
+     Build and Execute Query
     </vaadin-button>
    </div>
-   <div style="width: 33%; align-self: flex-end;">
-    <p>Generate SPARQL Query to get erroneous triples </p>
+   <div style="width: 33%; align-self: flex-start;">
+    <h5>Validation</h5>
+    <p>Validate PS constraints against its entities data:</p>
     <vaadin-button tabindex="0" theme="primary" id="buttonB">
-      Execute Query 
+     Start Validation
     </vaadin-button>
    </div>
-   <div style="width: 33%; align-self: flex-end;">
-    <p>Clean the Graph... How?</p>
+   <div style="width: 33%; align-self: flex-start;">
+    <h5>Cleaning </h5>
+    <p>TODO</p>
     <vaadin-button tabindex="0" theme="primary" id="buttonC">
-      Execute Query 
+     Action?
     </vaadin-button>
    </div>
   </vaadin-horizontal-layout>
