@@ -31,7 +31,7 @@ export class ExtractionView extends LitElement {
   <vaadin-vertical-layout class="content" style="width: 100%; flex-grow: 1; flex-shrink: 0; flex-basis: auto;" id="contentVerticalLayout">
    <vaadin-horizontal-layout theme="spacing" style="margin-right: 5%; margin-left: 5%; flex-grow: 0; align-self: stretch;">
     <vaadin-vertical-layout theme="spacing" style="flex-grow: 0; flex-shrink: 0; width: 65%;">
-     <h5 style="margin-bottom: 0%;">Shapes Analysis and Knowledge Graph Cleaning</h5>
+     <h4>SHACTOR (Step 3/4)</h4>
      <p style="align-self: flex-start; margin-top: 0%;">SHACTOR has extracted SHACL shapes for the chosen classes. You have the following options:</p>
      <vaadin-horizontal-layout style="align-self: stretch;" id="actionButtonsHorizontalLayout">
       <vaadin-button tabindex="0" id="readShapesStatsButton" style="margin-right: var(--lumo-space-l);" theme="primary">

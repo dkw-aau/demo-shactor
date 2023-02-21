@@ -16,7 +16,6 @@ public class QueryUtil {
                 """;
         query = query.replace("CLASS", type);
         query = query.replace("PROPERTY", property);
-        System.out.println(query);
         return query;
     }
 
@@ -32,7 +31,7 @@ public class QueryUtil {
         query = query.replace("PROPERTY", property);
         return query;
     }
-
+    //as triples
     public static String buildQueryToExtractEntitiesForTypeOfPs(String type, String property) {
         String query = """
                 CONSTRUCT WHERE { \s
@@ -75,7 +74,6 @@ public class QueryUtil {
         query = query.replace("CLASS", type);
         query = query.replace("PROPERTY", property);
         query = query.replace("OBJECT_TYPE", shClassType);
-        System.out.println(query);
         return query;
     }
 

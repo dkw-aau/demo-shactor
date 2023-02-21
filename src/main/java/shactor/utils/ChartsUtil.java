@@ -1,23 +1,34 @@
 package shactor.utils;
 
+import com.storedobject.chart.*;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.*;
+import com.vaadin.flow.component.charts.model.ChartType;
+import com.vaadin.flow.component.charts.model.Legend;
+import com.vaadin.flow.component.charts.model.Title;
+import com.vaadin.flow.component.charts.model.XAxis;
+import com.vaadin.flow.component.charts.model.YAxis;
 import com.vaadin.flow.component.charts.model.style.FontWeight;
 import com.vaadin.flow.component.charts.model.style.SolidColor;
 import com.vaadin.flow.component.charts.model.style.Style;
+import cs.mg.MembershipGraph;
+import cs.qse.common.encoders.StringEncoder;
+import cs.qse.filebased.Parser;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class ChartsUtil {
-    
+
     public static void setupKnowledgeGraphStatsChart(Chart knowledgeGraphStatsPieChart) {
         Configuration conf = knowledgeGraphStatsPieChart.getConfiguration();
         conf.setTitle(new Title("Knowledge Graph Statistics"));
         conf.getChart().setType(ChartType.COLUMN);
-        
+
         XAxis xAxis = new XAxis();
         xAxis.setCategories("Triples", "Objects", "Literals", "Subjects", "Entities", "Properties", "Classes");
-        
+
         Labels labels = new Labels();
         //labels.setRotation(-45);
         labels.setAlign(HorizontalAlign.CENTER);
@@ -27,7 +38,7 @@ public class ChartsUtil {
         labels.setStyle(style);
         xAxis.setLabels(labels);
         conf.addxAxis(xAxis);
-        
+
         YAxis yAxis = new YAxis();
         Labels labelsYaxis = new Labels();
         labelsYaxis.setStyle(style);
@@ -35,18 +46,18 @@ public class ChartsUtil {
         yAxis.setTitle("Count");
         yAxis.getTitle().setStyle(style);
         conf.addyAxis(yAxis);
-        
+
         Legend legend = new Legend();
         legend.setEnabled(false);
         conf.setLegend(legend);
         //Tooltip tooltip = new Tooltip();
         //tooltip.setFormatter("'<b>'+ this.x +'</b><br/>'+'Population in 2008: '" + "+ Highcharts.numberFormat(this.y, 1) +' millions'");
         //conf.setTooltip(tooltip);
-        
+
         ListSeries series = new ListSeries("Data", 52281114, 19357319, 15269876, 15141546, 5823566, 1323, 427);
         DataLabels dataLabels = new DataLabels();
         dataLabels.setEnabled(true);
-        
+
         PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
         plotOptionsColumn.setColor(new SolidColor(Colors.LC_COLOR));
         Style styleFont = new Style();
@@ -56,11 +67,11 @@ public class ChartsUtil {
         plotOptionsColumn.setDataLabels(dataLabels);
         series.setPlotOptions(plotOptionsColumn);
         conf.addSeries(series);
-        
-        
+
+
         knowledgeGraphStatsPieChart.drawChart();
     }
-    
+
     public static void setupPieChartsDataWithDefaultStats(Chart chart, HashMap<String, String> statsMap, PruningUtil pruningUtil) {
         Configuration conf = chart.getConfiguration();
         conf.setTitle("Default Shapes Analysis");
@@ -78,17 +89,17 @@ public class ChartsUtil {
         configurePieChart(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
-    
+
     public static void setupPieChart(Chart chart, HashMap<String, String> statsMap, Integer support, PruningUtil pruningUtil) {
         Configuration conf = chart.getConfiguration();
         conf.setTitle("Shapes Analysis by Support");
         DataSeries series = new DataSeries();
         conf.getChart().setType(ChartType.PIE);
-        
+
         int ns_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_NS")) - Integer.parseInt(statsMap.get("COUNT_NS"));
         series.add(new DataSeriesItem("NS > " + support + " = " + ns_green, ns_green, new SolidColor(Colors.NS_COLOR)));
         series.add(new DataSeriesItem("NS < " + support + " = " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")), new SolidColor(Colors.NS_COLOR_RED)));
-        
+
         int ps_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_PS")) - Integer.parseInt(statsMap.get("COUNT_PS"));
         series.add(new DataSeriesItem("PS > " + support + " = " + ps_green, ps_green, new SolidColor(Colors.PS_COLOR)));
         series.add(new DataSeriesItem("PS < " + support + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")), new SolidColor(Colors.PS_COLOR_RED)));
@@ -104,7 +115,7 @@ public class ChartsUtil {
         Style styleFont = new Style();
         styleFont.setFontWeight(FontWeight.BOLD);
         conf.getChart().setStyle(styleFont);
-        
+
         conf.setSeries(series);
         conf.getChart().setStyledMode(true);
         PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
@@ -112,7 +123,7 @@ public class ChartsUtil {
         conf.setPlotOptions(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
-    
+
     public static void setupPieChart(Chart chart, HashMap<String, String> statsMap, Double confidence, PruningUtil pruningUtil) {
         Configuration conf = chart.getConfiguration();
         conf.setTitle("Shapes Analysis by Confidence");
@@ -122,7 +133,7 @@ public class ChartsUtil {
         //int ns_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_NS")) - Integer.parseInt(statsMap.get("COUNT_NS"));
         //series.add(new DataSeriesItem("NS > " + confPercent + " = " + ns_green, ns_green, new SolidColor(Colors.NS_COLOR)));
         //series.add(new DataSeriesItem("NS < " + confPercent + " = " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")), new SolidColor(Colors.NS_COLOR_RED)));
-        
+
         int ps_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_PS")) - Integer.parseInt(statsMap.get("COUNT_PS"));
         series.add(new DataSeriesItem("PS > " + confPercent + " = " + ps_green, ps_green, new SolidColor(Colors.PS_COLOR)));
         series.add(new DataSeriesItem("PS < " + confPercent + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")), new SolidColor(Colors.PS_COLOR_RED)));
@@ -138,14 +149,14 @@ public class ChartsUtil {
         Style styleFont = new Style();
         styleFont.setFontWeight(FontWeight.BOLD);
         conf.getChart().setStyle(styleFont);
-        
+
         conf.setSeries(series);
         conf.getChart().setStyledMode(true);
         PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
         configurePieChart(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
-    
+
     public static void setupPieChart(Chart chart, HashMap<String, String> statsMap, Integer support, Double confidence, PruningUtil pruningUtil) {
         Configuration conf = chart.getConfiguration();
         conf.setTitle("By Support and Confidence");
@@ -178,7 +189,7 @@ public class ChartsUtil {
         configurePieChart(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
-    
+
     public static void configurePieChart(PlotOptionsPie plotOptionsPie) {
         Style style = new Style();
         style.setFontSize("16px");
@@ -188,5 +199,88 @@ public class ChartsUtil {
         plotOptionsPie.setShowInLegend(true);
         plotOptionsPie.setSize("60%");
     }
-    
+
+    /*
+    https://vaadin.com/directory/component/so-charts
+     */
+    public static SOChart buildFunnel() {
+        // Creating a chart display area
+        SOChart soChart = new SOChart();
+        soChart.setSize("800px", "500px");
+
+
+        CategoryData labels = new CategoryData("Banana", "Apple", "Orange", "Grapes");
+        Data data = new Data(25, 40, 20, 30);
+
+        FunnelChart fc = new FunnelChart();
+        fc.setData(data);
+        fc.setItemNames(labels);
+
+        PieChart pc = new PieChart();
+        pc.setData(data);
+        pc.setItemNames(labels);
+
+        // Add to the chart display area with a simple title
+        soChart.add(pc, new com.storedobject.chart.Title("Funnel Chart"));
+
+        return soChart;
+    }
+
+    public static SOChart buildPieChart(HashMap<String, Integer> typeToEntityCount) {
+        SOChart soChart = new SOChart();
+        soChart.setSize("1000px", "500px");
+        CategoryData cd = new CategoryData();
+        Data values = new Data();
+        typeToEntityCount.forEach((k, v) -> {
+            cd.add(k);
+            values.add(v);
+        });
+
+        PieChart pc = new PieChart();
+        pc.setItemNames(cd);
+        pc.setData(values);
+
+        soChart.add(pc);
+        return soChart;
+    }
+
+
+    public static SOChart buildTaxonomyTree(Parser parser) {
+        SOChart soChart = new SOChart();
+        soChart.setSize("100%", "100%");
+        StringEncoder encoder = parser.getStringEncoder();
+        TreeChart tc = new TreeChart();
+        //ItemStyle itemStyle = new ItemStyle();
+        Orientation orientation = new Orientation();
+        orientation.topToBottom();
+        tc.setOrientation(orientation);
+
+        parser.createMembershipGraph();
+        MembershipGraph mg = parser.mg;
+        DefaultDirectedGraph<Integer, DefaultEdge> directedGraph = mg.getMembershipGraph();
+
+
+        TreeData td = new TreeData(encoder.decode(mg.getMembershipGraphRootNode()));
+        tc.setTreeData(td);
+        directedGraph.removeVertex(mg.getMembershipGraphRootNode());
+        Set<Integer> vertices = directedGraph.vertexSet();
+        vertices.forEach(vertex -> {
+            td.add(new TreeData(getLastWord(encoder.decode(vertex))));
+        });
+
+        directedGraph.iterables().edges().forEach(edge -> {
+            int source = directedGraph.getEdgeTarget(edge);
+            int target = directedGraph.getEdgeSource(edge);
+            td.get(source).add(td.get(target));
+        });
+        soChart.add(tc, new com.storedobject.chart.Title("Taxonomy"));
+        return soChart;
+    }
+
+    public static String getLastWord(String iri) {
+        String[] parts = iri.split("/");
+        return parts[parts.length - 1];
+    }
+
+
 }

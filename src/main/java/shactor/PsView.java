@@ -90,6 +90,8 @@ public class PsView extends LitTemplate {
     GraphExplorer graphExplorer;
     TextArea descriptionArea;
     Model currNsPsModel;
+    @Id("visualizeScopeButton")
+    private Button visualizeScopeButton;
 
 
     public PsView() {
@@ -123,13 +125,13 @@ public class PsView extends LitTemplate {
 
     private void setupStatus(HorizontalLayout hl) {
         if (propertyShape.getPruneFlag()) {
-            Span status = new Span(createIcon(VaadinIcon.FILE_REMOVE), new H4("To be Pruned!"));
+            Span status = new Span(createIcon(VaadinIcon.FILE_REMOVE), new Span("To be Pruned!"));
             status.getElement().getThemeList().add("badge error");
             status.setSizeFull();
             status.setHeightFull();
             hl.add(status);
         } else {
-            Span status = new Span(createIcon(VaadinIcon.FLAG), new H4("Not to be Pruned!"));
+            Span status = new Span(createIcon(VaadinIcon.FLAG), new Span("Not to be Pruned!"));
             status.getElement().getThemeList().add("badge success");
             status.setSizeFull();
             hl.add(status);
@@ -161,6 +163,10 @@ public class PsView extends LitTemplate {
         select.setItems(values);
         hl.add(select);
 
+        visualizeScopeButton.addClickListener(e -> {
+            Dialog dialog = DialogUtil.getDialogToDisplayChartWithHeaderAndFooter("Scope", ChartsUtil.buildPieChart(typeToEntityCount));
+            dialog.open();
+        });
         //buildQueryToExtractEntitiesForTypeOfPs
         /*
         String type = "";
@@ -175,10 +181,9 @@ public class PsView extends LitTemplate {
     private void setupGrid() {
         if (propertyShape.getHasOrList()) {
             psConstraintsGrid.setVisible(false);
-
-            psOrItemsConstraintsGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES); //LUMO_COMPACT
+            psOrItemsConstraintsGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
             psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getNodeKind).setHeader(Utils.boldHeader("sh:NodeKind")).setResizable(true).setAutoWidth(true);
-            psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getDataTypeOrClass).setHeader(Utils.boldHeader("sh:Class (Object Type)")).setResizable(true).setAutoWidth(true);
+            psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getDataTypeOrClass).setHeader(Utils.boldHeader("sh:Class or sh:dataType")).setResizable(true).setAutoWidth(true);
             psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getSupport).setHeader(Utils.boldHeader("Support")).setResizable(true).setAutoWidth(false).setSortable(true);
             psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getConfidenceInPercentage).setHeader(Utils.boldHeader("Confidence")).setResizable(true).setAutoWidth(false).setComparator(ShaclOrListItem::getConfidence);
 
@@ -187,56 +192,59 @@ public class PsView extends LitTemplate {
                     item.setDataTypeOrClass("Undefined");
                 }
             }
-
             psOrItemsConstraintsGrid.addColumn(new ComponentRenderer<>(Button::new, (button, shaclOrListItem) -> {
+                String objType = shaclOrListItem.getDataTypeOrClass();
+                String nodeKind = shaclOrListItem.getNodeKind();
                 button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
-                button.addClickListener(e -> {
-                    List<BindingSet> output;
-                    if (shaclOrListItem.getDataTypeOrClass().equals("Undefined")) {
-                        output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractObjectsHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
+                if (nodeKind.equals("IRI")) {
+                    button.addClickListener(e -> {
+                        List<BindingSet> output;
+                        if (objType.equals("Undefined")) {
+                            output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractObjectsHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
+                        } else {
+                            output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), shaclOrListItem.getDataTypeOrClass()));
+                        }
+                        createDialogueToShowEntities(output);
+                    });
+                    if (objType.equals("Undefined")) {
+                        button.setIcon(new Icon(VaadinIcon.LIST));
+                        button.setText("Retrieve undefined object type entities");
                     } else {
-                        output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), shaclOrListItem.getDataTypeOrClass()));
+                        button.setIcon(new Icon(VaadinIcon.LIST));
+                        button.setText("Retrieve specified object type entities");
                     }
-                    createDialogueToShowEntities(output);
-                });
-                if (shaclOrListItem.getDataTypeOrClass().equals("Undefined")) {
-                    button.setIcon(new Icon(VaadinIcon.LIST));
-                    button.setText("Show entities having undefined object types");
-                } else {
-                    button.setIcon(new Icon(VaadinIcon.LIST));
-                    button.setText("Show Entities having specified object type");
                 }
-
             })).setHeader(setHeaderWithInfoLogo("Action", "blah blah"));
+
             psOrItemsConstraintsGrid.setItems(propertyShape.getShaclOrListItems());
         } else {
             psOrItemsConstraintsGrid.setVisible(false);
-            //psConstraintsGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER); //LUMO_COMPACT
-            //psConstraintsGrid.addColumn(PS::getLocalNameFromIri).setHeader(new Html("<div style='font-weight: bold;'>Property Shape</div>")).setResizable(true).setAutoWidth(true).setComparator(PS::getPruneFlag);
+            if (propertyShape.getDataTypeOrClass() == null) {
+                propertyShape.setDataTypeOrClass("Undefined");
+            }
+            String nodeKind = propertyShape.getNodeKind();
+
             psConstraintsGrid.addColumn(PS::getPath).setHeader(Utils.boldHeader("Property Path")).setResizable(true).setAutoWidth(true);
             psConstraintsGrid.addColumn(PS::getNodeKind).setHeader(Utils.boldHeader("sh:NodeKind")).setResizable(true).setAutoWidth(true);
-            psConstraintsGrid.addColumn(PS::getDataTypeOrClass).setHeader(Utils.boldHeader("sh:datatype")).setResizable(true).setAutoWidth(true);
+            psConstraintsGrid.addColumn(PS::getDataTypeOrClass).setHeader(Utils.boldHeader("sh:Class or sh:dataType")).setResizable(true).setAutoWidth(true);
             psConstraintsGrid.addColumn(PS::getSupport).setHeader(Utils.boldHeader("Support")).setResizable(true).setAutoWidth(true).setSortable(true);
             psConstraintsGrid.addColumn(PS::getConfidenceInPercentage).setHeader(Utils.boldHeader("Confidence")).setResizable(true).setAutoWidth(true).setComparator(PS::getConfidence);
-
-            psConstraintsGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ps) -> {
-                button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
-                button.addClickListener(e -> {
-                    List<BindingSet> output;
-                    if (ps.getDataTypeOrClass().equals("Undefined")) {
-                        Utils.notifyMessage("Undefined " + ps.getDataTypeOrClass());
-                        //output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractObjectsHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
-                    } else {
-                        Utils.notifyMessage("Defined " + ps.getDataTypeOrClass());
-                        //output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), ps.getDataTypeOrClass()));
-                    }
-                    //createDialogueToShowEntities(output);
-                });
-                button.setIcon(new Icon(VaadinIcon.LIST));
-                button.setText("Show Entities");
-            })).setHeader(setHeaderWithInfoLogo("Action", "blah blah"));
-
-
+            if (nodeKind.equals("IRI")) {
+                psConstraintsGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ps) -> {
+                    button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
+                    button.addClickListener(e -> {
+                        List<BindingSet> output;
+                        if (ps.getDataTypeOrClass().equals("Undefined")) {
+                            output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractObjectsHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
+                        } else {
+                            output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), ps.getDataTypeOrClass()));
+                        }
+                        createDialogueToShowEntities(output);
+                    });
+                    button.setIcon(new Icon(VaadinIcon.LIST));
+                    button.setText("Retrieve specified object type entities");
+                })).setHeader(setHeaderWithInfoLogo("Action", "blah blah"));
+            }
             psConstraintsGrid.setItems(propertyShape);
         }
 
@@ -413,7 +421,12 @@ public class PsView extends LitTemplate {
                 Resource child = model.createResource();
                 Statement psNodeKind = ResourceFactory.createStatement(child, ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource((SHACL.IRI.toString())));
                 if (item.getDataTypeOrClass() != null) { //sometimes object type is not defined
-                    Statement psNodeType = ResourceFactory.createStatement(child, ResourceFactory.createProperty((SHACL.CLASS.toString())), ResourceFactory.createResource((item.getDataTypeOrClass())));
+                    Statement psNodeType = null;
+                    if (item.getNodeKind().equals("IRI")) {
+                        psNodeType = ResourceFactory.createStatement(child, ResourceFactory.createProperty((SHACL.CLASS.toString())), ResourceFactory.createResource((item.getDataTypeOrClass())));
+                    } else {
+                        psNodeType = ResourceFactory.createStatement(child, ResourceFactory.createProperty((SHACL.DATATYPE.toString())), ResourceFactory.createResource((item.getDataTypeOrClass())));
+                    }
                     model.add(psNodeType);
                 }
                 Statement psSupport = ResourceFactory.createStatement(child, ResourceFactory.createProperty((Constants.SUPPORT)), ResourceFactory.createTypedLiteral(item.getSupport().toString()));
@@ -467,7 +480,7 @@ public class PsView extends LitTemplate {
 
     private void createDialogueToShowEntities(List<BindingSet> tripleList) {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Entities");
+        dialog.setHeaderTitle("Entities (" + tripleList.size() + ")");
         //dialog.getFooter().add(createFilterButton(dialog));
         VerticalLayout dialogLayout = createDialogContentForShowingEntities(tripleList);
         dialog.add(dialogLayout);

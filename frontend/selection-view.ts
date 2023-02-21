@@ -25,7 +25,7 @@ export class SelectionView extends LitElement {
   <h3 id="title" style="align-self: center; flex-grow: 1; padding: var(--lumo-space-s); flex-shrink: 1; text-align:center">SHACTOR : SHapes ExtrACTOR from very large Knowledge Graphs</h3>
  </vaadin-horizontal-layout>
  <vaadin-vertical-layout class="content" style="width: 100%; flex-grow: 1; flex-shrink: 1; flex-basis: auto;" id="contentVerticalLayout">
-  <h4 style="align-self: center; width: 80%; margin-bottom: 0%;">SHACTOR (Step 2/3)</h4>
+  <h4 style="align-self: center; width: 80%; margin-bottom: 0%;">SHACTOR (Step 2/4)</h4>
   <p style="margin-right: 10%; margin-left: 10%; align-self: stretch;">SHACTOR will take you through different steps of shapes extraction and show information about each step. Here you can see the information about first phase:</p>
   <h5 id="graphInfo" style="align-self: center; width: 80%;">graphInfo</h5>
   <vaadin-text-field placeholder="Search Class Names" id="searchField" style="width: 80%; align-self: flex-start; margin-left: 10%;" type="text">

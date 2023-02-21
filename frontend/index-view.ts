@@ -22,7 +22,7 @@ export class IndexView extends LitElement {
   <h3 id="title" style="align-self: stretch; flex-grow: 1; flex-shrink: 1; text-align:center;">SHACTOR : SHapes ExtrACTOR from very large Knowledge Graphs</h3>
  </vaadin-horizontal-layout>
  <vaadin-vertical-layout style="align-self: center;">
-  <h6 style="align-self: center; width: 80%;">Improving the Quality of Large-Scale Knowledge Graphs with Validating Shapes</h6>
+  <h4 style="align-self: center; width: 80%;">Improving the Quality of Large-Scale Knowledge Graphs with Validating Shapes - (Step 1/4)</h4>
   <p style="align-self: center; width: 80%;">SHACTOR is a system for extracting quality SHACL shapes from very large Knowledge Graphs (KGs), analyzing them to find spurious shapes constraints, and finding erroneous triples in the KG. </p>
   <vaadin-tabsheet id="tabSheet" style="flex-grow: 0; align-self: center; flex-shrink: 0; width: 80%; margin: var(--lumo-space-m);"></vaadin-tabsheet>
  </vaadin-vertical-layout>

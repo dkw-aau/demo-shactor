@@ -4,7 +4,6 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.charts.Chart;
-import com.vaadin.flow.component.charts.model.style.ButtonTheme;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.Grid;
@@ -34,6 +33,7 @@ import cs.qse.common.structure.ShaclOrListItem;
 import cs.qse.filebased.Parser;
 import org.apache.commons.io.FileUtils;
 import org.vaadin.olli.FileDownloadWrapper;
+import shactor.utils.ChartsUtil;
 import shactor.utils.PruningUtil;
 import shactor.utils.Utils;
 
@@ -144,7 +144,10 @@ public class ExtractionView extends LitTemplate {
         });
         readShactorLogsButton.addClickListener(buttonClickEvent -> {
         });
+
         taxonomyVisualizationButton.addClickListener(buttonClickEvent -> {
+            RouterLink link = new RouterLink("taxonomy-view", TaxonomyView.class);
+            taxonomyVisualizationButton.getUI().ifPresent(ui -> ui.getPage().open(link.getHref()));
         });
 
         startPruningButton.addClickListener(buttonClickEvent -> {
@@ -503,4 +506,5 @@ public class ExtractionView extends LitTemplate {
     public static Double getConfidence() {
         return confidence;
     }
+
 }
