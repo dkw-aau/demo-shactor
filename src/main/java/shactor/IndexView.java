@@ -26,8 +26,6 @@ import static shactor.utils.Utils.*;
 @JsModule("./index-view.ts")
 @Route("")
 public class IndexView extends LitTemplate {
-    public static String graphURL = "";
-    
     @Id("tabSheet")
     private TabSheet tabSheet;
     @Id("footerImageLeftDiv")
@@ -38,8 +36,19 @@ public class IndexView extends LitTemplate {
     private Image footerRightImage;
     @Id("footerLeftImage")
     private Image footerLeftImage;
-    
-    
+
+    public static enum Category {
+        EXISTING_FILE_BASED,
+        UPLOAD_FILE_BASED,
+        CONNECT_END_POINT,
+        ANALYZE_SHAPES
+    }
+
+    public static Category category;
+    public static String graphURL = "";
+    public static String endPointRepo = "";
+
+
     public IndexView() {
         Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
@@ -49,76 +58,86 @@ public class IndexView extends LitTemplate {
         tabSheet.add("Connect to SPARQL Endpoint", getTabThreeLayout());
         tabSheet.add("Analyze SHACL Shapes", getTabFourLayout());
     }
-    
-    
+
+
     private VerticalLayout getTabOneLayout() {
         VerticalLayout vl = getVerticalLayout();
         vl.add(configureAndGetSelectField());
         Button continueButton = getPrimaryButton("Continue");
-        
-        RadioButtonGroup rbg = getRadioButtonGroup("Select QSE Type:", new ArrayList<>(Arrays.asList("Exact", "Approximate")));
+
+        RadioButtonGroup<String> rbg = getRadioButtonGroup("Select QSE Type:", new ArrayList<>(Arrays.asList("Exact", "Approximate")));
         vl.add(rbg);
         continueButton.addClickListener(buttonClickEvent -> {
-            Utils.notifyMessage(rbg.getValue().toString());
+            Utils.notifyMessage(rbg.getValue());
             //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt";
             graphURL = "/Users/kashifrabbani/Documents/GitHub/data/DBpedia/DBpediaCityAndTown.nt";
-
+            //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/toy/uni0-lubm.nt";
             // Server: /home/ubuntu/data/dbpedia_ml.nt
             //graphURL = "/home/ubuntu/data/dbpedia_ml.nt";
+            category = Category.EXISTING_FILE_BASED;
             continueButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });
         vl.add(continueButton);
         return vl;
     }
-    
+
     private VerticalLayout getTabTwoLayout() {
         VerticalLayout vl = getVerticalLayout();
         TextField textField = getTextField("Enter Graph URL (in .NT Format)");
-        
+
         Button uploadGraphButton = getPrimaryButton("Upload Graph");
         vl.add(textField);
         vl.add(uploadGraphButton);
-        
+
         uploadGraphButton.addClickListener(buttonClickEvent -> {
             Notification.show("URL: " + textField.getValue());
             graphURL = textField.getValue();
+            category = Category.UPLOAD_FILE_BASED;
             uploadGraphButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });
         return vl;
     }
-    
+
     private VerticalLayout getTabThreeLayout() {
         VerticalLayout vl = getVerticalLayout();
         TextField textField = getTextField("Enter address of a SPARQL endpoint");
+        TextField textFieldRepo = getTextField("Enter name of a repository (for GraphDB)");
         Button graphEndpointButton = getPrimaryButton("Connect");
         vl.add(textField);
+        vl.add(textFieldRepo);
         vl.add(graphEndpointButton);
-        
+
+        textField.setValue("http://10.92.0.34:7200/");
+        textFieldRepo.setValue("DBPEDIA_ML");
+
         graphEndpointButton.addClickListener(buttonClickEvent -> {
             graphURL = textField.getValue();
-            Utils.notify("Not Implemented Yet!", NotificationVariant.LUMO_ERROR, Notification.Position.TOP_CENTER);
-            //graphEndpointButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
+            endPointRepo = textFieldRepo.getValue();
+            category = Category.CONNECT_END_POINT;
+            //Utils.notify("Not Implemented Yet!", NotificationVariant.LUMO_ERROR, Notification.Position.TOP_CENTER);
+            graphEndpointButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });
         return vl;
     }
-    
+
     private VerticalLayout getTabFourLayout() {
         VerticalLayout vl = getVerticalLayout();
         TextField textField = getTextField("Enter Shapes File URL (in .TTL format)");
-        
+
         Button shapesUploadButton = getPrimaryButton("Upload");
         vl.add(textField);
         vl.add(shapesUploadButton);
-        
+
         shapesUploadButton.addClickListener(buttonClickEvent -> {
             graphURL = textField.getValue();
+            category = Category.ANALYZE_SHAPES;
             Utils.notify("Not Implemented Yet!", NotificationVariant.LUMO_ERROR, Notification.Position.TOP_CENTER);
             //shapesUploadButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });
         return vl;
     }
-    
+
     // Helper Methods
-    
-    
+
+
 }

@@ -31,6 +31,7 @@ import cs.qse.common.structure.NS;
 import cs.qse.common.structure.PS;
 import cs.qse.common.structure.ShaclOrListItem;
 import cs.qse.filebased.Parser;
+import cs.qse.querybased.nonsampling.QbParser;
 import org.apache.commons.io.FileUtils;
 import org.vaadin.olli.FileDownloadWrapper;
 import shactor.utils.ChartsUtil;
@@ -92,7 +93,7 @@ public class ExtractionView extends LitTemplate {
     private Chart shapesStatsByBothPieChart;
 
     private final PruningUtil pruningUtil = new PruningUtil();
-    static Parser parser;
+
     String currNodeShape;
     String prunedFileAddress = "";
 
@@ -121,7 +122,7 @@ public class ExtractionView extends LitTemplate {
     public ExtractionView() {
         setupKnowledgeGraphStatsChart(knowledgeGraphStatsPieChart);
         //Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
-        parser = SelectionView.getParser();
+
         psGridRadioButtonInfo.setVisible(false);
         nsGridRadioButtonInfo.setVisible(false);
         downloadSelectedShapesButton.setVisible(false);
@@ -176,21 +177,32 @@ public class ExtractionView extends LitTemplate {
     }
 
     private void beginPruning() {
+        shapesGrid.removeAllColumns();
         support = Integer.parseInt(supportTextField.getValue());
         confidence = (Double.parseDouble(confidenceTextField.getValue())) / 100;
-        System.out.println(support + " - " + confidence);
-        System.out.println(parser.shapesExtractor.getNodeShapes().size());
-        shapesGrid.removeAllColumns();
+        List<NS> nodeShapes = null;
 
-        AtomicReference<List<NS>> nodeShapes = new AtomicReference<>(parser.shapesExtractor.getNodeShapes());
+        switch (IndexView.category) {
+            case EXISTING_FILE_BASED -> {
+                Parser parser = SelectionView.getParser();
+                this.prunedFileAddress = parser.extractSHACLShapesWithPruning(SelectionView.isFilteredClasses, confidence, support, SelectionView.chosenClasses); // extract shapes with pruning
+                nodeShapes = parser.shapesExtractor.getNodeShapes();
+            }
+            case CONNECT_END_POINT -> {
+                QbParser qbParser = SelectionView.getQbParser();
+                this.prunedFileAddress = qbParser.extractSHACLShapesWithPruning(confidence, support); // extract shapes with pruning
+                nodeShapes = qbParser.shapesExtractor.getNodeShapes();
+            }
+        }
 
-        pruningUtil.applyPruningFlags(nodeShapes.get(), support, confidence);
-        pruningUtil.getDefaultStats(nodeShapes.get());
-        pruningUtil.getStatsBySupport(nodeShapes.get());
-        pruningUtil.getStatsByConfidence(nodeShapes.get());
-        pruningUtil.getStatsByBoth(nodeShapes.get());
+        assert nodeShapes != null;
+        pruningUtil.applyPruningFlags(nodeShapes, support, confidence);
+        pruningUtil.getDefaultStats(nodeShapes);
+        pruningUtil.getStatsBySupport(nodeShapes);
+        pruningUtil.getStatsByConfidence(nodeShapes);
+        pruningUtil.getStatsByBoth(nodeShapes);
 
-        this.prunedFileAddress = parser.extractSHACLShapesWithPruning(SelectionView.isFilteredClasses, confidence, support, SelectionView.chosenClasses); // extract shapes with pruning
+
         headingPieCharts.setVisible(true);
         headingNodeShapesAnalysis.setVisible(true);
         setupPieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault(), pruningUtil);
@@ -203,27 +215,28 @@ public class ExtractionView extends LitTemplate {
         shapesStatsByConfidencePieChart.drawChart();
         shapesStatsByBothPieChart.drawChart();
 
-        setupNodeShapesGrid(nodeShapes.get(), support, confidence);
+        setupNodeShapesGrid(nodeShapes, support, confidence);
         //downloadPrunedShapesButton.setText("Download Reliable Shapes Pruned with Support: " + support + " and Confidence: " + Math.round(confidence * 100) + "%");
 
         downloadPrunedShapesButton.setVisible(true);
         setupFilterRadioGroup(vaadinRadioGroup);
         vaadinRadioGroup.setVisible(true);
+        List<NS> finalNodeShapes = nodeShapes;
         vaadinRadioGroup.addValueChangeListener(listener -> {
             if (listener.getValue() != null) {
                 if (vaadinRadioGroup.getValue().equals("Above")) {
-                    shapesGrid.setItems(positive(nodeShapes.get()));
+                    shapesGrid.setItems(positive(finalNodeShapes));
                     shapesGrid.getDataProvider().refreshAll();
                 }
 
                 if (vaadinRadioGroup.getValue().equals("Below")) {
-                    shapesGrid.setItems(negative(nodeShapes.get()));
+                    shapesGrid.setItems(negative(finalNodeShapes));
                     shapesGrid.getDataProvider().refreshAll();
                 }
 
                 if (vaadinRadioGroup.getValue().equals("All")) {
                     System.out.println("Default");
-                    shapesGrid.setItems(nodeShapes.get());
+                    shapesGrid.setItems(finalNodeShapes);
                     shapesGrid.getDataProvider().refreshAll();
                 }
             }

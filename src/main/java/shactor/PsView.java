@@ -101,26 +101,26 @@ public class PsView extends LitTemplate {
 
         setupNodeShapeInfo(infoHorizontalLayout);
         setupPropertyShapeInfo(infoHorizontalLayoutTwo);
-        setupTypesScopeOfPs(infoHorizontalLayoutTwo);
+        //setupTypesScopeOfPs(infoHorizontalLayoutTwo);
         setupStatus(statusHorizontalLayout);
         setupTextArea();
         setupGrid();
         setupActionButtons();
     }
 
-    private void setupNodeShapeInfo(HorizontalLayout vl) {
+    private void setupNodeShapeInfo(HorizontalLayout hl) {
         //vl.add(new H4("Node Shape (NS) Info:"));
-        vl.add(Utils.getReadOnlyTextField("Node Shape: ", nodeShape.getLocalNameFromIri()));
-        vl.add(Utils.getReadOnlyTextField("No. of Property Shapes (PS) of :" + nodeShape.getLocalNameFromIri() + ": ", nodeShape.getCountPropertyShapes().toString()));
-        vl.add(Utils.getReadOnlyTextField("Target Class: ", nodeShape.getTargetClass().toString()));
+        hl.add(Utils.getReadOnlyTextField("Node Shape: ", nodeShape.getLocalNameFromIri()));
+        hl.add(Utils.getReadOnlyTextField("No. of PS of :" + nodeShape.getLocalNameFromIri() + ": ", nodeShape.getCountPropertyShapes().toString()));
+        hl.add(Utils.getReadOnlyTextField("Target Class: ", nodeShape.getTargetClass().toString()));
+        hl.add(Utils.getReadOnlyTextField("Support Threshold: ", ExtractionView.getSupport().toString()));
+        hl.add(Utils.getReadOnlyTextField("Confidence Threshold: ", ExtractionView.getConfidence() * 100 + "%"));
     }
 
     private void setupPropertyShapeInfo(HorizontalLayout hl) {
         //vl.add(new H4("Property Shape (PS) Info:"));
         hl.add(Utils.getReadOnlyTextField("PS PATH: ", propertyShape.getPath()));
         hl.add(Utils.getReadOnlyTextField("PS IRI: ", nodeShape.getIri().toString()));
-        hl.add(Utils.getReadOnlyTextField("Support Threshold: ", ExtractionView.getSupport().toString()));
-        hl.add(Utils.getReadOnlyTextField("Confidence Threshold: ", ExtractionView.getConfidence() * 100 + "%"));
     }
 
     private void setupStatus(HorizontalLayout hl) {
@@ -421,7 +421,7 @@ public class PsView extends LitTemplate {
                 Resource child = model.createResource();
                 Statement psNodeKind = ResourceFactory.createStatement(child, ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource((SHACL.IRI.toString())));
                 if (item.getDataTypeOrClass() != null) { //sometimes object type is not defined
-                    Statement psNodeType = null;
+                    Statement psNodeType;
                     if (item.getNodeKind().equals("IRI")) {
                         psNodeType = ResourceFactory.createStatement(child, ResourceFactory.createProperty((SHACL.CLASS.toString())), ResourceFactory.createResource((item.getDataTypeOrClass())));
                     } else {
@@ -442,15 +442,26 @@ public class PsView extends LitTemplate {
             model.add(ResourceFactory.createResource((this.propertyShape.getIri().toString())), model.createProperty(SHACL.OR.toString()), list); // relate the root to the list
 
         } else {
-            Statement psNodeKind = ResourceFactory.createStatement(ResourceFactory.createResource((this.propertyShape.getIri().toString())), ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource((SHACL.LITERAL.toString())));
+
             if (this.propertyShape.getDataTypeOrClass() != null) {
-                Statement psNodeType = ResourceFactory.createStatement(ResourceFactory.createResource((this.propertyShape.getIri().toString())), ResourceFactory.createProperty((SHACL.DATATYPE.toString())), ResourceFactory.createResource((this.propertyShape.getDataTypeOrClass())));
-                model.add(psNodeType);
+                if (!this.propertyShape.getDataTypeOrClass().equals("Undefined")) {
+                    Statement psNodeType = ResourceFactory.createStatement(ResourceFactory.createResource((this.propertyShape.getIri().toString())), ResourceFactory.createProperty((SHACL.DATATYPE.toString())), ResourceFactory.createResource((this.propertyShape.getDataTypeOrClass())));
+                    model.add(psNodeType);
+                }
+
             }
+            if (this.propertyShape.getNodeKind().equals("IRI")) {
+                Statement psNodeKind = ResourceFactory.createStatement(ResourceFactory.createResource((this.propertyShape.getIri().toString())), ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource(SHACL.IRI.toString()));
+                model.add(psNodeKind);
+            }
+
+            if (this.propertyShape.getNodeKind().equals("Literal")) {
+                Statement psNodeKind = ResourceFactory.createStatement(ResourceFactory.createResource((this.propertyShape.getIri().toString())), ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource(SHACL.LITERAL.toString()));
+                model.add(psNodeKind);
+            }
+
             Statement psSupport = ResourceFactory.createStatement(ResourceFactory.createResource((this.propertyShape.getIri().toString())), ResourceFactory.createProperty((Constants.SUPPORT)), ResourceFactory.createTypedLiteral(this.propertyShape.getSupport().toString()));
             Statement psConfidence = ResourceFactory.createStatement(ResourceFactory.createResource((this.propertyShape.getIri().toString())), ResourceFactory.createProperty((Constants.CONFIDENCE)), ResourceFactory.createTypedLiteral(this.propertyShape.getConfidence().toString()));
-
-            model.add(psNodeKind);
 
             model.add(psSupport);
             model.add(psConfidence);

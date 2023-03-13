@@ -62,7 +62,7 @@ public class Utils {
         return primaryButton;
     }
 
-    public static RadioButtonGroup getRadioButtonGroup(String label, List<String> items) {
+    public static RadioButtonGroup<String> getRadioButtonGroup(String label, List<String> items) {
         RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
         radioGroup.setWidth("50%");
         //radioGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
