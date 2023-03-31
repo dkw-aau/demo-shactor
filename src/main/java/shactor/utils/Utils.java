@@ -144,4 +144,9 @@ public class Utils {
     public static Html boldHeader(String label) {
         return new Html("<div style='font-weight: bold;'>" + label + "</div>");
     }
+
+
+    public static boolean matchesTerm(String value, String searchTerm) {
+        return value.toLowerCase().contains(searchTerm.toLowerCase());
+    }
 }

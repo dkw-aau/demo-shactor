@@ -90,8 +90,8 @@ public class PsView extends LitTemplate {
     GraphExplorer graphExplorer;
     TextArea descriptionArea;
     Model currNsPsModel;
-    @Id("visualizeScopeButton")
-    private Button visualizeScopeButton;
+//    @Id("visualizeScopeButton")
+//    private Button visualizeScopeButton;
 
 
     public PsView() {
@@ -163,10 +163,10 @@ public class PsView extends LitTemplate {
         select.setItems(values);
         hl.add(select);
 
-        visualizeScopeButton.addClickListener(e -> {
-            Dialog dialog = DialogUtil.getDialogToDisplayChartWithHeaderAndFooter("Scope", ChartsUtil.buildPieChart(typeToEntityCount));
-            dialog.open();
-        });
+//        visualizeScopeButton.addClickListener(e -> {
+//            Dialog dialog = DialogUtil.getDialogToDisplayChartWithHeaderAndFooter("Scope", ChartsUtil.buildPieChart(typeToEntityCount));
+//            dialog.open();
+//        });
         //buildQueryToExtractEntitiesForTypeOfPs
         /*
         String type = "";

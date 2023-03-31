@@ -8,6 +8,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Paragraph;
@@ -24,6 +25,7 @@ import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.template.Id;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.StreamResource;
@@ -36,6 +38,7 @@ import org.apache.commons.io.FileUtils;
 import org.vaadin.olli.FileDownloadWrapper;
 import shactor.utils.ChartsUtil;
 import shactor.utils.PruningUtil;
+import shactor.utils.Type;
 import shactor.utils.Utils;
 
 import java.io.ByteArrayInputStream;
@@ -46,6 +49,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static shactor.utils.ChartsUtil.*;
+import static shactor.utils.Utils.matchesTerm;
 import static shactor.utils.Utils.setHeaderWithInfoLogo;
 
 
@@ -117,12 +121,17 @@ public class ExtractionView extends LitTemplate {
     static Double confidence;
     @Id("actionButtonsHorizontalLayout")
     private HorizontalLayout actionButtonsHorizontalLayout;
+    @Id("nsSearchField")
+    private TextField nsSearchField;
+    @Id("psSearchField")
+    private TextField psSearchField;
 
 
     public ExtractionView() {
         setupKnowledgeGraphStatsChart(knowledgeGraphStatsPieChart);
         //Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
-
+        nsSearchField.setVisible(false);
+        psSearchField.setVisible(false);
         psGridRadioButtonInfo.setVisible(false);
         nsGridRadioButtonInfo.setVisible(false);
         downloadSelectedShapesButton.setVisible(false);
@@ -315,10 +324,21 @@ public class ExtractionView extends LitTemplate {
         //setClassNameToHighlightNodeShapesInRed(shapesGrid);
 
         nodeShapes.sort((d1, d2) -> d2.getSupport() - d1.getSupport());
-        shapesGrid.setItems(nodeShapes);
+        GridListDataView<NS> dataView = shapesGrid.setItems(nodeShapes);
         shapesGrid.addSelectionListener(selection -> {
             System.out.printf("Number of selected classes: %s%n", selection.getAllSelectedItems().size());
             downloadSelectedShapesButton.setVisible(true);
+        });
+        nsSearchField.setVisible(true);
+        nsSearchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        nsSearchField.setValueChangeMode(ValueChangeMode.EAGER);
+        nsSearchField.addValueChangeListener(e -> dataView.refreshAll());
+
+        dataView.addFilter(type -> {
+            String searchTerm = nsSearchField.getValue().trim();
+            if (searchTerm.isEmpty())
+                return true;
+            return matchesTerm(type.getLocalNameFromIri(), searchTerm);
         });
     }
 
@@ -423,7 +443,20 @@ public class ExtractionView extends LitTemplate {
         });
 
         ns.getPropertyShapes().sort((d1, d2) -> d2.getSupport() - d1.getSupport());
-        propertyShapesGrid.setItems(ns.getPropertyShapes());
+        GridListDataView<PS> dataView = propertyShapesGrid.setItems(ns.getPropertyShapes());
+
+
+        psSearchField.setVisible(true);
+        psSearchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        psSearchField.setValueChangeMode(ValueChangeMode.EAGER);
+        psSearchField.addValueChangeListener(e -> dataView.refreshAll());
+
+        dataView.addFilter(type -> {
+            String searchTerm = psSearchField.getValue().trim();
+            if (searchTerm.isEmpty())
+                return true;
+            return matchesTerm(type.getLocalNameFromIri(), searchTerm);
+        });
     }
 
     private void setupFilterRadioGroup(RadioButtonGroup<String> vaadinRadioGroup) {

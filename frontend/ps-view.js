@@ -6,11 +6,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { LitElement, html, css, customElement } from 'lit-element';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-vertical-layout.js';
-import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/grid/src/vaadin-grid.js';
 import '@vaadin/text-area/src/vaadin-text-area.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
+import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/button/src/vaadin-button.js';
 let PsView = class PsView extends LitElement {
     static get styles() {
@@ -31,11 +31,6 @@ let PsView = class PsView extends LitElement {
   <h4 style="align-self: center;">PS Analysis Dashboard - SHACTOR (Step 4/4)</h4>
   <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayout" style="align-self: stretch;"></vaadin-horizontal-layout>
   <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayoutTwo" style="align-self: stretch;"></vaadin-horizontal-layout>
-  <vaadin-horizontal-layout theme="spacing" style="align-self: center;">
-   <vaadin-button id="visualizeScopeButton" style="align-self: center; flex-grow: 0;" tabindex="0">
-    Visualize Scope
-   </vaadin-button>
-  </vaadin-horizontal-layout>
   <vaadin-horizontal-layout id="statusHorizontalLayout" style="align-self: center;"></vaadin-horizontal-layout>
   <h4>Selected Property Shape Info:</h4>
   <p>This property shape has following constraints where you can check conformance of each constraint with the graph. We show support and confidence of each PS constraint along with options to retrieve or edit the entities corresponding to each constraints.</p>
