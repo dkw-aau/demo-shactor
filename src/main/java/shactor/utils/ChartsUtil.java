@@ -20,8 +20,10 @@ import org.jgrapht.graph.DefaultEdge;
 
 import java.util.*;
 
+/**
+ * https://vaadin.com/directory/component/so-charts
+ */
 public class ChartsUtil {
-
     public static void setupKnowledgeGraphStatsChart(Chart knowledgeGraphStatsPieChart) {
         Configuration conf = knowledgeGraphStatsPieChart.getConfiguration();
         conf.setTitle(new Title("Knowledge Graph Statistics"));
@@ -68,8 +70,6 @@ public class ChartsUtil {
         plotOptionsColumn.setDataLabels(dataLabels);
         series.setPlotOptions(plotOptionsColumn);
         conf.addSeries(series);
-
-
         knowledgeGraphStatsPieChart.drawChart();
     }
 
@@ -242,36 +242,28 @@ public class ChartsUtil {
     /*
     https://vaadin.com/directory/component/so-charts
      */
-    public static SOChart buildFunnel() {
+    public static SOChart buildBarChartUsingDbpediaStats() {
         // Creating a chart display area
         SOChart soChart = new SOChart();
-        soChart.setSize("800px", "500px");
-
-
-        CategoryData labels = new CategoryData("Banana", "Apple", "Orange", "Grapes");
-        Data data = new Data(25, 40, 20, 30);
-
-        FunnelChart fc = new FunnelChart();
-        fc.setData(data);
-        fc.setItemNames(labels);
-
-        PieChart pc = new PieChart();
-        pc.setData(data);
-        pc.setItemNames(labels);
-
-        // Add to the chart display area with a simple title
-        soChart.add(pc, new com.storedobject.chart.Title("Funnel Chart"));
-
+        soChart.setSize("95%", "100%");
+        CategoryData labels = new CategoryData("Triples", "Objects", "Literals", "Subjects", "Entities", "Properties", "Classes");
+        Data data = new Data(52281114, 19357319, 15269876, 15141546, 5823566, 1323, 427);
+        NightingaleRoseChart rc = new NightingaleRoseChart(labels, data);
+        //Position p = new Position();
+        //p.setTop(Size.percentage(25));
+        //rc.setPosition(p);
+        soChart.disableDefaultLegend();
+        soChart.add(rc);
         return soChart;
     }
 
-    public static SOChart buildPieChart(HashMap<String, Integer> typeToEntityCount) {
+    public static SOChart buildPieChart(HashMap<String, Integer> map) {
         SOChart soChart = new SOChart();
 
         soChart.setSize("350px", "200px");
         CategoryData cd = new CategoryData();
         Data values = new Data();
-        typeToEntityCount.forEach((k, v) -> {
+        map.forEach((k, v) -> {
             cd.add(k);
             values.add(v);
         });

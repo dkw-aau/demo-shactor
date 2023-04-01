@@ -22,6 +22,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.progressbar.ProgressBarVariant;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.template.Id;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -87,8 +88,6 @@ public class ExtractionView extends LitTemplate {
 
 
     //Charts
-    @Id("knowledgeGraphStatsPieChart")
-    private Chart knowledgeGraphStatsPieChart;
     @Id("defaultShapesStatsPieChart")
     private Chart defaultShapesStatsPieChart;
     @Id("shapesStatsBySupportPieChart")
@@ -139,12 +138,17 @@ public class ExtractionView extends LitTemplate {
     private VerticalLayout vl3;
     @Id("vl4")
     private VerticalLayout vl4;
+    @Id("graphStatsVerticalLayout")
+    private VerticalLayout graphStatsVerticalLayout;
+    @Id("splitLayout")
+    private SplitLayout splitLayout;
 
 
     public ExtractionView() {
+        splitLayout.setSplitterPosition(60);
         chartsContainerHorizontalLayout.removeAll();
         soChartsContainerHorizontalLayout.setVisible(false);
-        setupKnowledgeGraphStatsChart(knowledgeGraphStatsPieChart);
+        graphStatsVerticalLayout.add(buildBarChartUsingDbpediaStats());
         //Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
         nsSearchField.setVisible(false);
         psSearchField.setVisible(false);

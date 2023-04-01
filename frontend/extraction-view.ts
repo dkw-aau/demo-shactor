@@ -1,14 +1,15 @@
 import {LitElement, html, css, customElement} from 'lit-element';
-import '@vaadin/vaadin-ordered-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/grid/src/vaadin-grid.js';
-import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
-import '@vaadin/text-field/src/vaadin-text-field.js';
 import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/charts/src/vaadin-chart.js';
+import '@vaadin/split-layout/src/vaadin-split-layout.js';
+import '@vaadin/vaadin-ordered-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/radio-group/src/vaadin-radio-group.js';
-import '@polymer/iron-icon/iron-icon.js';
 import '@vaadin/button/src/vaadin-button.js';
+import '@polymer/iron-icon/iron-icon.js';
+import '@vaadin/text-field/src/vaadin-text-field.js';
 import '@vaadin/vertical-layout/src/vaadin-vertical-layout.js';
+import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
 
 @customElement('extraction-view')
 export class ExtractionView extends LitElement {
@@ -28,9 +29,9 @@ export class ExtractionView extends LitElement {
   <vaadin-horizontal-layout class="header" style="width: 100%; flex-basis: var(--lumo-size-l); flex-shrink: 1; align-items: stretch; align-self: center;" id="header">
    <h3 id="title" style="align-self: center; flex-grow: 1; padding: var(--lumo-space-s); flex-shrink: 1; text-align:center">SHACTOR : SHapes ExtrACTOR from very large Knowledge Graphs</h3>
   </vaadin-horizontal-layout>
-  <vaadin-vertical-layout class="content" style="width: 100%; flex-grow: 1; flex-shrink: 0; flex-basis: auto;" id="contentVerticalLayout">
-   <vaadin-horizontal-layout theme="spacing" style="margin-right: 5%; margin-left: 5%; flex-grow: 0; align-self: stretch;">
-    <vaadin-vertical-layout theme="spacing" style="flex-grow: 0; flex-shrink: 0; width: 65%;">
+  <vaadin-vertical-layout class="content" style="flex-grow: 1; flex-shrink: 0; flex-basis: auto;" id="contentVerticalLayout">
+   <vaadin-split-layout id="splitLayout" style="align-self: stretch; margin-left: 5%; margin-right: 5%;">
+    <vaadin-vertical-layout theme="spacing" style="flex-grow: 1; flex-shrink: 1; width: 60%;">
      <h4>SHACTOR (Step 3/4)</h4>
      <p style="align-self: flex-start; margin-top: 0%;">SHACTOR has extracted SHACL shapes for the chosen classes. You have the following options:</p>
      <vaadin-horizontal-layout style="align-self: stretch;" id="actionButtonsHorizontalLayout">
@@ -56,21 +57,23 @@ export class ExtractionView extends LitElement {
       </vaadin-button>
      </vaadin-horizontal-layout>
     </vaadin-vertical-layout>
-    <vaadin-chart type="column" tooltip="" id="knowledgeGraphStatsPieChart" style="flex-grow: 0; flex-shrink: 0; width: 35%; align-self: stretch;" additional-options=""></vaadin-chart>
-   </vaadin-horizontal-layout>
+    <vaadin-vertical-layout id="graphStatsVerticalLayout" style="flex-grow: 0; flex-shrink: 1; width: 40%; flex-direction: column;">
+     <p class="bold-paragraph" style="align-self: center;" font-weight="bold">Knowledge Graph Statistics</p>
+    </vaadin-vertical-layout>
+   </vaadin-split-layout>
    <h2 id="headingPieCharts" style="align-self: stretch; margin-right: 5%; margin-left: 5%;">Shapes Statistical Analysis</h2>
    <vaadin-horizontal-layout theme="spacing" id="soChartsContainerHorizontalLayout" style="align-self: center;">
     <vaadin-vertical-layout theme="spacing" id="vl1">
-     <p style="align-self: center;">Default Shapes Analysis</p>
+     <p class="bold-paragraph" style="align-self: center;">Default Shapes Analysis</p>
     </vaadin-vertical-layout>
     <vaadin-vertical-layout theme="spacing" id="vl2">
-     <p style="align-self: center;">Shapes Analysis by Support</p>
+     <p class="bold-paragraph" style="align-self: center;">Shapes Analysis by Support</p>
     </vaadin-vertical-layout>
     <vaadin-vertical-layout theme="spacing" id="vl3">
-     <p style="align-self: center;">Shapes Analysis by Confidence</p>
+     <p class="bold-paragraph" style="align-self: center;">Shapes Analysis by Confidence</p>
     </vaadin-vertical-layout>
     <vaadin-vertical-layout theme="spacing" id="vl4">
-     <p style="align-self: center;">By Support and Confidence</p>
+     <p class="bold-paragraph" style="align-self: center;">By Support and Confidence</p>
     </vaadin-vertical-layout>
    </vaadin-horizontal-layout>
    <vaadin-horizontal-layout style="align-self: stretch; margin-left: 5%; margin-right: 5%; flex-shrink: 1; flex-grow: 1; margin-bottom: 0%; align-items: stretch; flex-wrap: nowrap;" id="chartsContainerHorizontalLayout">
