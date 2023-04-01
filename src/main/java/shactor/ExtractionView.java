@@ -45,7 +45,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static shactor.utils.ChartsUtil.*;
@@ -125,9 +127,23 @@ public class ExtractionView extends LitTemplate {
     private TextField nsSearchField;
     @Id("psSearchField")
     private TextField psSearchField;
+    @Id("chartsContainerHorizontalLayout")
+    private HorizontalLayout chartsContainerHorizontalLayout;
+    @Id("soChartsContainerHorizontalLayout")
+    private HorizontalLayout soChartsContainerHorizontalLayout;
+    @Id("vl1")
+    private VerticalLayout vl1;
+    @Id("vl2")
+    private VerticalLayout vl2;
+    @Id("vl3")
+    private VerticalLayout vl3;
+    @Id("vl4")
+    private VerticalLayout vl4;
 
 
     public ExtractionView() {
+        chartsContainerHorizontalLayout.removeAll();
+        soChartsContainerHorizontalLayout.setVisible(false);
         setupKnowledgeGraphStatsChart(knowledgeGraphStatsPieChart);
         //Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
         nsSearchField.setVisible(false);
@@ -186,6 +202,7 @@ public class ExtractionView extends LitTemplate {
     }
 
     private void beginPruning() {
+        soChartsContainerHorizontalLayout.setVisible(true);
         shapesGrid.removeAllColumns();
         support = Integer.parseInt(supportTextField.getValue());
         confidence = (Double.parseDouble(confidenceTextField.getValue())) / 100;
@@ -213,16 +230,21 @@ public class ExtractionView extends LitTemplate {
 
 
         headingPieCharts.setVisible(true);
-        headingNodeShapesAnalysis.setVisible(true);
-        setupPieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault(), pruningUtil);
-        setupPieChart(shapesStatsBySupportPieChart, pruningUtil.getStatsBySupport(), support, pruningUtil);
-        setupPieChart(shapesStatsByConfidencePieChart, pruningUtil.getStatsByConfidence(), confidence, pruningUtil);
-        setupPieChart(shapesStatsByBothPieChart, pruningUtil.getStatsByBoth(), support, confidence, pruningUtil);
 
-        defaultShapesStatsPieChart.drawChart();
-        shapesStatsBySupportPieChart.drawChart();
-        shapesStatsByConfidencePieChart.drawChart();
-        shapesStatsByBothPieChart.drawChart();
+        headingNodeShapesAnalysis.setVisible(true);
+        vl1.add(ChartsUtil.buildPieChart(preparePieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault(), pruningUtil)));
+        //setupPieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault(), pruningUtil);
+        vl2.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAnalysis(shapesStatsBySupportPieChart, pruningUtil.getStatsBySupport(), support, pruningUtil)));
+        //setupPieChart(shapesStatsBySupportPieChart, pruningUtil.getStatsBySupport(), support, pruningUtil);
+        vl3.add(ChartsUtil.buildPieChart(preparePieChartDataForConfidenceAnalysis(shapesStatsByConfidencePieChart, pruningUtil.getStatsByConfidence(), confidence, pruningUtil)));
+        //setupPieChart(shapesStatsByConfidencePieChart, pruningUtil.getStatsByConfidence(), confidence, pruningUtil);
+        vl4.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAndConfidenceAnalysis(shapesStatsByBothPieChart, pruningUtil.getStatsByBoth(), support, confidence, pruningUtil)));
+        //setupPieChart(shapesStatsByBothPieChart, pruningUtil.getStatsByBoth(), support, confidence, pruningUtil);
+
+        //defaultShapesStatsPieChart.drawChart();
+        //shapesStatsBySupportPieChart.drawChart();
+        //shapesStatsByConfidencePieChart.drawChart();
+        //shapesStatsByBothPieChart.drawChart();
 
         setupNodeShapesGrid(nodeShapes, support, confidence);
         //downloadPrunedShapesButton.setText("Download Reliable Shapes Pruned with Support: " + support + " and Confidence: " + Math.round(confidence * 100) + "%");

@@ -1,7 +1,6 @@
 import {LitElement, html, css, customElement} from 'lit-element';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/grid/src/vaadin-grid.js';
-import '@vaadin/vertical-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/text-field/src/vaadin-text-field.js';
 import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
@@ -9,6 +8,7 @@ import '@vaadin/charts/src/vaadin-chart.js';
 import '@vaadin/radio-group/src/vaadin-radio-group.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@vaadin/button/src/vaadin-button.js';
+import '@vaadin/vertical-layout/src/vaadin-vertical-layout.js';
 
 @customElement('extraction-view')
 export class ExtractionView extends LitElement {
@@ -59,7 +59,21 @@ export class ExtractionView extends LitElement {
     <vaadin-chart type="column" tooltip="" id="knowledgeGraphStatsPieChart" style="flex-grow: 0; flex-shrink: 0; width: 35%; align-self: stretch;" additional-options=""></vaadin-chart>
    </vaadin-horizontal-layout>
    <h2 id="headingPieCharts" style="align-self: stretch; margin-right: 5%; margin-left: 5%;">Shapes Statistical Analysis</h2>
-   <vaadin-horizontal-layout style="align-self: stretch; margin-left: 5%; margin-right: 5%; flex-shrink: 1; flex-grow: 1; margin-bottom: 0%; align-items: stretch; flex-wrap: nowrap;">
+   <vaadin-horizontal-layout theme="spacing" id="soChartsContainerHorizontalLayout" style="align-self: center;">
+    <vaadin-vertical-layout theme="spacing" id="vl1">
+     <p style="align-self: center;">Default Shapes Analysis</p>
+    </vaadin-vertical-layout>
+    <vaadin-vertical-layout theme="spacing" id="vl2">
+     <p style="align-self: center;">Shapes Analysis by Support</p>
+    </vaadin-vertical-layout>
+    <vaadin-vertical-layout theme="spacing" id="vl3">
+     <p style="align-self: center;">Shapes Analysis by Confidence</p>
+    </vaadin-vertical-layout>
+    <vaadin-vertical-layout theme="spacing" id="vl4">
+     <p style="align-self: center;">By Support and Confidence</p>
+    </vaadin-vertical-layout>
+   </vaadin-horizontal-layout>
+   <vaadin-horizontal-layout style="align-self: stretch; margin-left: 5%; margin-right: 5%; flex-shrink: 1; flex-grow: 1; margin-bottom: 0%; align-items: stretch; flex-wrap: nowrap;" id="chartsContainerHorizontalLayout">
     <vaadin-chart type="pie" tooltip="" id="defaultShapesStatsPieChart" style="align-self: flex-start; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
     <vaadin-chart type="pie" tooltip="" id="shapesStatsBySupportPieChart" style="align-self: flex-start; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
     <vaadin-chart type="pie" tooltip="" id="shapesStatsByConfidencePieChart" style="align-self: flex-start; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>

@@ -1,6 +1,7 @@
 package shactor.utils;
 
 import com.storedobject.chart.*;
+import com.storedobject.chart.Position;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.*;
 import com.vaadin.flow.component.charts.model.ChartType;
@@ -81,6 +82,7 @@ public class ChartsUtil {
         series.add(new DataSeriesItem("Literal PSc : " + statsMap.get("COUNT_LC"), Integer.parseInt(statsMap.get("COUNT_LC")), new SolidColor(Colors.LC_COLOR)));
         series.add(new DataSeriesItem("Non-Literal PSc : " + statsMap.get("COUNT_CC"), Integer.parseInt(statsMap.get("COUNT_CC")), new SolidColor(Colors.CC_COLOR)));
         conf.setSeries(series);
+
         conf.getChart().setStyledMode(true);
         Style styleFont = new Style();
         styleFont.setFontWeight(FontWeight.BOLD);
@@ -88,6 +90,15 @@ public class ChartsUtil {
         PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
         configurePieChart(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
+    }
+
+    public static HashMap<String, Integer> preparePieChartsDataWithDefaultStats(Chart chart, HashMap<String, String> statsMap, PruningUtil pruningUtil) {
+        HashMap<String, Integer> map = new HashMap<>();
+        map.put("NS : " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")));
+        map.put("PS : " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")));
+        map.put("Literal PSc : " + statsMap.get("COUNT_LC"), Integer.parseInt(statsMap.get("COUNT_LC")));
+        map.put("Non-Literal PSc : " + statsMap.get("COUNT_CC"), Integer.parseInt(statsMap.get("COUNT_CC")));
+        return map;
     }
 
     public static void setupPieChart(Chart chart, HashMap<String, String> statsMap, Integer support, PruningUtil pruningUtil) {
@@ -124,6 +135,17 @@ public class ChartsUtil {
         series.setPlotOptions(plotOptionsPie);
     }
 
+    public static HashMap<String, Integer> preparePieChartDataForSupportAnalysis(Chart chart, HashMap<String, String> statsMap, Integer support, PruningUtil pruningUtil) {
+        HashMap<String, Integer> map = new HashMap<>();
+        int ns_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_NS")) - Integer.parseInt(statsMap.get("COUNT_NS"));
+        map.put("NS > " + support + " = " + ns_green, ns_green);
+        map.put("NS < " + support + " = " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")));
+
+        int ps_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_PS")) - Integer.parseInt(statsMap.get("COUNT_PS"));
+        map.put("PS > " + support + " = " + ps_green, ps_green);
+        map.put("PS < " + support + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")));
+        return map;
+    }
     public static void setupPieChart(Chart chart, HashMap<String, String> statsMap, Double confidence, PruningUtil pruningUtil) {
         Configuration conf = chart.getConfiguration();
         conf.setTitle("Shapes Analysis by Confidence");
@@ -156,7 +178,15 @@ public class ChartsUtil {
         configurePieChart(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
-
+    public static HashMap<String, Integer> preparePieChartDataForConfidenceAnalysis(Chart chart, HashMap<String, String> statsMap, Double confidence, PruningUtil pruningUtil) {
+        HashMap<String, Integer> map = new HashMap<>();
+        int c = (int) (confidence * 100);
+        String confPercent = c + "%";
+        int ps_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_PS")) - Integer.parseInt(statsMap.get("COUNT_PS"));
+        map.put("PS > " + confPercent + " = " + ps_green, ps_green);
+        map.put("PS < " + confPercent + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")));
+        return map;
+    }
     public static void setupPieChart(Chart chart, HashMap<String, String> statsMap, Integer support, Double confidence, PruningUtil pruningUtil) {
         Configuration conf = chart.getConfiguration();
         conf.setTitle("By Support and Confidence");
@@ -188,6 +218,15 @@ public class ChartsUtil {
         PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
         configurePieChart(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
+    }
+    public static HashMap<String, Integer> preparePieChartDataForSupportAndConfidenceAnalysis(Chart chart, HashMap<String, String> statsMap, Integer support, Double confidence, PruningUtil pruningUtil) {
+        HashMap<String, Integer> map = new HashMap<>();
+        int c = (int) (confidence * 100);
+        String confPercent = c + "%";
+        int ps_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_PS")) - Integer.parseInt(statsMap.get("COUNT_PS"));
+        map.put("PS > " + "(" + support + ", " + confPercent + ") " + " = " + ps_green, ps_green);
+        map.put("PS < " + "(" + support + ", " + confPercent + ") " + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")));
+        return map;
     }
 
     public static void configurePieChart(PlotOptionsPie plotOptionsPie) {
@@ -228,18 +267,21 @@ public class ChartsUtil {
 
     public static SOChart buildPieChart(HashMap<String, Integer> typeToEntityCount) {
         SOChart soChart = new SOChart();
-        soChart.setSize("1000px", "500px");
+
+        soChart.setSize("350px", "200px");
         CategoryData cd = new CategoryData();
         Data values = new Data();
         typeToEntityCount.forEach((k, v) -> {
             cd.add(k);
             values.add(v);
         });
-
         PieChart pc = new PieChart();
         pc.setItemNames(cd);
-        pc.setData(values);
 
+        Position p = new Position();
+        p.setTop(Size.percentage(30));
+        pc.setPosition(p);
+        pc.setData(values);
         soChart.add(pc);
         return soChart;
     }
