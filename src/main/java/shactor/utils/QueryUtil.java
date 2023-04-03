@@ -59,6 +59,7 @@ public class QueryUtil {
                 """;
         query = query.replace("CLASS", type);
         query = query.replace("PROPERTY", property);
+        System.out.println(query);
         return query;
     }
 

@@ -289,29 +289,6 @@ public class PsView extends LitTemplate {
             }
             psConstraintsGrid.setItems(propertyShape);
         }
-
-        /*
-        psConstraintsGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ps) -> {
-                    progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
-                    progressBar.setId("quality-indicator-progress-bar");
-                    if (ps.getConfidence() != null) {
-                        progressBar.setValue(ps.getConfidence());
-                    } else {
-                        ShaclOrListItem item = null;
-                        for (ShaclOrListItem currItem : ps.getShaclOrListItems()) {
-                            if (item == null) {
-                                item = currItem;
-                            }
-                            if (currItem.getConfidence() > item.getConfidence()) {
-                                item = currItem;
-                            }
-                        }
-                        assert item != null;
-                        progressBar.setValue(item.getConfidence());
-                    }
-                }))
-                .setHeader(setHeaderWithInfoLogo("PSc Quality (by Confidence)", " This shows"))
-                .setResizable(true).setAutoWidth(true);*/
     }
 
     private void setupTextArea() {

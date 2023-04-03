@@ -10,6 +10,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.component.template.Id;
@@ -62,19 +63,18 @@ public class IndexView extends LitTemplate {
 
     private VerticalLayout getTabOneLayout() {
         VerticalLayout vl = getVerticalLayout();
-        vl.add(configureAndGetSelectField());
+        Select<String> datasetsSelection = configureAndGetSelectField();
+        vl.add(datasetsSelection);
+
         Button continueButton = getPrimaryButton("Continue");
 
         RadioButtonGroup<String> rbg = getRadioButtonGroup("Select QSE Type:", new ArrayList<>(Arrays.asList("Exact", "Approximate")));
         vl.add(rbg);
         continueButton.addClickListener(buttonClickEvent -> {
-            Utils.notifyMessage(rbg.getValue());
-            graphURL = "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt";
-            //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/DBpedia/DBpediaCityAndTown.nt";
-            //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/toy/uni0-lubm.nt";
-            // Server: /home/ubuntu/datasets/dbpedia_ml.nt
-            //graphURL = "/home/ubuntu/datasets/dbpedia_ml.nt";
+            //Utils.notifyMessage(rbg.getValue());
             category = Category.EXISTING_FILE_BASED;
+            graphURL = Utils.getDatasetsAddresses().get(datasetsSelection.getValue());
+            System.out.println(graphURL);
             continueButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });
         vl.add(continueButton);
@@ -138,6 +138,9 @@ public class IndexView extends LitTemplate {
     }
 
     // Helper Methods
-
-
+    //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt";
+    //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/DBpedia/DBpediaCityAndTown.nt";
+    //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/toy/uni0-lubm.nt";
+    // Server: /home/ubuntu/datasets/dbpedia_ml.nt
+    //graphURL = "/home/ubuntu/datasets/dbpedia_ml.nt";
 }

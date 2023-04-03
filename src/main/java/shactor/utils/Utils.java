@@ -51,8 +51,8 @@ public class Utils {
         Select<String> selectField = new Select<>();
         selectField.setWidth("50%");
         selectField.setLabel("Select from existing datasets");
-        selectField.setItems("DBpedia", "LUBM", "YAGO-4", "WikiData");
-        selectField.setValue("DBpedia");
+        selectField.setItems( "DBpediaMini", "DBpedia", "LUBM", "YAGO-4", "WATDIV");
+        //selectField.setValue("DBpedia");
         return selectField;
     }
 
@@ -148,5 +148,16 @@ public class Utils {
 
     public static boolean matchesTerm(String value, String searchTerm) {
         return value.toLowerCase().contains(searchTerm.toLowerCase());
+    }
+
+    public static HashMap<String, String> getDatasetsAddresses(){
+        HashMap<String, String> map = new HashMap<>();
+        //"DBpedia", "LUBM", "YAGO-4", "WikiData");
+        map.put("DBpediaMini", "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt");
+        map.put("DBpedia", "/home/ubuntu/datasets/dbpedia_ml.nt");
+        map.put("LUBM", "/home/ubuntu/datasets/lubm.n3");
+        map.put("YAGO-4", "/home/ubuntu/datasets/yago.n3");
+        map.put("WATDIV", "/home/ubuntu/datasets/WATDIV.n3");
+        return map;
     }
 }
