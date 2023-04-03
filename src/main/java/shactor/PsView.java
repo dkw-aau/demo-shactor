@@ -78,8 +78,6 @@ public class PsView extends LitTemplate {
     private Button buttonA;
     @Id("buttonB")
     private Button buttonB;
-    @Id("buttonC")
-    private Button buttonC;
     @Id("copySyntaxButton")
     private Button copySyntaxButton;
     @Id("statusHorizontalLayout")
@@ -90,9 +88,10 @@ public class PsView extends LitTemplate {
     GraphExplorer graphExplorer;
     TextArea descriptionArea;
     Model currNsPsModel;
-//    @Id("visualizeScopeButton")
-//    private Button visualizeScopeButton;
-
+    @Id("propCoverageInfoParagraph")
+    private Paragraph propCoverageInfoParagraph;
+    @Id("propCoverageQueryButton")
+    private Button propCoverageQueryButton;
 
     public PsView() {
         graphExplorer = new GraphExplorer("http://10.92.0.34:7200/", "DBPEDIA_ML");
@@ -105,6 +104,7 @@ public class PsView extends LitTemplate {
         setupStatus(statusHorizontalLayout);
         setupTextArea();
         setupGrid();
+        extractEntitiesNotHavingFocusProperty();
         setupActionButtons();
     }
 
@@ -138,6 +138,19 @@ public class PsView extends LitTemplate {
         }
     }
 
+    private void extractEntitiesNotHavingFocusProperty() {
+        nodeShape.getTargetClass();
+        nodeShape.getSupport();
+        propertyShape.getPath();
+        List<BindingSet> result = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesNotHavingFocusProperty(nodeShape.getTargetClass(), propertyShape.getPath()));
+        propCoverageInfoParagraph.setText("There are total " + nodeShape.getSupport() + " entities of " + nodeShape.getTargetClass().getLocalName() + " class, and " +
+                " there exists " + result.size() + " entities not having " + propertyShape.getPath() + " property. Click the button 'Show Entities' below to retrieve the list of entities not having this property. " +
+                "We also provide an option to insert this property for each entity (in case this is the case of missing information) by automatically constructing a query. ");
+        propCoverageQueryButton.addClickListener(buttonClickEvent -> {
+            createDialogueToShowEntitiesHavingMissingProperty(result);
+        });
+    }
+
     private void setupTypesScopeOfPs(HorizontalLayout hl) {
         HashMap<String, Integer> typeToEntityCount = new HashMap<>();
         //extract types
@@ -162,20 +175,6 @@ public class PsView extends LitTemplate {
         });
         select.setItems(values);
         hl.add(select);
-
-//        visualizeScopeButton.addClickListener(e -> {
-//            Dialog dialog = DialogUtil.getDialogToDisplayChartWithHeaderAndFooter("Scope", ChartsUtil.buildPieChart(typeToEntityCount));
-//            dialog.open();
-//        });
-        //buildQueryToExtractEntitiesForTypeOfPs
-        /*
-        String type = "";
-        List<Triple> resultEntitiesForTypesPs = graphExplorer.runQuery(QueryUtil.buildQueryToExtractEntitiesForTypeOfPs(type, propertyShape.getPath()));
-        for (Triple triple : resultEntitiesForTypesPs) { //bindings : ?types
-            //triple.getSubject()
-            //triple.getPredicate();
-            //triple.getObject();
-        }*/
     }
 
     private void setupGrid() {
@@ -451,8 +450,8 @@ public class PsView extends LitTemplate {
                 Statement psSupport = ResourceFactory.createStatement(child, ResourceFactory.createProperty((Constants.SUPPORT)), ResourceFactory.createTypedLiteral(item.getSupport().toString()));
                 Statement psConfidence = ResourceFactory.createStatement(child, ResourceFactory.createProperty((Constants.CONFIDENCE)), ResourceFactory.createTypedLiteral(item.getConfidence().toString()));
                 model.add(psNodeKind);
-                model.add(psSupport);
-                model.add(psConfidence);
+                //model.add(psSupport);
+                //model.add(psConfidence);
                 resources.add(child);
             }
             for (Resource element : resources) { // add each of these resources onto the end of the list
@@ -482,8 +481,8 @@ public class PsView extends LitTemplate {
             Statement psSupport = ResourceFactory.createStatement(ResourceFactory.createResource((this.propertyShape.getIri().toString())), ResourceFactory.createProperty((Constants.SUPPORT)), ResourceFactory.createTypedLiteral(this.propertyShape.getSupport().toString()));
             Statement psConfidence = ResourceFactory.createStatement(ResourceFactory.createResource((this.propertyShape.getIri().toString())), ResourceFactory.createProperty((Constants.CONFIDENCE)), ResourceFactory.createTypedLiteral(this.propertyShape.getConfidence().toString()));
 
-            model.add(psSupport);
-            model.add(psConfidence);
+            //model.add(psSupport);
+            //model.add(psConfidence);
         }
 
         this.currNsPsModel = model;
@@ -525,6 +524,19 @@ public class PsView extends LitTemplate {
 
         //dialog.getFooter().add(createFilterButton(dialog));
         VerticalLayout dialogLayout = createDialogContentForShowingEntities(tripleList);
+        dialog.add(dialogLayout);
+        dialog.setDraggable(true);
+        dialog.setResizable(true);
+        dialog.addThemeVariants(DialogVariant.LUMO_NO_PADDING);
+        dialog.open();
+    }
+
+    private void createDialogueToShowEntitiesHavingMissingProperty(List<BindingSet> tripleList) {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Entities (" + tripleList.size() + ")");
+
+        //dialog.getFooter().add(createFilterButton(dialog));
+        VerticalLayout dialogLayout = createDialogContentForShowingEntitiesHavingMissingProperty(tripleList);
         dialog.add(dialogLayout);
         dialog.setDraggable(true);
         dialog.setResizable(true);
@@ -601,6 +613,35 @@ public class PsView extends LitTemplate {
         return dialogLayout;
     }
 
+    private VerticalLayout createDialogContentForShowingEntitiesHavingMissingProperty(List<BindingSet> tripleList) {
+        List<Triple> subjectList = new ArrayList<>();
+        tripleList.forEach(bindings -> {
+            subjectList.add(new Triple(bindings.getBinding("entity").getValue().stringValue(), "", ""));
+        });
+
+        Grid<Triple> grid = new Grid<>(Triple.class, false);
+
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        grid.addColumn(Triple::getSubject).setHeader("Entity IRI").setResizable(true).setSortable(true);
+
+        grid.addColumn(new ComponentRenderer<>(Button::new, (button, triple) -> {
+            button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
+            button.addClickListener(e -> this.generateQueryToAddProperty(triple));
+            button.setIcon(new Icon(VaadinIcon.PLUS));
+        })).setHeader(setHeaderWithInfoLogo("INSERT Property", "A SPARQL Query to insert property for this entity will be constructed."));
+
+
+        grid.getStyle().set("width", "1500px").set("max-width", "100%");
+        grid.setItems(subjectList);
+        Paragraph paragraph = new Paragraph("Entities not having property ' " + propertyShape.getPath() + "' are shown below. " +
+                "If you want to insert this property for a given entity, click on the + icon to generate the INSERT Query. ");
+        VerticalLayout dialogLayout = new VerticalLayout(paragraph, grid);
+        dialogLayout.setPadding(true);
+        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        dialogLayout.getStyle().set("min-width", "1500px").set("max-width", "100%").set("height", "100%");
+
+        return dialogLayout;
+    }
 
 
     private VerticalLayout createDialogContentForShowingTriples(List<Triple> tripleList) {
@@ -626,16 +667,24 @@ public class PsView extends LitTemplate {
         return dialogLayout;
     }
 
+    private void generateQueryToAddProperty(Triple triple) {
+        String insertPart = "INSERT { \n <" + triple.getSubject() + ">  <" + propertyShape.getPath() + ">  <VALUE_TO_ADD> \n } \n";
+        String tripleClause = "WHERE { <"+ triple.getSubject()  +">  a  <"+nodeShape.getTargetClass().stringValue() + ">  } \n";
+        String updateQuery = "\n" + insertPart + tripleClause + "\n\n";
+        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to add property for entity ", updateQuery, "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!");
+    }
+
     private void generateQueryToAddType(Triple triple) {
         String insertPart = "INSERT { \n <" + triple.getSubject() + ">  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  <VALUE_TO_ADD> \n } \n";
         String tripleClause = "WHERE {} ";
-        String updateQuery = "\n" +  insertPart + tripleClause + "\n\n";
-        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to add insert type of IRI ", updateQuery, "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!");
+        String updateQuery = "\n" + insertPart + tripleClause + "\n\n";
+        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to add type of IRI ", updateQuery, "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!");
     }
+
     private void generateQueryToRemoveTriple(Triple triple) {
         String delPart = "DELETE { \n <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } \n";
         String tripleClause = " WHERE { \n  <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } ";
-        String updateQuery = "\n\n" +  delPart  + tripleClause + "\n\n";
+        String updateQuery = "\n\n" + delPart + tripleClause + "\n\n";
 
         DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to Delete Triple ", updateQuery, "Here is the delete query, you can copy this query to execute it on your graph!");
     }
@@ -644,7 +693,7 @@ public class PsView extends LitTemplate {
         String delPart = "DELETE { \n <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + ">  \n} \n";
         String insertPart = "INSERT { \n <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <VALUE_TO_REPLACE> \n } \n";
         String tripleClause = " WHERE { \n  <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } ";
-        String updateQuery = "\n\n" +  delPart + insertPart + tripleClause + "\n\n";
+        String updateQuery = "\n\n" + delPart + insertPart + tripleClause + "\n\n";
 
         DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to Update Entity Information ", updateQuery, "Here is the update query, you can update the desired value by replacing 'VALUE_TO_REPLACE' and copy this query to execute it on your graph!");
     }

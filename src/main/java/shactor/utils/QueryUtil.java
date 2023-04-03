@@ -2,6 +2,7 @@ package shactor.utils;
 
 import cs.qse.common.structure.NS;
 import cs.qse.common.structure.PS;
+import org.eclipse.rdf4j.model.IRI;
 
 public class QueryUtil {
 
@@ -140,5 +141,20 @@ public class QueryUtil {
         //constructQuery = constructQuery.replace("PROPERTY", ps.getPath());
 
         return constructQuery;
+    }
+
+    public static String buildQueryToExtractEntitiesNotHavingFocusProperty(IRI targetClass, String path) {
+        String query = """
+                SELECT ?entity
+                WHERE {
+                  ?entity rdf:type <CLASS> .
+                  FILTER NOT EXISTS {
+                    ?entity <PROPERTY> ?value .
+                  }
+                }
+                """;
+        query = query.replace("CLASS", targetClass.toString());
+        query = query.replace("PROPERTY", path);
+        return query;
     }
 }
