@@ -209,7 +209,7 @@ public class SelectionView extends LitTemplate {
             defaultShapesOutputFileAddress = parser.extractSHACLShapes(false, chosenClasses);
         }
         defaultShapesModelStats = parser.shapesExtractor.getCurrentShapesModelStats();
-        Utils.notifyMessage(graphStatsCheckBox.getValue().toString());
+        //Utils.notifyMessage(graphStatsCheckBox.getValue().toString());
         completeShapesExtractionButton.getUI().ifPresent(ui -> ui.navigate("extraction-view"));
     }
 

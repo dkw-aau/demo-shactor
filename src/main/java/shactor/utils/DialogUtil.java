@@ -5,20 +5,15 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
-import cs.qse.common.structure.NS;
-import cs.qse.common.structure.PS;
-
-import java.util.List;
 
 public class DialogUtil {
     public static Button actionButton;
 
-    public static Dialog getDialogWithHeaderAndFooter(String title, String textAreaText, String infoParagraphText) {
+    public static void getDialogWithHeaderAndFooter(String title, String textAreaText, String infoParagraphText) {
         Dialog dialog = new Dialog();
         dialog.getElement().setAttribute("aria-label", "Dialog");
         dialog.getHeader().add(getHeaderTitle(title));
@@ -28,7 +23,6 @@ public class DialogUtil {
         dialog.setModal(false);
         dialog.setDraggable(true);
         dialog.open();
-        return dialog;
     }
 
     public static Dialog getDialogToDisplayChartWithHeaderAndFooter(String title, SOChart chart) {

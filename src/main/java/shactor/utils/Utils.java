@@ -5,6 +5,7 @@ import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -37,6 +38,11 @@ public class Utils {
         return textField;
     }
 
+    public static Paragraph getParagraph(String text) {
+        Paragraph paragraph = new Paragraph(text);
+        paragraph.setClassName("bold-paragraph");
+        return paragraph;
+    }
     public static TextField getReadOnlyTextField(String label, String value) {
         TextField textField = new TextField();
         textField.setReadOnly(true);

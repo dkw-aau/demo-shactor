@@ -90,12 +90,20 @@ public class QueryUtil {
 
     public static String buildQueryToExtractEntitiesHavingUndefinedShClass(String type, String property) {
         String query = """
-                SELECT DISTINCT ?val WHERE { \s
-                	?val a <CLASS> . \s
-                	?val <PROPERTY> ?s .
-                	FILTER NOT EXISTS {?s a ?objType. }
+                SELECT DISTINCT * WHERE { \s
+                    ?subject a <CLASS> . \s
+                    BIND(<PROPERTY> AS ?predicate) .
+                    ?subject ?predicate ?object .
+                    FILTER NOT EXISTS {?object a ?objType. } \s
                 }
                 """;
+        //        String query = """
+        //                SELECT DISTINCT ?val WHERE { \s
+        //                	?val a <CLASS> . \s
+        //                	?val <PROPERTY> ?s .
+        //                	FILTER NOT EXISTS {?s a ?objType. }
+        //                }
+        //                """;
         query = query.replace("CLASS", type);
         query = query.replace("PROPERTY", property);
         System.out.println(query);

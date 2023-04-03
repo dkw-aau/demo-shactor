@@ -204,11 +204,10 @@ public class PsView extends LitTemplate {
                         List<BindingSet> output;
                         if (objType.equals("Undefined")) {
                             output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
-                            createDialogueToShowEntities(output);
                         } else {
                             output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), shaclOrListItem.getDataTypeOrClass()));
-                            createDialogueToShowEntitiesWithPropAndObject(output);
                         }
+                        createDialogueToShowEntitiesWithPropAndObject(output);
                     });
 
                     button.setIcon(new Icon(VaadinIcon.LIST));
@@ -264,7 +263,7 @@ public class PsView extends LitTemplate {
                         } else {
                             output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), ps.getDataTypeOrClass()));
                         }
-                        createDialogueToShowEntities(output);
+                        createDialogueToShowEntitiesWithPropAndObject(output);
                     });
                     button.setIcon(new Icon(VaadinIcon.LIST));
                     button.setText("List Entities");
@@ -387,7 +386,7 @@ public class PsView extends LitTemplate {
 
         executeQueryButton.addClickListener(buttonClickEvent -> {
             List<Triple> tripleList = queryGraph(descriptionArea.getValue());
-            simplifyOutput(tripleList);
+            //simplifyOutput(tripleList);
             createDialogueToShowTriples(tripleList);
         });
     }
@@ -523,6 +522,7 @@ public class PsView extends LitTemplate {
     private void createDialogueToShowEntities(List<BindingSet> tripleList) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Entities (" + tripleList.size() + ")");
+
         //dialog.getFooter().add(createFilterButton(dialog));
         VerticalLayout dialogLayout = createDialogContentForShowingEntities(tripleList);
         dialog.add(dialogLayout);
@@ -551,14 +551,14 @@ public class PsView extends LitTemplate {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
             button.addClickListener(e -> this.generateQueryToUpdateTriple(triple));
             button.setIcon(new Icon(VaadinIcon.EDIT));
-        })).setHeader(setHeaderWithInfoLogo("Edit", "A SPARQL Query to edit this triple will be executed."));
+        })).setHeader(setHeaderWithInfoLogo("Edit", "A SPARQL Query to edit this triple will be constructed."));
 
 
         grid.addColumn(new ComponentRenderer<>(Button::new, (button, triple) -> {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
             button.addClickListener(e -> this.generateQueryToRemoveTriple(triple));
             button.setIcon(new Icon(VaadinIcon.TRASH));
-        })).setHeader(setHeaderWithInfoLogo("Delete", "A SPARQL Query to remove this triple will be executed."));
+        })).setHeader(setHeaderWithInfoLogo("Delete", "A SPARQL Query to remove this triple will be constructed."));
 
 
         grid.getStyle().set("width", "1500px").set("max-width", "100%");
@@ -582,16 +582,26 @@ public class PsView extends LitTemplate {
 
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.addColumn(Triple::getSubject).setHeader("Entity IRI").setResizable(true).setSortable(true);
+
+        grid.addColumn(new ComponentRenderer<>(Button::new, (button, triple) -> {
+            button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
+            button.addClickListener(e -> this.generateQueryToAddType(triple));
+            button.setIcon(new Icon(VaadinIcon.PLUS));
+        })).setHeader(setHeaderWithInfoLogo("INSERT TYPE", "A SPARQL Query to insert type of this entity will be constructed."));
+
+
         grid.getStyle().set("width", "1500px").set("max-width", "100%");
         grid.setItems(subjectList);
-
-        VerticalLayout dialogLayout = new VerticalLayout(grid);
-        dialogLayout.setPadding(false);
+        Paragraph paragraph = new Paragraph("IRIs having undefined type");
+        VerticalLayout dialogLayout = new VerticalLayout(paragraph, grid);
+        dialogLayout.setPadding(true);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("min-width", "1500px").set("max-width", "100%").set("height", "100%");
 
         return dialogLayout;
     }
+
+
 
     private VerticalLayout createDialogContentForShowingTriples(List<Triple> tripleList) {
         Grid<Triple> grid = new Grid<>(Triple.class, false);
@@ -616,8 +626,14 @@ public class PsView extends LitTemplate {
         return dialogLayout;
     }
 
+    private void generateQueryToAddType(Triple triple) {
+        String insertPart = "INSERT { \n <" + triple.getSubject() + ">  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  <VALUE_TO_ADD> \n } \n";
+        String tripleClause = "WHERE {} ";
+        String updateQuery = "\n" +  insertPart + tripleClause + "\n\n";
+        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to add insert type of IRI ", updateQuery, "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!");
+    }
     private void generateQueryToRemoveTriple(Triple triple) {
-        String delPart = "DELETE { <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> } \n";
+        String delPart = "DELETE { \n <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } \n";
         String tripleClause = " WHERE { \n  <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } ";
         String updateQuery = "\n\n" +  delPart  + tripleClause + "\n\n";
 
@@ -625,8 +641,8 @@ public class PsView extends LitTemplate {
     }
 
     private void generateQueryToUpdateTriple(Triple triple) {
-        String delPart = "DELETE { <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> } \n";
-        String insertPart = "INSERT { <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <VALUE_TO_REPLACE> } \n";
+        String delPart = "DELETE { \n <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + ">  \n} \n";
+        String insertPart = "INSERT { \n <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <VALUE_TO_REPLACE> \n } \n";
         String tripleClause = " WHERE { \n  <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } ";
         String updateQuery = "\n\n" +  delPart + insertPart + tripleClause + "\n\n";
 

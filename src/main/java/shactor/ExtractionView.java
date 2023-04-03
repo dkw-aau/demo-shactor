@@ -52,8 +52,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static shactor.utils.ChartsUtil.*;
-import static shactor.utils.Utils.matchesTerm;
-import static shactor.utils.Utils.setHeaderWithInfoLogo;
+import static shactor.utils.Utils.*;
 
 
 @Tag("extraction-view")
@@ -197,6 +196,11 @@ public class ExtractionView extends LitTemplate {
     private void beginPruning() {
         soChartsContainerHorizontalLayout.setVisible(true);
         shapesGrid.removeAllColumns();
+        vl1.removeAll();
+        vl2.removeAll();
+        vl3.removeAll();
+        vl4.removeAll();
+
         support = Integer.parseInt(supportTextField.getValue());
         confidence = (Double.parseDouble(confidenceTextField.getValue())) / 100;
         List<NS> nodeShapes = null;
@@ -225,6 +229,11 @@ public class ExtractionView extends LitTemplate {
         headingPieCharts.setVisible(true);
 
         headingNodeShapesAnalysis.setVisible(true);
+        vl1.add(getParagraph("Default Shapes Analysis"));
+        vl2.add(getParagraph("Shapes Analysis by Support"));
+        vl3.add(getParagraph("Shapes Analysis by Confidence"));
+        vl4.add(getParagraph("By Support and Confidence"));
+
         vl1.add(ChartsUtil.buildPieChart(preparePieChartsDataWithDefaultStats( pruningUtil.getStatsDefault(), pruningUtil)));
         //setupPieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault(), pruningUtil);
         vl2.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAnalysis( pruningUtil.getStatsBySupport(), support, pruningUtil)));
