@@ -92,7 +92,7 @@ public class ChartsUtil {
         series.setPlotOptions(plotOptionsPie);
     }
 
-    public static HashMap<String, Integer> preparePieChartsDataWithDefaultStats(Chart chart, HashMap<String, String> statsMap, PruningUtil pruningUtil) {
+    public static HashMap<String, Integer> preparePieChartsDataWithDefaultStats(HashMap<String, String> statsMap, PruningUtil pruningUtil) {
         HashMap<String, Integer> map = new HashMap<>();
         map.put("NS : " + statsMap.get("COUNT_NS"), Integer.parseInt(statsMap.get("COUNT_NS")));
         map.put("PS : " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")));
@@ -134,8 +134,7 @@ public class ChartsUtil {
         conf.setPlotOptions(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
-
-    public static HashMap<String, Integer> preparePieChartDataForSupportAnalysis(Chart chart, HashMap<String, String> statsMap, Integer support, PruningUtil pruningUtil) {
+    public static HashMap<String, Integer> preparePieChartDataForSupportAnalysis( HashMap<String, String> statsMap, Integer support, PruningUtil pruningUtil) {
         HashMap<String, Integer> map = new HashMap<>();
         int ns_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_NS")) - Integer.parseInt(statsMap.get("COUNT_NS"));
         map.put("NS > " + support + " = " + ns_green, ns_green);
@@ -178,7 +177,7 @@ public class ChartsUtil {
         configurePieChart(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
-    public static HashMap<String, Integer> preparePieChartDataForConfidenceAnalysis(Chart chart, HashMap<String, String> statsMap, Double confidence, PruningUtil pruningUtil) {
+    public static HashMap<String, Integer> preparePieChartDataForConfidenceAnalysis(HashMap<String, String> statsMap, Double confidence, PruningUtil pruningUtil) {
         HashMap<String, Integer> map = new HashMap<>();
         int c = (int) (confidence * 100);
         String confPercent = c + "%";
@@ -219,7 +218,7 @@ public class ChartsUtil {
         configurePieChart(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
-    public static HashMap<String, Integer> preparePieChartDataForSupportAndConfidenceAnalysis(Chart chart, HashMap<String, String> statsMap, Integer support, Double confidence, PruningUtil pruningUtil) {
+    public static HashMap<String, Integer> preparePieChartDataForSupportAndConfidenceAnalysis(HashMap<String, String> statsMap, Integer support, Double confidence, PruningUtil pruningUtil) {
         HashMap<String, Integer> map = new HashMap<>();
         int c = (int) (confidence * 100);
         String confPercent = c + "%";

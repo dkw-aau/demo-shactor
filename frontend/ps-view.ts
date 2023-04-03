@@ -27,8 +27,9 @@ export class PsView extends LitElement {
  <vaadin-vertical-layout style="width: 90%; flex-grow: 1; flex-shrink: 1; flex-basis: auto; margin-left: 5%; margin-right: 5%;" id="contentVerticalLayout">
   <h4 style="align-self: center;">PS Analysis Dashboard - SHACTOR (Step 4/4)</h4>
   <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayout" style="align-self: stretch;"></vaadin-horizontal-layout>
-  <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayoutTwo" style="align-self: stretch;"></vaadin-horizontal-layout>
-  <vaadin-horizontal-layout id="statusHorizontalLayout" style="align-self: center;"></vaadin-horizontal-layout>
+  <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayoutTwo" style="align-self: flex-start; width: 50%;"></vaadin-horizontal-layout>
+  <br>
+  <vaadin-horizontal-layout id="statusHorizontalLayout" style="align-self: flex-start;"></vaadin-horizontal-layout>
   <h4>Selected Property Shape Info:</h4>
   <p>This property shape has following constraints where you can check conformance of each constraint with the graph. We show support and confidence of each PS constraint along with options to retrieve or edit the entities corresponding to each constraints.</p>
   <vaadin-grid style="align-self: stretch; flex-grow: 0; flex-shrink: 1; max-height: 15%;" is-attached multi-sort-priority="prepend" id="psConstraintsGrid"></vaadin-grid>

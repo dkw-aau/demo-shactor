@@ -74,6 +74,21 @@ public class QueryUtil {
         query = query.replace("CLASS", type);
         query = query.replace("PROPERTY", property);
         query = query.replace("OBJECT_TYPE", shClassType);
+        System.out.println(query);
+        return query;
+    }
+
+// FILTER NOT EXISTS {?s a ?objType. }
+    public static String buildQueryToExtractEntitiesHavingUndefinedShClass(String type, String property) {
+        String query = """
+                SELECT DISTINCT ?val WHERE { \s
+                	?val a <CLASS> . \s
+                	?val <PROPERTY> ?s .
+                }
+                """;
+        query = query.replace("CLASS", type);
+        query = query.replace("PROPERTY", property);
+        System.out.println(query);
         return query;
     }
 

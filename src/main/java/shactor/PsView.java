@@ -187,9 +187,12 @@ public class PsView extends LitTemplate {
             psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getSupport).setHeader(Utils.boldHeader("Support")).setResizable(true).setAutoWidth(false).setSortable(true);
             psOrItemsConstraintsGrid.addColumn(ShaclOrListItem::getConfidenceInPercentage).setHeader(Utils.boldHeader("Confidence")).setResizable(true).setAutoWidth(false).setComparator(ShaclOrListItem::getConfidence);
 
+            //Declare an undefined flag
+            boolean flag = false;
             for (ShaclOrListItem item : propertyShape.getShaclOrListItems()) {
                 if (item.getDataTypeOrClass() == null) {
                     item.setDataTypeOrClass("Undefined");
+                    flag = true;
                 }
             }
             psOrItemsConstraintsGrid.addColumn(new ComponentRenderer<>(Button::new, (button, shaclOrListItem) -> {
@@ -200,27 +203,48 @@ public class PsView extends LitTemplate {
                     button.addClickListener(e -> {
                         List<BindingSet> output;
                         if (objType.equals("Undefined")) {
-                            output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractObjectsHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
+                            output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
                         } else {
                             output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), shaclOrListItem.getDataTypeOrClass()));
                         }
                         createDialogueToShowEntities(output);
                     });
-                    if (objType.equals("Undefined")) {
-                        button.setIcon(new Icon(VaadinIcon.LIST));
-                        button.setText("Retrieve undefined object type entities");
-                    } else {
-                        button.setIcon(new Icon(VaadinIcon.LIST));
-                        button.setText("Retrieve specified object type entities");
-                    }
-                }
-            })).setHeader(setHeaderWithInfoLogo("Action", "blah blah"));
 
+                    button.setIcon(new Icon(VaadinIcon.LIST));
+                    button.setText("List Entities");
+                }
+            })).setHeader(setHeaderWithInfoLogo("Show Entities", "Retrieve list of entities having specified object type."));
+            //FIXME: extract entities having specified object type (i.e., value of sh:class constraint)
+
+            if (flag) {
+                psOrItemsConstraintsGrid.addColumn(new ComponentRenderer<>(Button::new, (button, shaclOrListItem) -> {
+                    String objType = shaclOrListItem.getDataTypeOrClass();
+                    String nodeKind = shaclOrListItem.getNodeKind();
+                    if (!objType.equals("Undefined")) {
+                        button.setVisible(false);
+                    }
+                    button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
+                    if (nodeKind.equals("IRI")) {
+                        button.addClickListener(e -> {
+                            if (objType.equals("Undefined")) {
+                                List<BindingSet> output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractObjectsHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
+                                createDialogueToShowEntities(output);
+                            }
+                        });
+                        button.setIcon(new Icon(VaadinIcon.LIST));
+                        button.setText("List Objects (IRIs)");
+                    }
+                })).setHeader(setHeaderWithInfoLogo("Show Objects", "Retrieve list of objects (IRIs) having undefined type."));
+            }
             psOrItemsConstraintsGrid.setItems(propertyShape.getShaclOrListItems());
         } else {
             psOrItemsConstraintsGrid.setVisible(false);
+
+            //Declare an undefined flag
+            boolean flag = false;
             if (propertyShape.getDataTypeOrClass() == null) {
                 propertyShape.setDataTypeOrClass("Undefined");
+                flag = true;
             }
             String nodeKind = propertyShape.getNodeKind();
 
@@ -235,15 +259,33 @@ public class PsView extends LitTemplate {
                     button.addClickListener(e -> {
                         List<BindingSet> output;
                         if (ps.getDataTypeOrClass().equals("Undefined")) {
-                            output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractObjectsHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
+                            output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
                         } else {
                             output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), ps.getDataTypeOrClass()));
                         }
                         createDialogueToShowEntities(output);
                     });
                     button.setIcon(new Icon(VaadinIcon.LIST));
-                    button.setText("Retrieve specified object type entities");
-                })).setHeader(setHeaderWithInfoLogo("Action", "blah blah"));
+                    button.setText("List Entities");
+                })).setHeader(setHeaderWithInfoLogo("Show Entities", "Retrieve list of entities having specified object type."));
+
+
+                if (flag) {
+                    psConstraintsGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ps) -> {
+                        if (!ps.getDataTypeOrClass().equals("Undefined")) {
+                            button.setVisible(false);
+                        }
+                        button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
+                        button.addClickListener(e -> {
+                            if (ps.getDataTypeOrClass().equals("Undefined")) {
+                                List<BindingSet> output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractObjectsHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
+                                createDialogueToShowEntities(output);
+                            }
+                        });
+                        button.setIcon(new Icon(VaadinIcon.LIST));
+                        button.setText("List Object (IRIs)");
+                    })).setHeader(setHeaderWithInfoLogo("Show Objects", "Retrieve list of objects (IRIs) having undefined type."));
+                }
             }
             psConstraintsGrid.setItems(propertyShape);
         }

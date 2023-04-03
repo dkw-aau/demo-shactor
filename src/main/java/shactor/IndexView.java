@@ -69,11 +69,11 @@ public class IndexView extends LitTemplate {
         vl.add(rbg);
         continueButton.addClickListener(buttonClickEvent -> {
             Utils.notifyMessage(rbg.getValue());
-            //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt";
+            graphURL = "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt";
             //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/DBpedia/DBpediaCityAndTown.nt";
             //graphURL = "/Users/kashifrabbani/Documents/GitHub/data/toy/uni0-lubm.nt";
             // Server: /home/ubuntu/datasets/dbpedia_ml.nt
-            graphURL = "/home/ubuntu/datasets/dbpedia_ml.nt";
+            //graphURL = "/home/ubuntu/datasets/dbpedia_ml.nt";
             category = Category.EXISTING_FILE_BASED;
             continueButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });

@@ -86,17 +86,6 @@ public class ExtractionView extends LitTemplate {
     @Id("downloadSelectedShapesButton")
     private Button downloadSelectedShapesButton;
 
-
-    //Charts
-    @Id("defaultShapesStatsPieChart")
-    private Chart defaultShapesStatsPieChart;
-    @Id("shapesStatsBySupportPieChart")
-    private Chart shapesStatsBySupportPieChart;
-    @Id("shapesStatsByConfidencePieChart")
-    private Chart shapesStatsByConfidencePieChart;
-    @Id("shapesStatsByBothPieChart")
-    private Chart shapesStatsByBothPieChart;
-
     private final PruningUtil pruningUtil = new PruningUtil();
 
     String currNodeShape;
@@ -236,13 +225,13 @@ public class ExtractionView extends LitTemplate {
         headingPieCharts.setVisible(true);
 
         headingNodeShapesAnalysis.setVisible(true);
-        vl1.add(ChartsUtil.buildPieChart(preparePieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault(), pruningUtil)));
+        vl1.add(ChartsUtil.buildPieChart(preparePieChartsDataWithDefaultStats( pruningUtil.getStatsDefault(), pruningUtil)));
         //setupPieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault(), pruningUtil);
-        vl2.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAnalysis(shapesStatsBySupportPieChart, pruningUtil.getStatsBySupport(), support, pruningUtil)));
+        vl2.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAnalysis( pruningUtil.getStatsBySupport(), support, pruningUtil)));
         //setupPieChart(shapesStatsBySupportPieChart, pruningUtil.getStatsBySupport(), support, pruningUtil);
-        vl3.add(ChartsUtil.buildPieChart(preparePieChartDataForConfidenceAnalysis(shapesStatsByConfidencePieChart, pruningUtil.getStatsByConfidence(), confidence, pruningUtil)));
+        vl3.add(ChartsUtil.buildPieChart(preparePieChartDataForConfidenceAnalysis( pruningUtil.getStatsByConfidence(), confidence, pruningUtil)));
         //setupPieChart(shapesStatsByConfidencePieChart, pruningUtil.getStatsByConfidence(), confidence, pruningUtil);
-        vl4.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAndConfidenceAnalysis(shapesStatsByBothPieChart, pruningUtil.getStatsByBoth(), support, confidence, pruningUtil)));
+        vl4.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAndConfidenceAnalysis(pruningUtil.getStatsByBoth(), support, confidence, pruningUtil)));
         //setupPieChart(shapesStatsByBothPieChart, pruningUtil.getStatsByBoth(), support, confidence, pruningUtil);
 
         //defaultShapesStatsPieChart.drawChart();
