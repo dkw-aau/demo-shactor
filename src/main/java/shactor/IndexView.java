@@ -74,7 +74,6 @@ public class IndexView extends LitTemplate {
             //Utils.notifyMessage(rbg.getValue());
             category = Category.EXISTING_FILE_BASED;
             graphURL = Utils.getDatasetsAddresses().get(datasetsSelection.getValue());
-            System.out.println(graphURL);
             continueButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });
         vl.add(continueButton);

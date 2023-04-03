@@ -204,10 +204,11 @@ public class PsView extends LitTemplate {
                         List<BindingSet> output;
                         if (objType.equals("Undefined")) {
                             output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingUndefinedShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath()));
+                            createDialogueToShowEntities(output);
                         } else {
                             output = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesHavingSpecificShClass(nodeShape.getTargetClass().stringValue(), propertyShape.getPath(), shaclOrListItem.getDataTypeOrClass()));
+                            createDialogueToShowEntitiesWithPropAndObject(output);
                         }
-                        createDialogueToShowEntities(output);
                     });
 
                     button.setIcon(new Icon(VaadinIcon.LIST));
@@ -507,6 +508,17 @@ public class PsView extends LitTemplate {
         dialog.open();
     }
 
+    private void createDialogueToShowEntitiesWithPropAndObject(List<BindingSet> tripleList) {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Entities (" + tripleList.size() + ")");
+        //dialog.getFooter().add(createFilterButton(dialog));
+        VerticalLayout dialogLayout = createDialogContentForShowingEntitiesWithPropAndObject(tripleList);
+        dialog.add(dialogLayout);
+        dialog.setDraggable(true);
+        dialog.setResizable(true);
+        dialog.addThemeVariants(DialogVariant.LUMO_NO_PADDING);
+        dialog.open();
+    }
 
     private void createDialogueToShowEntities(List<BindingSet> tripleList) {
         Dialog dialog = new Dialog();
@@ -518,6 +530,46 @@ public class PsView extends LitTemplate {
         dialog.setResizable(true);
         dialog.addThemeVariants(DialogVariant.LUMO_NO_PADDING);
         dialog.open();
+    }
+
+    private VerticalLayout createDialogContentForShowingEntitiesWithPropAndObject(List<BindingSet> result) {
+        List<Triple> tripleList = new ArrayList<>();
+        result.forEach(bindings -> {
+            tripleList.add(new Triple(bindings.getBinding("subject").getValue().stringValue(),
+                    bindings.getBinding("predicate").getValue().stringValue(),
+                    bindings.getBinding("object").getValue().stringValue()));
+        });
+
+        Grid<Triple> grid = new Grid<>(Triple.class, false);
+
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        grid.addColumn(Triple::getSubject).setHeader("Subject (Entity IRI)").setResizable(true).setSortable(true);
+        grid.addColumn(Triple::getPredicate).setHeader("Property").setResizable(true).setSortable(true);
+        grid.addColumn(Triple::getObject).setHeader("Object").setResizable(true).setSortable(true);
+
+        grid.addColumn(new ComponentRenderer<>(Button::new, (button, triple) -> {
+            button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
+            button.addClickListener(e -> this.generateQueryToUpdateTriple(triple));
+            button.setIcon(new Icon(VaadinIcon.EDIT));
+        })).setHeader(setHeaderWithInfoLogo("Edit", "A SPARQL Query to edit this triple will be executed."));
+
+
+        grid.addColumn(new ComponentRenderer<>(Button::new, (button, triple) -> {
+            button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
+            button.addClickListener(e -> this.generateQueryToRemoveTriple(triple));
+            button.setIcon(new Icon(VaadinIcon.TRASH));
+        })).setHeader(setHeaderWithInfoLogo("Delete", "A SPARQL Query to remove this triple will be executed."));
+
+
+        grid.getStyle().set("width", "1500px").set("max-width", "100%");
+        grid.setItems(tripleList);
+
+        VerticalLayout dialogLayout = new VerticalLayout(grid);
+        dialogLayout.setPadding(false);
+        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        dialogLayout.getStyle().set("min-width", "1500px").set("max-width", "100%").set("height", "100%");
+
+        return dialogLayout;
     }
 
     private VerticalLayout createDialogContentForShowingEntities(List<BindingSet> tripleList) {
@@ -565,7 +617,20 @@ public class PsView extends LitTemplate {
     }
 
     private void generateQueryToRemoveTriple(Triple triple) {
-        System.out.println("Hi, I will remove this triple: " + triple.toString());
+        String delPart = "DELETE { <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> } \n";
+        String tripleClause = " WHERE { \n  <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } ";
+        String updateQuery = "\n\n" +  delPart  + tripleClause + "\n\n";
+
+        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to Delete Triple ", updateQuery, "Here is the delete query, you can copy this query to execute it on your graph!");
+    }
+
+    private void generateQueryToUpdateTriple(Triple triple) {
+        String delPart = "DELETE { <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> } \n";
+        String insertPart = "INSERT { <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <VALUE_TO_REPLACE> } \n";
+        String tripleClause = " WHERE { \n  <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } ";
+        String updateQuery = "\n\n" +  delPart + insertPart + tripleClause + "\n\n";
+
+        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to Update Entity Information ", updateQuery, "Here is the update query, you can update the desired value by replacing 'VALUE_TO_REPLACE' and copy this query to execute it on your graph!");
     }
 
     private String buildSyntaxForNsAndPs() {

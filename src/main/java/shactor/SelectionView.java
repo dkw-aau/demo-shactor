@@ -225,7 +225,7 @@ public class SelectionView extends LitTemplate {
         defaultShapesOutputFileAddress = qbParser.extractSHACLShapes();
         qbParser.writeSupportToFile();
         defaultShapesModelStats = qbParser.shapesExtractor.getCurrentShapesModelStats();
-        Utils.notifyMessage(graphStatsCheckBox.getValue().toString());
+        //Utils.notifyMessage(graphStatsCheckBox.getValue().toString());
         completeShapesExtractionButton.getUI().ifPresent(ui -> ui.navigate("extraction-view"));
     }
 

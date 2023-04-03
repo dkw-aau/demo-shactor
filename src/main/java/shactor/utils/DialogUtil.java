@@ -27,7 +27,7 @@ public class DialogUtil {
         dialog.add(dialogLayout);
         dialog.setModal(false);
         dialog.setDraggable(true);
-        //dialog.open();
+        dialog.open();
         return dialog;
     }
 
@@ -55,13 +55,13 @@ public class DialogUtil {
 
     private static VerticalLayout createDialogLayout(String textAreaText, String paragraphText) {
         Paragraph paragraph = new Paragraph(paragraphText);
-        TextArea descriptionArea = new TextArea(textAreaText);
+        TextArea descriptionArea = new TextArea();
         descriptionArea.setValue(textAreaText);
         VerticalLayout fieldLayout = new VerticalLayout(paragraph, descriptionArea);
         fieldLayout.setSpacing(false);
         fieldLayout.setPadding(false);
         fieldLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
-        fieldLayout.getStyle().set("width", "1500px").set("max-width", "100%");
+        fieldLayout.getStyle().set("width", "1200px").set("max-width", "100%");
         return fieldLayout;
     }
 

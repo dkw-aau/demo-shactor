@@ -52,7 +52,7 @@ public class Utils {
         selectField.setWidth("50%");
         selectField.setLabel("Select from existing datasets");
         selectField.setItems( "DBpediaMini", "DBpedia", "LUBM", "YAGO-4", "WATDIV");
-        //selectField.setValue("DBpedia");
+        selectField.setValue("DBpediaMini");
         return selectField;
     }
 

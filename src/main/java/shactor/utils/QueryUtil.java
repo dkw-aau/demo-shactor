@@ -31,6 +31,7 @@ public class QueryUtil {
         query = query.replace("PROPERTY", property);
         return query;
     }
+
     //as triples
     public static String buildQueryToExtractEntitiesForTypeOfPs(String type, String property) {
         String query = """
@@ -66,12 +67,20 @@ public class QueryUtil {
 
     public static String buildQueryToExtractEntitiesHavingSpecificShClass(String type, String property, String shClassType) {
         String query = """
-                SELECT DISTINCT ?val  WHERE { \s
-                	?val a <CLASS> . \s
-                	?val <PROPERTY> ?o .
-                	?o a <OBJECT_TYPE> . \s
+                SELECT * WHERE { \s
+                    ?subject a <CLASS> . \s
+                    BIND(<PROPERTY> AS ?predicate) .
+                    ?subject ?predicate ?object .
+                    ?object a <OBJECT_TYPE> . \s
                 }
                 """;
+        //        String query = """
+        //                SELECT DISTINCT ?val  WHERE { \s
+        //                	?val a <CLASS> . \s
+        //                	?val <PROPERTY> ?o .
+        //                	?o a <OBJECT_TYPE> . \s
+        //                }
+        //                """;
         query = query.replace("CLASS", type);
         query = query.replace("PROPERTY", property);
         query = query.replace("OBJECT_TYPE", shClassType);
@@ -79,12 +88,12 @@ public class QueryUtil {
         return query;
     }
 
-// FILTER NOT EXISTS {?s a ?objType. }
     public static String buildQueryToExtractEntitiesHavingUndefinedShClass(String type, String property) {
         String query = """
                 SELECT DISTINCT ?val WHERE { \s
                 	?val a <CLASS> . \s
                 	?val <PROPERTY> ?s .
+                	FILTER NOT EXISTS {?s a ?objType. }
                 }
                 """;
         query = query.replace("CLASS", type);
