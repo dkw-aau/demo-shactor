@@ -102,7 +102,7 @@ public class PsView extends LitTemplate {
         setupNodeShapeInfo(infoHorizontalLayout);
         setupPropertyShapeInfo(infoHorizontalLayoutTwo);
         //setupTypesScopeOfPs(infoHorizontalLayoutTwo);
-        setupStatus(statusHorizontalLayout);
+        //setupStatus(statusHorizontalLayout);
         setupTextArea();
         setupGrid();
         extractEntitiesNotHavingFocusProperty();
