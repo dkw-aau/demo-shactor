@@ -248,10 +248,10 @@ public class ChartsUtil {
         CategoryData labels = new CategoryData("Triples", "Objects", "Literals", "Subjects", "Entities", "Properties", "Classes");
         Data data = new Data(52281114, 19357319, 15269876, 15141546, 5823566, 1323, 427);
         NightingaleRoseChart rc = new NightingaleRoseChart(labels, data);
-        //Position p = new Position();
-        //p.setTop(Size.percentage(25));
-        //rc.setPosition(p);
-        soChart.disableDefaultLegend();
+        Position p = new Position();
+        p.setTop(Size.percentage(25));
+        rc.setPosition(p);
+        //soChart.disableDefaultLegend();
         soChart.add(rc);
         return soChart;
     }
@@ -271,6 +271,8 @@ public class ChartsUtil {
 
         Position p = new Position();
         p.setTop(Size.percentage(30));
+        p.setBottom(Size.percentage(10));
+
         pc.setPosition(p);
         pc.setData(values);
         soChart.add(pc);

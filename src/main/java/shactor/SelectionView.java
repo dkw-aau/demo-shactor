@@ -63,7 +63,7 @@ public class SelectionView extends LitTemplate {
     public static HashMap<String, String> defaultShapesModelStats;
 
     public static String defaultShapesOutputFileAddress = "";
-
+    public static Boolean computeStats = false;
     public SelectionView() {
         Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
         graphInfo.setVisible(false);
@@ -210,6 +210,7 @@ public class SelectionView extends LitTemplate {
         }
         defaultShapesModelStats = parser.shapesExtractor.getCurrentShapesModelStats();
         //Utils.notifyMessage(graphStatsCheckBox.getValue().toString());
+        computeStats = graphStatsCheckBox.getValue();
         completeShapesExtractionButton.getUI().ifPresent(ui -> ui.navigate("extraction-view"));
     }
 
@@ -226,6 +227,7 @@ public class SelectionView extends LitTemplate {
         qbParser.writeSupportToFile();
         defaultShapesModelStats = qbParser.shapesExtractor.getCurrentShapesModelStats();
         //Utils.notifyMessage(graphStatsCheckBox.getValue().toString());
+        computeStats = graphStatsCheckBox.getValue();
         completeShapesExtractionButton.getUI().ifPresent(ui -> ui.navigate("extraction-view"));
     }
 

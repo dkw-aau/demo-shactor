@@ -46,6 +46,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static shactor.utils.Utils.*;
 
@@ -189,7 +190,7 @@ public class PsView extends LitTemplate {
             //Declare an undefined flag
             boolean flag = false;
             for (ShaclOrListItem item : propertyShape.getShaclOrListItems()) {
-                if (item.getDataTypeOrClass() == null) {
+                if (item.getDataTypeOrClass() == null || Objects.equals(item.getDataTypeOrClass(), "http://shaclshapes.org/undefined")) {
                     item.setDataTypeOrClass("Undefined");
                     flag = true;
                 }

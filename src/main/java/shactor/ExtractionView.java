@@ -133,10 +133,17 @@ public class ExtractionView extends LitTemplate {
 
 
     public ExtractionView() {
-        splitLayout.setSplitterPosition(60);
         chartsContainerHorizontalLayout.removeAll();
         soChartsContainerHorizontalLayout.setVisible(false);
-        graphStatsVerticalLayout.add(buildBarChartUsingDbpediaStats());
+
+        if (SelectionView.computeStats) {
+            splitLayout.setSplitterPosition(60);
+            graphStatsVerticalLayout.add(buildBarChartUsingDbpediaStats());
+        } else {
+            graphStatsVerticalLayout.setVisible(false);
+            splitLayout.setSplitterPosition(100);
+        }
+
         //Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
         nsSearchField.setVisible(false);
         psSearchField.setVisible(false);
@@ -157,12 +164,9 @@ public class ExtractionView extends LitTemplate {
         Utils.setIconForButtonWithToolTip(readShactorLogsButton, VaadinIcon.TIMER, "Read SHACTOR extraction logs");
         Utils.setIconForButtonWithToolTip(taxonomyVisualizationButton, VaadinIcon.FILE_TREE, "Visualize Shapes Taxonomy");
 
-
-        readShapesStatsButton.addClickListener(buttonClickEvent -> {
-        });
-        readShactorLogsButton.addClickListener(buttonClickEvent -> {
-        });
-
+        readShapesStatsButton.addClickListener(buttonClickEvent -> {});
+        readShactorLogsButton.addClickListener(buttonClickEvent -> {});
+        taxonomyVisualizationButton.setVisible(false);
         taxonomyVisualizationButton.addClickListener(buttonClickEvent -> {
             RouterLink link = new RouterLink("taxonomy-view", TaxonomyView.class);
             taxonomyVisualizationButton.getUI().ifPresent(ui -> ui.getPage().open(link.getHref()));
@@ -217,14 +221,12 @@ public class ExtractionView extends LitTemplate {
                 nodeShapes = qbParser.shapesExtractor.getNodeShapes();
             }
         }
-
         assert nodeShapes != null;
         pruningUtil.applyPruningFlags(nodeShapes, support, confidence);
         pruningUtil.getDefaultStats(nodeShapes);
         pruningUtil.getStatsBySupport(nodeShapes);
         pruningUtil.getStatsByConfidence(nodeShapes);
         pruningUtil.getStatsByBoth(nodeShapes);
-
 
         headingPieCharts.setVisible(true);
 
@@ -234,23 +236,12 @@ public class ExtractionView extends LitTemplate {
         vl3.add(getParagraph("Shapes Analysis by Confidence"));
         vl4.add(getParagraph("By Support and Confidence"));
 
-        vl1.add(ChartsUtil.buildPieChart(preparePieChartsDataWithDefaultStats( pruningUtil.getStatsDefault(), pruningUtil)));
-        //setupPieChartsDataWithDefaultStats(defaultShapesStatsPieChart, pruningUtil.getStatsDefault(), pruningUtil);
-        vl2.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAnalysis( pruningUtil.getStatsBySupport(), support, pruningUtil)));
-        //setupPieChart(shapesStatsBySupportPieChart, pruningUtil.getStatsBySupport(), support, pruningUtil);
-        vl3.add(ChartsUtil.buildPieChart(preparePieChartDataForConfidenceAnalysis( pruningUtil.getStatsByConfidence(), confidence, pruningUtil)));
-        //setupPieChart(shapesStatsByConfidencePieChart, pruningUtil.getStatsByConfidence(), confidence, pruningUtil);
+        vl1.add(ChartsUtil.buildPieChart(preparePieChartsDataWithDefaultStats(pruningUtil.getStatsDefault(), pruningUtil)));
+        vl2.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAnalysis(pruningUtil.getStatsBySupport(), support, pruningUtil)));
+        vl3.add(ChartsUtil.buildPieChart(preparePieChartDataForConfidenceAnalysis(pruningUtil.getStatsByConfidence(), confidence, pruningUtil)));
         vl4.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAndConfidenceAnalysis(pruningUtil.getStatsByBoth(), support, confidence, pruningUtil)));
-        //setupPieChart(shapesStatsByBothPieChart, pruningUtil.getStatsByBoth(), support, confidence, pruningUtil);
-
-        //defaultShapesStatsPieChart.drawChart();
-        //shapesStatsBySupportPieChart.drawChart();
-        //shapesStatsByConfidencePieChart.drawChart();
-        //shapesStatsByBothPieChart.drawChart();
 
         setupNodeShapesGrid(nodeShapes, support, confidence);
-        //downloadPrunedShapesButton.setText("Download Reliable Shapes Pruned with Support: " + support + " and Confidence: " + Math.round(confidence * 100) + "%");
-
         downloadPrunedShapesButton.setVisible(true);
         setupFilterRadioGroup(vaadinRadioGroup);
         vaadinRadioGroup.setVisible(true);
@@ -283,57 +274,30 @@ public class ExtractionView extends LitTemplate {
         nsGridRadioButtonInfo.setVisible(true);
         shapesGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         shapesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        //shapesGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
-        //shapesGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
         shapesGrid.addColumn(NS::getLocalNameFromIri).setHeader(Utils.boldHeader("Node Shape")).setResizable(true).setAutoWidth(true).setComparator(NS::getPruneFlag);
         shapesGrid.addColumn(NS::getTargetClass).setHeader(Utils.boldHeader("Target Class")).setResizable(true).setResizable(true).setAutoWidth(true);
         shapesGrid.addColumn(NS::getSupport).setHeader(Utils.boldHeader("Support")).setResizable(true).setAutoWidth(true).setSortable(true);
         shapesGrid.addColumn(NS::getCountPropertyShapes).setHeader(Utils.boldHeader("Count PS")).setResizable(true).setAutoWidth(true);
-        //shapesGrid.addColumn(NS::getCountPsWithPruneFlag).setHeader(Utils.boldHeader("PS > (Supp: " + support + ", Conf: " + confidence + ")").setResizable(true);
-        //shapesGrid.addColumn(NS::getCountPscWithPruneFlag).setHeader(Utils.boldHeader("PSc > (Supp: " + support + ", Conf: " + confidence + ")").setResizable(true);
-        
-        /*shapesGrid.addComponentColumn(ns -> createStatusIcon(String.valueOf(ns.getPruneFlag()))).setTooltipGenerator(ns -> {
-            String val = "NS Support > (Support, Confidence) thresholds. Should not be removed";
-            if (ns.getPruneFlag()) {
-                val = "NS Support < (Support, Confidence) thresholds. Should be removed";
-            }
-            return val;
-        }).setHeader(Utils.boldHeader("Prune NS");*/
-
-
         shapesGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ns) -> {
             progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
             progressBar.setId("quality-indicator-progress-bar");
-            //double psCountGreen = ns.getCountPropertyShapes() - ns.getCountPsWithPruneFlag();
-            //progressBar.setValue(psCountGreen / ns.getCountPropertyShapes());
             double psCountGreen = ns.getCountPropertyShapes() - ns.getCountPsWithSupportPruneFlag();
-            //System.out.println(ns.getLocalNameFromIri());
-            //System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithSupportPruneFlag() + " = " + psCountGreen);
-            //System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
             progressBar.setValue(psCountGreen / ns.getCountPropertyShapes());
         })).setHeader((setHeaderWithInfoLogo(
                 "PS Quality (by Support)",
                 "This shows quality of NS in terms of PS left after pruning (green) and removed by pruning (red) provided user's support and confidence thresholds."))).setResizable(true).setAutoWidth(true);
 
-
         shapesGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ns) -> {
             progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
             progressBar.setId("quality-indicator-progress-bar");
             double psCountGreen = ns.getCountPropertyShapes() - ns.getCountPsWithConfidencePruneFlag();
-
-            //System.out.println(ns.getLocalNameFromIri());
-            //System.out.println(ns.getCountPropertyShapes() + " - " + ns.getCountPsWithConfidencePruneFlag() + " = " + psCountGreen);
-            //System.out.println("division = " + psCountGreen / ns.getCountPropertyShapes());
-
             progressBar.setValue(psCountGreen / ns.getCountPropertyShapes());
         })).setHeader(setHeaderWithInfoLogo(
                 "PS Quality (by Confidence)",
                 "This shows quality of NS in terms of PS left after pruning (green) and removed by pruning (red) provided user's support and confidence thresholds.")).setResizable(true).setAutoWidth(true);
 
-
         shapesGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ns) -> {
-
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
             button.addClickListener(e -> {
                 currNS = ns;
@@ -344,9 +308,7 @@ public class ExtractionView extends LitTemplate {
             button.setText("PS List");
         })).setHeader(setHeaderWithInfoLogo("Show PS", "See PS of current NS"));
 
-
         //setClassNameToHighlightNodeShapesInRed(shapesGrid);
-
         nodeShapes.sort((d1, d2) -> d2.getSupport() - d1.getSupport());
         GridListDataView<NS> dataView = shapesGrid.setItems(nodeShapes);
         shapesGrid.addSelectionListener(selection -> {
@@ -375,19 +337,12 @@ public class ExtractionView extends LitTemplate {
 
         //propertyShapesGrid.removeAllColumns();
         propertyShapesGrid.setVisible(true);
-
         propertyShapesGrid.setSelectionMode(Grid.SelectionMode.MULTI);
-        propertyShapesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES); //LUMO_COMPACT
-
+        propertyShapesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         propertyShapesGrid.addColumn(PS::getLocalNameFromIri).setHeader(Utils.boldHeader("Property Shape")).setResizable(true).setAutoWidth(true).setComparator(PS::getPruneFlag);
         propertyShapesGrid.addColumn(PS::getPath).setHeader(Utils.boldHeader("Property Path")).setResizable(true).setAutoWidth(true);
-
         propertyShapesGrid.addColumn(PS::getSupport).setHeader(Utils.boldHeader("Support")).setResizable(true).setAutoWidth(true).setSortable(true);
         propertyShapesGrid.addColumn(PS::getConfidenceInPercentage).setHeader(Utils.boldHeader("Confidence")).setResizable(true).setAutoWidth(true).setComparator(PS::getConfidence);
-
-        //propertyShapesGrid.addColumn(PS::getNodeKind).setHeader(Utils.boldHeader("NodeKind");
-        //propertyShapesGrid.addColumn(PS::getDataTypeOrClass).setHeader(Utils.boldHeader("Data Type or Class");
-
         propertyShapesGrid.addColumn(new ComponentRenderer<>(ProgressBar::new, (progressBar, ps) -> {
             progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
             progressBar.setId("quality-indicator-progress-bar");
@@ -407,7 +362,6 @@ public class ExtractionView extends LitTemplate {
                 progressBar.setValue(item.getConfidence());
             }
         })).setHeader(setHeaderWithInfoLogo("PSc Quality (by Confidence)", " This shows")).setResizable(true).setAutoWidth(true);
-
         propertyShapesGrid.addColumn(new ComponentRenderer<>(Button::new, (button, ps) -> {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
             //button.addClickListener(e -> this.generateQueryForPropertyShape(ns, ps));
@@ -421,9 +375,7 @@ public class ExtractionView extends LitTemplate {
             button.setText("Analyze");
         })).setHeader(setHeaderWithInfoLogo("Action", "The generated SPARQL query will fetch the triples responsible for having chosen PS as part of NS"));
 
-
         setClassNameToHighlightPropertyShapesInRed(propertyShapesGrid);
-
 
         for (PS ps : ns.getPropertyShapes()) {
             if (ps.getConfidence() == null) {
@@ -441,11 +393,10 @@ public class ExtractionView extends LitTemplate {
                 ps.setSupport(item.getSupport());
             }
         }
-
+        ns.getPropertyShapes().sort((d1, d2) -> d2.getSupport() - d1.getSupport());
 
         psVaadinRadioGroup.setVisible(true);
         setupFilterRadioGroup(psVaadinRadioGroup);
-
         psVaadinRadioGroup.addValueChangeListener(listener -> {
             if (listener.getValue() != null) {
                 if (listener.getValue().equals("Above")) {
@@ -466,9 +417,7 @@ public class ExtractionView extends LitTemplate {
             }
         });
 
-        ns.getPropertyShapes().sort((d1, d2) -> d2.getSupport() - d1.getSupport());
         GridListDataView<PS> dataView = propertyShapesGrid.setItems(ns.getPropertyShapes());
-
 
         psSearchField.setVisible(true);
         psSearchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));

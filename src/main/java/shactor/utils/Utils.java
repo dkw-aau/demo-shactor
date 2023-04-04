@@ -57,8 +57,10 @@ public class Utils {
         Select<String> selectField = new Select<>();
         selectField.setWidth("50%");
         selectField.setLabel("Select from existing datasets");
-        selectField.setItems( "DBpediaMini", "DBpedia", "LUBM", "YAGO-4", "WATDIV");
-        selectField.setValue("DBpediaMini");
+        selectField.setItems(  "DBpedia", "LUBM", "YAGO-4", "WATDIV");
+        selectField.setValue("DBpedia");
+        //selectField.setItems( "DBpediaMini", "DBpedia", "LUBM", "YAGO-4", "WATDIV");
+        //selectField.setValue("DBpediaMini");
         return selectField;
     }
 
