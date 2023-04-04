@@ -1,7 +1,9 @@
-# Demo: SHACTOR
+## SHACTOR: Improving the Quality of Large-Scale Knowledge Graphs with Validating Shapes
+### Demo Paper: SIGMOD-2023
 
-This project can be used as a starting point to create your own Vaadin application with Spring Boot.
-It contains all the necessary configuration and some placeholder files to get you started.
+Visit demo's website for more information on the demo paper: http://relweb.cs.aau.dk/qse/shactor/ 
+
+This readme contains all the necessary configuration to run the demo:
 
 ## Running the application
 
@@ -32,7 +34,7 @@ Once the JAR file is built, you can run it using
 - `views` folder in `frontend/` contains the client-side JavaScript views of your application.
 - `themes` folder in `frontend/` contains the custom CSS styles.
 
-## Useful links
+### Useful links (In case you are not familiar with Vaadin framework)
 
 - Read the documentation at [vaadin.com/docs](https://vaadin.com/docs).
 - Follow the tutorials at [vaadin.com/tutorials](https://vaadin.com/tutorials).
