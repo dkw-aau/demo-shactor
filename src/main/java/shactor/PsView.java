@@ -27,6 +27,7 @@ import cs.qse.common.structure.NS;
 import cs.qse.common.structure.PS;
 import cs.qse.common.structure.ShaclOrListItem;
 import cs.utils.Constants;
+import cs.utils.Tuple2;
 import de.atextor.turtle.formatter.FormattingStyle;
 import de.atextor.turtle.formatter.TurtleFormatter;
 import org.apache.jena.graph.Graph;
@@ -95,7 +96,8 @@ public class PsView extends LitTemplate {
     private Button propCoverageQueryButton;
 
     public PsView() {
-        graphExplorer = new GraphExplorer("http://10.92.0.34:7200/", "DBPEDIA_ML");
+        Tuple2<String, String> urlAndRepoTuple = Utils.getDatasetsEndpointDetails().get(IndexView.selectedDataset);
+        graphExplorer = new GraphExplorer(urlAndRepoTuple._1, urlAndRepoTuple._2);
         nodeShape = ExtractionView.getCurrNS();
         propertyShape = ExtractionView.getCurrPS();
 
@@ -522,7 +524,6 @@ public class PsView extends LitTemplate {
     private void createDialogueToShowEntities(List<BindingSet> tripleList) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Entities (" + tripleList.size() + ")");
-
         //dialog.getFooter().add(createFilterButton(dialog));
         VerticalLayout dialogLayout = createDialogContentForShowingEntities(tripleList);
         dialog.add(dialogLayout);
@@ -670,16 +671,33 @@ public class PsView extends LitTemplate {
 
     private void generateQueryToAddProperty(Triple triple) {
         String insertPart = "INSERT { \n <" + triple.getSubject() + ">  <" + propertyShape.getPath() + ">  <VALUE_TO_ADD> \n } \n";
-        String tripleClause = "WHERE { <"+ triple.getSubject()  +">  a  <"+nodeShape.getTargetClass().stringValue() + ">  } \n";
+        String tripleClause = "WHERE { <" + triple.getSubject() + ">  a  <" + nodeShape.getTargetClass().stringValue() + ">  } \n";
         String updateQuery = "\n" + insertPart + tripleClause + "\n\n";
-        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to add property for entity ", updateQuery, "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!");
+        String title = "SPARQL Query to add *Missing* property for entity";
+        String description = "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!";
+
+        String suggestion = RequestKnowledgeGraphAPI.getEntityInfo(triple.getSubject());
+        if (!suggestion.isEmpty()) {
+            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, updateQuery, description + " We suggest the following to help you find the appropriate value for this property:", suggestion);
+        } else {
+            DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description + "SHACTOR is unable to suggest more information for this particular IRI. Please look over the internet. ");
+        }
     }
 
     private void generateQueryToAddType(Triple triple) {
         String insertPart = "INSERT { \n <" + triple.getSubject() + ">  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  <VALUE_TO_ADD> \n } \n";
         String tripleClause = "WHERE {} ";
         String updateQuery = "\n" + insertPart + tripleClause + "\n\n";
-        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to add type of IRI ", updateQuery, "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!");
+        String title = "SPARQL Query to add *Missing* type of the IRI ";
+        String description = "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!";
+
+        String suggestion = RequestKnowledgeGraphAPI.getEntityInfo(triple.getSubject());
+        if (!suggestion.isEmpty()) {
+            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, updateQuery, description + " We suggest the following to help you find the appropriate missing value for entity " + triple.getSubject() + ": ", suggestion);
+        } else {
+            DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description + "SHACTOR is unable to suggest more information for this particular IRI. Please look over the internet. Thanks.");
+        }
+
     }
 
     private void generateQueryToRemoveTriple(Triple triple) {
@@ -687,7 +705,7 @@ public class PsView extends LitTemplate {
         String tripleClause = " WHERE { \n  <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } ";
         String updateQuery = "\n\n" + delPart + tripleClause + "\n\n";
 
-        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to Delete Triple ", updateQuery, "Here is the delete query, you can copy this query to execute it on your graph!");
+        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to Delete Triple ", updateQuery, "Here is the delete query, you can copy this query to execute it on your graph! ");
     }
 
     private void generateQueryToUpdateTriple(Triple triple) {
@@ -696,7 +714,15 @@ public class PsView extends LitTemplate {
         String tripleClause = " WHERE { \n  <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } ";
         String updateQuery = "\n\n" + delPart + insertPart + tripleClause + "\n\n";
 
-        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to Update Entity Information ", updateQuery, "Here is the update query, you can update the desired value by replacing 'VALUE_TO_REPLACE' and copy this query to execute it on your graph!");
+        String title = "SPARQL Query to Update Entity Information ";
+        String description = "Here is the update query, you can update the desired value by replacing 'VALUE_TO_REPLACE' and copy this query to execute it on your graph!";
+
+        String suggestion = RequestKnowledgeGraphAPI.getEntityInfo(triple.getSubject());
+        if (!suggestion.isEmpty()) {
+            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, updateQuery, description + " We suggest the following to help you update the value for entity " + triple.getSubject() + ": ", suggestion);
+        } else {
+            DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description + "SHACTOR is unable to suggest more information for this particular IRI. Please look over the internet. Thanks.");
+        }
     }
 
     private String buildSyntaxForNsAndPs() {
@@ -738,7 +764,7 @@ public class PsView extends LitTemplate {
         }
     }
 
-    private Icon createIcon(VaadinIcon vaadinIcon) {
+    public Icon createIcon(VaadinIcon vaadinIcon) {
         Icon icon = vaadinIcon.create();
         icon.getStyle().set("padding", "var(--lumo-space-xs");
         return icon;

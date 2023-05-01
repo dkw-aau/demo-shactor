@@ -61,11 +61,11 @@ let ExtractionView = class ExtractionView extends LitElement {
      </vaadin-horizontal-layout>
     </vaadin-vertical-layout>
     <vaadin-vertical-layout id="graphStatsVerticalLayout" style="flex-grow: 0; flex-shrink: 1; width: 40%; flex-direction: column;">
-     <p class="bold-paragraph" style="align-self: center;" font-weight="bold">Knowledge Graph Statistics</p>
+     <p class="bold-paragraph" font-weight="bold" id="graphStatsHeading">Knowledge Graph Statistics</p>
     </vaadin-vertical-layout>
    </vaadin-split-layout>
    <h2 id="headingPieCharts" style="align-self: stretch; margin-right: 5%; margin-left: 5%;">Shapes Statistical Analysis</h2>
-   <vaadin-horizontal-layout theme="spacing" id="soChartsContainerHorizontalLayout" style="align-self: center;">
+   <vaadin-horizontal-layout theme="spacing" id="soChartsContainerHorizontalLayout" style="align-self: stretch; margin-left: 5%; margin-right: 5%;">
     <vaadin-vertical-layout theme="spacing" id="vl1">
      <p class="bold-paragraph" style="align-self: center;">Default Shapes Analysis</p>
     </vaadin-vertical-layout>
@@ -79,7 +79,7 @@ let ExtractionView = class ExtractionView extends LitElement {
      <p class="bold-paragraph" style="align-self: center;">By Support and Confidence</p>
     </vaadin-vertical-layout>
    </vaadin-horizontal-layout>
-   <vaadin-horizontal-layout style="align-self: stretch; margin-left: 5%; margin-right: 5%; flex-shrink: 1; flex-grow: 1; margin-bottom: 0%; align-items: stretch; flex-wrap: nowrap;" id="chartsContainerHorizontalLayout">
+   <vaadin-horizontal-layout style="align-self: stretch; margin-left: 5%; margin-right: 5%; flex-shrink: 1; flex-grow: 1; margin-bottom: 0%; align-items: stretch; flex-wrap: nowrap; width: 100%;" id="chartsContainerHorizontalLayout">
     <vaadin-chart type="pie" tooltip="" id="defaultShapesStatsPieChart" style="align-self: flex-start; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
     <vaadin-chart type="pie" tooltip="" id="shapesStatsBySupportPieChart" style="align-self: flex-start; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>
     <vaadin-chart type="pie" tooltip="" id="shapesStatsByConfidencePieChart" style="align-self: flex-start; flex-shrink: 1; flex-grow: 1;"></vaadin-chart>

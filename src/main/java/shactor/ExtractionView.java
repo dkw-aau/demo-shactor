@@ -130,6 +130,8 @@ public class ExtractionView extends LitTemplate {
     private VerticalLayout graphStatsVerticalLayout;
     @Id("splitLayout")
     private SplitLayout splitLayout;
+    @Id("graphStatsHeading")
+    private Paragraph graphStatsHeading;
 
 
     public ExtractionView() {
@@ -321,6 +323,7 @@ public class ExtractionView extends LitTemplate {
         nsSearchField.addValueChangeListener(e -> dataView.refreshAll());
 
         dataView.addFilter(type -> {
+            psSearchField.clear();
             String searchTerm = nsSearchField.getValue().trim();
             if (searchTerm.isEmpty())
                 return true;

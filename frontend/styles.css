@@ -95,3 +95,21 @@
     font-weight: bold;
     text-align: center;
 }
+
+#graphStatsHeading {
+    margin-bottom: -35px;
+}
+
+.suggestion-span {
+    margin: 10px;
+}
+
+.suggestion {
+    color: #1b62c7;
+    font-weight: bold;
+}
+
+.suggestion-red {
+    color: #c71b1b;
+    font-weight: bold;
+}

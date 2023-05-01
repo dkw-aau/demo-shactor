@@ -134,7 +134,8 @@ public class ChartsUtil {
         conf.setPlotOptions(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
-    public static HashMap<String, Integer> preparePieChartDataForSupportAnalysis( HashMap<String, String> statsMap, Integer support, PruningUtil pruningUtil) {
+
+    public static HashMap<String, Integer> preparePieChartDataForSupportAnalysis(HashMap<String, String> statsMap, Integer support, PruningUtil pruningUtil) {
         HashMap<String, Integer> map = new HashMap<>();
         int ns_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_NS")) - Integer.parseInt(statsMap.get("COUNT_NS"));
         map.put("NS > " + support + " = " + ns_green, ns_green);
@@ -145,6 +146,7 @@ public class ChartsUtil {
         map.put("PS < " + support + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")));
         return map;
     }
+
     public static void setupPieChart(Chart chart, HashMap<String, String> statsMap, Double confidence, PruningUtil pruningUtil) {
         Configuration conf = chart.getConfiguration();
         conf.setTitle("Shapes Analysis by Confidence");
@@ -177,6 +179,7 @@ public class ChartsUtil {
         configurePieChart(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
+
     public static HashMap<String, Integer> preparePieChartDataForConfidenceAnalysis(HashMap<String, String> statsMap, Double confidence, PruningUtil pruningUtil) {
         HashMap<String, Integer> map = new HashMap<>();
         int c = (int) (confidence * 100);
@@ -186,6 +189,7 @@ public class ChartsUtil {
         map.put("PS < " + confPercent + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")));
         return map;
     }
+
     public static void setupPieChart(Chart chart, HashMap<String, String> statsMap, Integer support, Double confidence, PruningUtil pruningUtil) {
         Configuration conf = chart.getConfiguration();
         conf.setTitle("By Support and Confidence");
@@ -218,6 +222,7 @@ public class ChartsUtil {
         configurePieChart(plotOptionsPie);
         series.setPlotOptions(plotOptionsPie);
     }
+
     public static HashMap<String, Integer> preparePieChartDataForSupportAndConfidenceAnalysis(HashMap<String, String> statsMap, Integer support, Double confidence, PruningUtil pruningUtil) {
         HashMap<String, Integer> map = new HashMap<>();
         int c = (int) (confidence * 100);
@@ -244,14 +249,16 @@ public class ChartsUtil {
     public static SOChart buildBarChartUsingDbpediaStats() {
         // Creating a chart display area
         SOChart soChart = new SOChart();
-        soChart.setSize("95%", "100%");
+        soChart.setSize("650px", "300px");
         CategoryData labels = new CategoryData("Triples", "Objects", "Literals", "Subjects", "Entities", "Properties", "Classes");
         Data data = new Data(52281114, 19357319, 15269876, 15141546, 5823566, 1323, 427);
-        NightingaleRoseChart rc = new NightingaleRoseChart(labels, data);
-        Position p = new Position();
-        p.setTop(Size.percentage(25));
-        rc.setPosition(p);
-        //soChart.disableDefaultLegend();
+        BarChart bc = new BarChart(labels, data);
+        RectangularCoordinate rc = new RectangularCoordinate(new com.storedobject.chart.XAxis(DataType.CATEGORY), new com.storedobject.chart.YAxis(DataType.NUMBER));
+        rc.getPosition(true).setWidth(Size.pixels(650));
+        rc.getPosition(true).setLeft(Size.pixels(100));
+        rc.getPosition(true).setBottom(Size.pixels(20));
+        bc.plotOn(rc);
+        soChart.disableDefaultLegend();
         soChart.add(rc);
         return soChart;
     }

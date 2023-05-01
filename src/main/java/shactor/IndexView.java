@@ -46,6 +46,7 @@ public class IndexView extends LitTemplate {
     }
 
     public static Category category;
+    public static String selectedDataset;
     public static String graphURL = "";
     public static String endPointRepo = "";
 
@@ -66,6 +67,7 @@ public class IndexView extends LitTemplate {
         Select<String> datasetsSelection = configureAndGetSelectField();
         vl.add(datasetsSelection);
 
+
         Button continueButton = getPrimaryButton("Continue");
 
         RadioButtonGroup<String> rbg = getRadioButtonGroup("Select QSE Type:", new ArrayList<>(Arrays.asList("Exact", "Approximate")));
@@ -74,6 +76,7 @@ public class IndexView extends LitTemplate {
             //Utils.notifyMessage(rbg.getValue());
             category = Category.EXISTING_FILE_BASED;
             graphURL = Utils.getDatasetsAddresses().get(datasetsSelection.getValue());
+            selectedDataset = datasetsSelection.getValue();
             continueButton.getUI().ifPresent(ui -> ui.navigate("selection-view"));
         });
         vl.add(continueButton);
@@ -100,7 +103,7 @@ public class IndexView extends LitTemplate {
     private VerticalLayout getTabThreeLayout() {
         VerticalLayout vl = getVerticalLayout();
         TextField textField = getTextField("Enter address of a SPARQL endpoint");
-        TextField textFieldRepo = getTextField("Enter name of a repository (for GraphDB)");
+        TextField textFieldRepo = getTextField("Enter name of a repository (if required)");
         Button graphEndpointButton = getPrimaryButton("Connect");
         vl.add(textField);
         vl.add(textFieldRepo);

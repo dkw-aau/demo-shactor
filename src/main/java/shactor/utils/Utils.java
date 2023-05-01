@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import cs.utils.Tuple2;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ public class Utils {
         paragraph.setClassName("bold-paragraph");
         return paragraph;
     }
+
     public static TextField getReadOnlyTextField(String label, String value) {
         TextField textField = new TextField();
         textField.setReadOnly(true);
@@ -53,16 +55,6 @@ public class Utils {
         return textField;
     }
 
-    public static Select<String> configureAndGetSelectField() {
-        Select<String> selectField = new Select<>();
-        selectField.setWidth("50%");
-        selectField.setLabel("Select from existing datasets");
-        selectField.setItems(  "DBpedia", "LUBM", "YAGO-4", "WATDIV");
-        selectField.setValue("DBpedia");
-        //selectField.setItems( "DBpediaMini", "DBpedia", "LUBM", "YAGO-4", "WATDIV");
-        //selectField.setValue("DBpediaMini");
-        return selectField;
-    }
 
     public static Button getPrimaryButton(String label) {
         Button primaryButton = new Button(label);
@@ -153,19 +145,44 @@ public class Utils {
         return new Html("<div style='font-weight: bold;'>" + label + "</div>");
     }
 
-
     public static boolean matchesTerm(String value, String searchTerm) {
         return value.toLowerCase().contains(searchTerm.toLowerCase());
     }
 
-    public static HashMap<String, String> getDatasetsAddresses(){
+    public static Select<String> configureAndGetSelectField() {
+        Select<String> selectField = new Select<>();
+        selectField.setWidth("50%");
+        selectField.setLabel("Select from existing datasets");
+        selectField.setItems(getDatasetsAddresses().keySet());
+        selectField.setValue("LUBM-Mini");
+        return selectField;
+    }
+
+    public static HashMap<String, String> getDatasetsAddresses() {
         HashMap<String, String> map = new HashMap<>();
-        //"DBpedia", "LUBM", "YAGO-4", "WikiData");
-        map.put("DBpediaMini", "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt");
+        map.put("DBpedia-CityData", "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt");
+        map.put("LUBM-Mini", "/Users/kashifrabbani/Documents/GitHub/lubm-uba/output/lubm-sf-1.nt");
         map.put("DBpedia", "/home/ubuntu/datasets/dbpedia_ml.nt");
         map.put("LUBM", "/home/ubuntu/datasets/lubm.n3");
         map.put("YAGO-4", "/home/ubuntu/datasets/yago.n3");
         map.put("WATDIV", "/home/ubuntu/datasets/WATDIV.n3");
         return map;
+    }
+
+    public static HashMap<String, Tuple2<String, String>> getDatasetsEndpointDetails() {
+        HashMap<String, Tuple2<String, String>> map = new HashMap<>();
+        map.put("DBpedia-CityData", new Tuple2<>("http://10.92.0.34:7200/", "DBpediaCityData"));
+        map.put("LUBM-Mini", new Tuple2<>("http://10.92.0.34:7200/", "LUBM-ScaleFactor-1"));
+        map.put("DBpedia", new Tuple2<>("http://10.92.0.34:7200/", "DBPEDIA_ML"));
+        map.put("LUBM", new Tuple2<>("http://10.92.0.34:7200/", "LUBM"));
+        map.put("YAGO-4", new Tuple2<>("http://10.92.0.34:7200/", "Yago_EngWiki"));
+        map.put("WATDIV", new Tuple2<>("http://10.92.0.34:7200/", "WATDIV_1B"));
+        return map;
+    }
+
+    public static Icon createIcon(VaadinIcon vaadinIcon) {
+        Icon icon = vaadinIcon.create();
+        icon.getStyle().set("padding", "var(--lumo-space-xs");
+        return icon;
     }
 }
