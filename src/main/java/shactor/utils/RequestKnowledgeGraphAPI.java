@@ -12,7 +12,7 @@ import org.json.JSONObject;
 public class RequestKnowledgeGraphAPI {
 
     // Replace YOUR_API_KEY with your actual API key
-    private static final String API_KEY = "AIzaSyApJxl1p-B9rZWoIKMZwf3bf2fKwnP2WoM";
+    private static final String API_KEY = Utils.readKey();
 
     private static void lookupIRI(String queryIRI) {
         String entityName = queryIRI.substring(queryIRI.lastIndexOf("/") + 1);

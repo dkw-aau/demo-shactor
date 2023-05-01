@@ -17,8 +17,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import cs.utils.ConfigManager;
 import cs.utils.Tuple2;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -184,5 +188,16 @@ public class Utils {
         Icon icon = vaadinIcon.create();
         icon.getStyle().set("padding", "var(--lumo-space-xs");
         return icon;
+    }
+
+
+    public static String readKey() {
+        String key = null;
+        try {
+            key = new String(Files.readAllBytes(Paths.get( "google_api_key.txt")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return key;
     }
 }
