@@ -66,6 +66,12 @@ public class Utils {
         return primaryButton;
     }
 
+    public static Button getSecondaryButton(String label) {
+        Button primaryButton = new Button(label);
+        primaryButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        return primaryButton;
+    }
+
     public static RadioButtonGroup<String> getRadioButtonGroup(String label, List<String> items) {
         RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
         radioGroup.setWidth("50%");
@@ -158,7 +164,7 @@ public class Utils {
         selectField.setWidth("50%");
         selectField.setLabel("Select from existing datasets");
         selectField.setItems(getDatasetsAddresses().keySet());
-        selectField.setValue("LUBM-Mini");
+        selectField.setValue("DBpedia-CityData");
         return selectField;
     }
 

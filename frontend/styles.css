@@ -101,7 +101,20 @@
 }
 
 .suggestion-span {
-    margin: 10px;
+    margin: 2px;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.suggestion-span:hover {
+    background-color: blue;
+}
+
+
+.span-selected {
+    background-color: #2b908f;
+    color: #1b62c7;
+    font-size: 100px;
 }
 
 .suggestion {

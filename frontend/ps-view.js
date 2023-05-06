@@ -9,9 +9,9 @@ import '@vaadin/vaadin-ordered-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/grid/src/vaadin-grid.js';
 import '@vaadin/text-area/src/vaadin-text-area.js';
 import '@polymer/iron-icon/iron-icon.js';
-import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
-import '@vaadin/button/src/vaadin-button.js';
 import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
+import '@vaadin/button/src/vaadin-button.js';
+import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
 let PsView = class PsView extends LitElement {
     static get styles() {
         return css `
@@ -28,11 +28,14 @@ let PsView = class PsView extends LitElement {
   <h3 id="title" style="align-self: stretch; flex-grow: 1; flex-shrink: 1; text-align:center;">SHACTOR : SHapes ExtrACTOR from very large Knowledge Graphs</h3>
  </vaadin-horizontal-layout>
  <vaadin-vertical-layout style="width: 90%; flex-grow: 1; flex-shrink: 1; flex-basis: auto; margin-left: 5%; margin-right: 5%;" id="contentVerticalLayout">
-  <h4 style="align-self: center;">PS Analysis Dashboard - SHACTOR (Step 4/4)</h4>
+  <h4 style="align-self: center;">Property Shape Analysis Dashboard</h4>
   <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayout" style="align-self: stretch;"></vaadin-horizontal-layout>
+  <h4>Entity Exploration</h4>
+  <p>Here you can explore all the entities having this focus property and click on the button below to retrieve list of all entities along with an option to generate delete query (in case you want to delete a triple).</p>
+  <vaadin-button tabindex="0" theme="secondary" id="buttonA">
+    Build and Execute Query 
+  </vaadin-button>
   <vaadin-horizontal-layout theme="spacing" id="infoHorizontalLayoutTwo" style="align-self: flex-start; width: 50%;"></vaadin-horizontal-layout>
-  <br>
-  <vaadin-horizontal-layout id="statusHorizontalLayout" style="align-self: flex-start;"></vaadin-horizontal-layout>
   <h4>Selected Property Shape Info:</h4>
   <p>This property shape has following constraints where you can check conformance of each constraint with the graph. We show support and confidence of each PS constraint along with options to retrieve or edit the entities corresponding to each constraints.</p>
   <vaadin-grid style="align-self: stretch; flex-grow: 0; flex-shrink: 1; max-height: 15%;" is-attached multi-sort-priority="prepend" id="psConstraintsGrid"></vaadin-grid>
@@ -40,17 +43,7 @@ let PsView = class PsView extends LitElement {
   <h4>Property Coverage</h4>
   <p id="propCoverageInfoParagraph">Paragraph</p>
   <vaadin-button theme="secondary" id="propCoverageQueryButton" tabindex="0">
-   Show Entities
-  </vaadin-button>
-  <h4>Entity Exploration</h4>
-  <p>Here you can explore all the entities having this focus property and click on the button below to retrieve list of all entities along with an option to generate delete query (in case you want to delete a triple).</p>
-  <vaadin-button tabindex="0" theme="secondary" id="buttonA">
-    Build and Execute Query 
-  </vaadin-button>
-  <h4>Validation</h4>
-  <p>In case you are interested to validate the constraints of the presented property shape against the graph, you can click the button below and it will notify if the graph conforms to these constraints or not.</p>
-  <vaadin-button tabindex="0" theme="secondary" id="buttonB">
-   Validate
+    Show Entities 
   </vaadin-button>
   <h4>Shape Syntax (SHACL)</h4>
   <vaadin-text-area label="Edit SHACL Syntax" id="psSyntaxTextArea" style="align-self: stretch; flex-grow: 0;"></vaadin-text-area>

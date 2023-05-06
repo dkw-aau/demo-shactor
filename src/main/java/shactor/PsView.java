@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -44,10 +45,8 @@ import shactor.utils.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static shactor.utils.Utils.*;
 
@@ -74,16 +73,12 @@ public class PsView extends LitTemplate {
     private TextArea psSyntaxTextArea;
     @Id("infoHorizontalLayout")
     private HorizontalLayout infoHorizontalLayout;
-    @Id("infoHorizontalLayoutTwo")
-    private HorizontalLayout infoHorizontalLayoutTwo;
     @Id("buttonA")
     private Button buttonA;
-    @Id("buttonB")
-    private Button buttonB;
     @Id("copySyntaxButton")
     private Button copySyntaxButton;
-    @Id("statusHorizontalLayout")
-    private HorizontalLayout statusHorizontalLayout;
+//    @Id("statusHorizontalLayout")
+//    private HorizontalLayout statusHorizontalLayout;
 
     NS nodeShape;
     PS propertyShape;
@@ -102,7 +97,7 @@ public class PsView extends LitTemplate {
         propertyShape = ExtractionView.getCurrPS();
 
         setupNodeShapeInfo(infoHorizontalLayout);
-        setupPropertyShapeInfo(infoHorizontalLayoutTwo);
+        //setupPropertyShapeInfo(infoHorizontalLayoutTwo);
         //setupTypesScopeOfPs(infoHorizontalLayoutTwo);
         //setupStatus(statusHorizontalLayout);
         setupTextArea();
@@ -116,14 +111,10 @@ public class PsView extends LitTemplate {
         hl.add(Utils.getReadOnlyTextField("Node Shape: ", nodeShape.getLocalNameFromIri()));
         hl.add(Utils.getReadOnlyTextField("No. of PS of :" + nodeShape.getLocalNameFromIri() + ": ", nodeShape.getCountPropertyShapes().toString()));
         hl.add(Utils.getReadOnlyTextField("Target Class: ", nodeShape.getTargetClass().toString()));
-        hl.add(Utils.getReadOnlyTextField("Support Threshold: ", ExtractionView.getSupport().toString()));
-        hl.add(Utils.getReadOnlyTextField("Confidence Threshold: ", ExtractionView.getConfidence() * 100 + "%"));
-    }
-
-    private void setupPropertyShapeInfo(HorizontalLayout hl) {
-        //vl.add(new H4("Property Shape (PS) Info:"));
         hl.add(Utils.getReadOnlyTextField("PS PATH: ", propertyShape.getPath()));
         hl.add(Utils.getReadOnlyTextField("PS IRI: ", nodeShape.getIri().toString()));
+        //hl.add(Utils.getReadOnlyTextField("Support Threshold: ", ExtractionView.getSupport().toString()));
+        //hl.add(Utils.getReadOnlyTextField("Confidence Threshold: ", ExtractionView.getConfidence() * 100 + "%"));
     }
 
     private void setupStatus(HorizontalLayout hl) {
@@ -180,7 +171,10 @@ public class PsView extends LitTemplate {
         hl.add(select);
     }
 
+    ArrayList<String> suggestionsList = new ArrayList<>();
+
     private void setupGrid() {
+        StringBuilder suggestionBuilder = new StringBuilder();
         if (propertyShape.getHasOrList()) {
             psConstraintsGrid.setVisible(false);
             psOrItemsConstraintsGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -195,6 +189,12 @@ public class PsView extends LitTemplate {
                 if (item.getDataTypeOrClass() == null || Objects.equals(item.getDataTypeOrClass(), "http://shaclshapes.org/undefined")) {
                     item.setDataTypeOrClass("Undefined");
                     flag = true;
+                }
+            }
+
+            for (ShaclOrListItem val : propertyShape.getShaclOrListItems()) {
+                if (val.getDataTypeOrClass() != null && !val.getDataTypeOrClass().equals("Undefined")) {
+                    suggestionsList.add(val.getDataTypeOrClass());
                 }
             }
             psOrItemsConstraintsGrid.addColumn(new ComponentRenderer<>(Button::new, (button, shaclOrListItem) -> {
@@ -213,7 +213,7 @@ public class PsView extends LitTemplate {
                     });
 
                     button.setIcon(new Icon(VaadinIcon.LIST));
-                    button.setText("List Entities");
+                    button.setText("Inspect Entities");
                 }
             })).setHeader(setHeaderWithInfoLogo("Show Entities", "Retrieve list of entities having specified object type."));
             //FIXME: extract entities having specified object type (i.e., value of sh:class constraint)
@@ -234,14 +234,18 @@ public class PsView extends LitTemplate {
                             }
                         });
                         button.setIcon(new Icon(VaadinIcon.LIST));
-                        button.setText("List Objects (IRIs)");
+                        button.setText("Inspect Objects");
                     }
                 })).setHeader(setHeaderWithInfoLogo("Show Objects", "Retrieve list of objects (IRIs) having undefined type."));
             }
             psOrItemsConstraintsGrid.setItems(propertyShape.getShaclOrListItems());
+
+
         } else {
             psOrItemsConstraintsGrid.setVisible(false);
-
+            if (propertyShape.getDataTypeOrClass() != null) {
+                suggestionsList.add(propertyShape.getDataTypeOrClass());
+            }
             //Declare an undefined flag
             boolean flag = false;
             if (propertyShape.getDataTypeOrClass() == null) {
@@ -268,7 +272,7 @@ public class PsView extends LitTemplate {
                         createDialogueToShowEntitiesWithPropAndObject(output);
                     });
                     button.setIcon(new Icon(VaadinIcon.LIST));
-                    button.setText("List Entities");
+                    button.setText("Inspect Entities");
                 })).setHeader(setHeaderWithInfoLogo("Show Entities", "Retrieve list of entities having specified object type."));
 
 
@@ -285,7 +289,7 @@ public class PsView extends LitTemplate {
                             }
                         });
                         button.setIcon(new Icon(VaadinIcon.LIST));
-                        button.setText("List Object (IRIs)");
+                        button.setText("Inspect Objects");
                     })).setHeader(setHeaderWithInfoLogo("Show Objects", "Retrieve list of objects (IRIs) having undefined type."));
                 }
             }
@@ -309,7 +313,7 @@ public class PsView extends LitTemplate {
         buttonA.addClickListener(e -> this.generateDialogWithQueryForPropertyShape(nodeShape, propertyShape));
 
         //Button B
-        buttonB.addClickListener(e -> this.validateEntitiesData(nodeShape, propertyShape));
+        //buttonB.addClickListener(e -> this.validateEntitiesData(nodeShape, propertyShape));
     }
 
     private void validateEntitiesData(NS ns, PS ps) {
@@ -606,12 +610,52 @@ public class PsView extends LitTemplate {
 
         grid.getStyle().set("width", "1500px").set("max-width", "100%");
         grid.setItems(subjectList);
-        Paragraph paragraph = new Paragraph("IRIs having undefined type");
-        VerticalLayout dialogLayout = new VerticalLayout(paragraph, grid);
+        String title = "IRIs having undefined type";
+        if (!suggestionsList.isEmpty()) {
+            title = "The table below shows the entities missing type information. SHACTOR suggests the following types/classes for these entities. Select entities using checkbox and select the one of the suggested type:";
+        }
+        Paragraph paragraph = new Paragraph(title);
+
+        CheckboxGroup<String> checkboxGroup = new CheckboxGroup<>();
+        checkboxGroup.setItems(suggestionsList);
+
+        Button generateInsertQueryButton = Utils.getPrimaryButton("Generate insert query to insert missing value for selected entities");
+        //generateInsertQueryButton.setWidth("300px");
+        generateInsertQueryButton.setAutofocus(true);
+        generateInsertQueryButton.setVisible(false);
+
+        VerticalLayout dialogLayout = new VerticalLayout(paragraph, checkboxGroup, generateInsertQueryButton, grid);
         dialogLayout.setPadding(true);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("min-width", "1500px").set("max-width", "100%").set("height", "100%");
 
+
+        AtomicReference<Set<Triple>> selectedItems = new AtomicReference<>();
+        grid.addSelectionListener(selection -> {
+            System.out.printf("Number of selected classes: %s%n", selection.getAllSelectedItems().size());
+            selectedItems.set(selection.getAllSelectedItems());
+            if (checkboxGroup.getSelectedItems().size() > 0 && selection.getAllSelectedItems().size() > 0) {
+                generateInsertQueryButton.setVisible(true);
+            } else {
+                generateInsertQueryButton.setVisible(false);
+            }
+        });
+
+        checkboxGroup.addSelectionListener(listener -> {
+            if (selectedItems.get() != null) {
+                if (checkboxGroup.getSelectedItems().size() > 0 && selectedItems.get().size() > 0) {
+                    generateInsertQueryButton.setVisible(true);
+                } else {
+                    generateInsertQueryButton.setVisible(false);
+                }
+            }
+
+        });
+
+        generateInsertQueryButton.addClickListener(buttonClickEvent -> {
+            System.out.println(selectedItems);
+            System.out.println(checkboxGroup.getSelectedItems());
+        });
         return dialogLayout;
     }
 
@@ -675,13 +719,7 @@ public class PsView extends LitTemplate {
         String updateQuery = "\n" + insertPart + tripleClause + "\n\n";
         String title = "SPARQL Query to add *Missing* property for entity";
         String description = "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!";
-
-        String suggestion = RequestKnowledgeGraphAPI.getEntityInfo(triple.getSubject());
-        if (!suggestion.isEmpty()) {
-            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, updateQuery, description + " We suggest the following to help you find the appropriate value for this property:", suggestion);
-        } else {
-            DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description + "SHACTOR is unable to suggest more information for this particular IRI. Please look over the internet. ");
-        }
+        DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description);
     }
 
     private void generateQueryToAddType(Triple triple) {
@@ -690,14 +728,11 @@ public class PsView extends LitTemplate {
         String updateQuery = "\n" + insertPart + tripleClause + "\n\n";
         String title = "SPARQL Query to add *Missing* type of the IRI ";
         String description = "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!";
-
-        String suggestion = RequestKnowledgeGraphAPI.getEntityInfo(triple.getSubject());
-        if (!suggestion.isEmpty()) {
-            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, updateQuery, description + " We suggest the following to help you find the appropriate missing value for entity " + triple.getSubject() + ": ", suggestion);
+        if (!suggestionsList.isEmpty()) {
+            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, updateQuery, description + " We suggest the following to help you find the appropriate missing value for entity " + triple.getSubject() + ": ", suggestionsList);
         } else {
-            DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description + "SHACTOR is unable to suggest more information for this particular IRI. Please look over the internet. Thanks.");
+            DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description);
         }
-
     }
 
     private void generateQueryToRemoveTriple(Triple triple) {
@@ -718,11 +753,12 @@ public class PsView extends LitTemplate {
         String description = "Here is the update query, you can update the desired value by replacing 'VALUE_TO_REPLACE' and copy this query to execute it on your graph!";
 
         String suggestion = RequestKnowledgeGraphAPI.getEntityInfo(triple.getSubject());
-        if (!suggestion.isEmpty()) {
-            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, updateQuery, description + " We suggest the following to help you update the value for entity " + triple.getSubject() + ": ", suggestion);
-        } else {
-            DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description + "SHACTOR is unable to suggest more information for this particular IRI. Please look over the internet. Thanks.");
-        }
+        DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description + "SHACTOR is unable to suggest more information for this particular IRI. Please look over the internet. Thanks.");
+//        if (!suggestion.isEmpty()) {
+//            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, updateQuery, description + " We suggest the following to help you update the value for entity " + triple.getSubject() + ": ", suggestion);
+//        } else {
+//            DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description + "SHACTOR is unable to suggest more information for this particular IRI. Please look over the internet. Thanks.");
+//        }
     }
 
     private String buildSyntaxForNsAndPs() {

@@ -1,7 +1,6 @@
 package shactor.utils;
 
 import com.storedobject.chart.SOChart;
-import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -9,7 +8,6 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -34,7 +32,7 @@ public class DialogUtil {
         dialog.open();
     }
 
-    public static void getDialogWithHeaderAndFooterWithSuggestion(String title, String textAreaText, String infoParagraphText, String suggestions) {
+    public static void getDialogWithHeaderAndFooterWithSuggestion(String title, String textAreaText, String infoParagraphText, ArrayList<String> suggestions) {
         Dialog dialog = new Dialog();
         dialog.getElement().setAttribute("aria-label", "Dialog");
         dialog.getHeader().add(getHeaderTitle(title));
@@ -69,13 +67,10 @@ public class DialogUtil {
     }
 
     private static VerticalLayout createDialogLayout(String textAreaText, String paragraphText) {
-
-        Paragraph paragraph = new Paragraph(paragraphText.split("!")[0]);
-        Paragraph p1 = new Paragraph(paragraphText.split("!")[1]);
-        p1.addClassName("suggestion-red");
+        Paragraph paragraph = new Paragraph(paragraphText);
         TextArea descriptionArea = new TextArea();
         descriptionArea.setValue(textAreaText);
-        VerticalLayout fieldLayout = new VerticalLayout(paragraph, p1, descriptionArea);
+        VerticalLayout fieldLayout = new VerticalLayout(paragraph, descriptionArea);
         fieldLayout.setSpacing(false);
         fieldLayout.setPadding(false);
         fieldLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
@@ -84,21 +79,12 @@ public class DialogUtil {
     }
 
 
-    private static VerticalLayout createDialogLayoutWithSuggestion(String textAreaText, String paragraphText, String suggestions) {
-
-        Paragraph paragraph = new Paragraph(paragraphText.split("!")[0]);
-        Paragraph p1 = new Paragraph(paragraphText.split("!")[1]);
-        p1.addClassName("suggestion");
+    private static VerticalLayout createDialogLayoutWithSuggestion(String textAreaText, String paragraphText, ArrayList<String> suggestions) {
         TextArea descriptionArea = new TextArea();
         descriptionArea.setValue(textAreaText);
-        VerticalLayout fieldLayout = new VerticalLayout(paragraph, p1);
-        String[] suggestionsArray = suggestions.split("\\|");
-        fieldLayout.add(new H4(suggestionsArray[0]));
-        fieldLayout.add(new Paragraph(suggestionsArray[1]));
-
-        //fieldLayout.add(new Paragraph(suggestionsArray[2]));
+        VerticalLayout fieldLayout = new VerticalLayout(descriptionArea);
         Paragraph p = new Paragraph();
-        for (String val : suggestionsArray[2].split(",")) {
+        for (String val : suggestions) {
             Span shape = new Span(createIcon(VaadinIcon.INFO), new Span(val));
             shape.addClassName("suggestion-span");
             shape.getElement().getThemeList().add("badge contrast pill");
