@@ -126,3 +126,11 @@
     color: #c71b1b;
     font-weight: bold;
 }
+
+
+#inspectionDivPsView {
+    width: 100%;
+    background-color: color(srgb 0.9529 0.9608 0.9687);
+    padding: 10px;
+    border-radius: 5px;
+}

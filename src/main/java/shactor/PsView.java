@@ -89,6 +89,12 @@ public class PsView extends LitTemplate {
     private Paragraph propCoverageInfoParagraph;
     @Id("propCoverageQueryButton")
     private Button propCoverageQueryButton;
+    @Id("matchedEntitiesHeading")
+    private H4 matchedEntitiesHeading;
+    @Id("missingPropertiesHeading")
+    private H4 missingPropertiesHeading;
+    @Id("entitiesInspectionInfoParagraph")
+    private Paragraph entitiesInspectionInfoParagraph;
 
     public PsView() {
         Tuple2<String, String> urlAndRepoTuple = Utils.getDatasetsEndpointDetails().get(IndexView.selectedDataset);
@@ -136,10 +142,15 @@ public class PsView extends LitTemplate {
         nodeShape.getTargetClass();
         nodeShape.getSupport();
         propertyShape.getPath();
+        String[] propPathSplit = propertyShape.getPath().split("/");
+        String propLocalName = propPathSplit[propPathSplit.length - 1];
         List<BindingSet> result = graphExplorer.runSelectQuery(QueryUtil.buildQueryToExtractEntitiesNotHavingFocusProperty(nodeShape.getTargetClass(), propertyShape.getPath()));
-        propCoverageInfoParagraph.setText("There are total " + nodeShape.getSupport() + " entities of " + nodeShape.getTargetClass().getLocalName() + " class, and " +
-                " there exists " + result.size() + " entities not having " + propertyShape.getPath() + " property. Click the button 'Show Entities' below to retrieve the list of entities not having this property. " +
-                "We also provide an option to insert this property for each entity (in case this is the case of missing information) by automatically constructing a query. ");
+        propCoverageInfoParagraph.setText("There are total " + Utils.formatWithCommas(nodeShape.getSupport()) + " entities of " + nodeShape.getTargetClass().getLocalName() + " class out of which " + result.size() + " are missing " + propertyShape.getPath() + " property. SHACTOR allows to add this property to selected entities.");
+        entitiesInspectionInfoParagraph.setText("Explore all entities of type " + nodeShape.getTargetClass().getLocalName() + " having property <" + propertyShape.getPath() + ">. SHACTOR allows to generate queries to delete the chosen entities.");
+
+        matchedEntitiesHeading.setText(Utils.formatWithCommas(nodeShape.getSupport() - result.size()) + " entities matched " + propLocalName + " property shape:");
+        missingPropertiesHeading.setText(result.size() + " entities of type " + nodeShape.getTargetClass().getLocalName() + " are missing " + propLocalName + " property:");
+
         propCoverageQueryButton.addClickListener(buttonClickEvent -> {
             createDialogueToShowEntitiesHavingMissingProperty(result);
         });
@@ -299,6 +310,9 @@ public class PsView extends LitTemplate {
 
     private void setupTextArea() {
         this.psSyntaxTextArea.setValue(prepareModelForNsAndPs());
+        this.psSyntaxTextArea.getStyle().set("resize", "vertical"); //https://cookbook.vaadin.com/resizable-components
+        this.psSyntaxTextArea.getStyle().set("overflow", "auto");
+        this.psSyntaxTextArea.setHeight("150px");
         this.copySyntaxButton.setIcon(VaadinIcon.COPY.create());
         this.copySyntaxButton.getElement().setProperty("title", "Does not work on Safari!");
         this.copySyntaxButton.addClickListener(e -> {
@@ -309,11 +323,12 @@ public class PsView extends LitTemplate {
     }
 
     private void setupActionButtons() {
-        //Button A
         buttonA.addClickListener(e -> this.generateDialogWithQueryForPropertyShape(nodeShape, propertyShape));
+        buttonA.addThemeVariants(ButtonVariant.LUMO_ICON);
+        buttonA.setIcon(new Icon(VaadinIcon.EDIT));
 
-        //Button B
-        //buttonB.addClickListener(e -> this.validateEntitiesData(nodeShape, propertyShape));
+        propCoverageQueryButton.addThemeVariants(ButtonVariant.LUMO_ICON);
+        propCoverageQueryButton.setIcon(new Icon(VaadinIcon.EDIT));
     }
 
     private void validateEntitiesData(NS ns, PS ps) {
@@ -599,13 +614,13 @@ public class PsView extends LitTemplate {
         Grid<Triple> grid = new Grid<>(Triple.class, false);
 
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
-        grid.addColumn(Triple::getSubject).setHeader("Entity IRI").setResizable(true).setSortable(true);
+        grid.addColumn(Triple::getSubject).setHeader("IRI or Literal value").setResizable(true).setSortable(true);
 
         grid.addColumn(new ComponentRenderer<>(Button::new, (button, triple) -> {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
             button.addClickListener(e -> this.generateQueryToAddType(triple));
             button.setIcon(new Icon(VaadinIcon.PLUS));
-        })).setHeader(setHeaderWithInfoLogo("INSERT TYPE", "A SPARQL Query to insert type of this entity will be constructed."));
+        })).setHeader(setHeaderWithInfoLogo("Generate Insert Query", "A SPARQL Query to insert type of this entity will be constructed."));
 
 
         grid.getStyle().set("width", "1500px").set("max-width", "100%");
@@ -624,7 +639,7 @@ public class PsView extends LitTemplate {
         generateInsertQueryButton.setAutofocus(true);
         generateInsertQueryButton.setVisible(false);
 
-        VerticalLayout dialogLayout = new VerticalLayout(paragraph, checkboxGroup, generateInsertQueryButton, grid);
+        VerticalLayout dialogLayout = new VerticalLayout(paragraph, checkboxGroup, grid, generateInsertQueryButton);
         dialogLayout.setPadding(true);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("min-width", "1500px").set("max-width", "100%").set("height", "100%");
@@ -649,12 +664,11 @@ public class PsView extends LitTemplate {
                     generateInsertQueryButton.setVisible(false);
                 }
             }
-
         });
-
         generateInsertQueryButton.addClickListener(buttonClickEvent -> {
             System.out.println(selectedItems);
             System.out.println(checkboxGroup.getSelectedItems());
+            generateInsertQueryForSelectedData(selectedItems.get(), checkboxGroup.getSelectedItems());
         });
         return dialogLayout;
     }
@@ -689,7 +703,6 @@ public class PsView extends LitTemplate {
         return dialogLayout;
     }
 
-
     private VerticalLayout createDialogContentForShowingTriples(List<Triple> tripleList) {
         Grid<Triple> grid = new Grid<>(Triple.class, false);
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
@@ -713,6 +726,20 @@ public class PsView extends LitTemplate {
         return dialogLayout;
     }
 
+    private void generateInsertQueryForSelectedData(Set<Triple> triples, Set<String> entityTypes) {
+        StringBuilder insertQuery = new StringBuilder();
+        insertQuery.append("INSERT { \n ");
+        for (Triple triple : triples) {
+            for (String type : entityTypes) {
+                insertQuery.append("\t<").append(triple.getSubject()).append(">  ").append(Constants.RDF_TYPE).append("  <").append(type).append("> . \n");
+            }
+        }
+        insertQuery.append("}\nWHERE { } \n");
+        String title = "SPARQL Query to add *Missing* type of the IRI ";
+        String description = "Here is the generated insert query for the selected entities and types. Please execute it on your graph to make the changes. ";
+        DialogUtil.getDialogWithHeaderAndFooter(title, insertQuery.toString(), description);
+    }
+
     private void generateQueryToAddProperty(Triple triple) {
         String insertPart = "INSERT { \n <" + triple.getSubject() + ">  <" + propertyShape.getPath() + ">  <VALUE_TO_ADD> \n } \n";
         String tripleClause = "WHERE { <" + triple.getSubject() + ">  a  <" + nodeShape.getTargetClass().stringValue() + ">  } \n";
@@ -729,7 +756,7 @@ public class PsView extends LitTemplate {
         String title = "SPARQL Query to add *Missing* type of the IRI ";
         String description = "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!";
         if (!suggestionsList.isEmpty()) {
-            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, updateQuery, description + " We suggest the following to help you find the appropriate missing value for entity " + triple.getSubject() + ": ", suggestionsList);
+            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, triple, updateQuery, description + " We suggest the following to help you find the appropriate missing value for entity " + triple.getSubject() + ": ", suggestionsList);
         } else {
             DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description);
         }

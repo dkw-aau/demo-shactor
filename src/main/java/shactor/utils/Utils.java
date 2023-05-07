@@ -23,6 +23,7 @@ import cs.utils.Tuple2;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -205,5 +206,11 @@ public class Utils {
             e.printStackTrace();
         }
         return key;
+    }
+
+
+    public static String formatWithCommas(int number) {
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        return formatter.format(number);
     }
 }

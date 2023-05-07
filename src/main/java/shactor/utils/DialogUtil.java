@@ -3,19 +3,16 @@ package shactor.utils;
 import com.storedobject.chart.SOChart;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
+import cs.utils.Constants;
 
 import java.util.ArrayList;
-
-import static shactor.utils.Utils.createIcon;
 
 public class DialogUtil {
     public static Button actionButton;
@@ -32,12 +29,12 @@ public class DialogUtil {
         dialog.open();
     }
 
-    public static void getDialogWithHeaderAndFooterWithSuggestion(String title, String textAreaText, String infoParagraphText, ArrayList<String> suggestions) {
+    public static void getDialogWithHeaderAndFooterWithSuggestion(String title, Triple triple, String textAreaText, String infoParagraphText, ArrayList<String> suggestions) {
         Dialog dialog = new Dialog();
         dialog.getElement().setAttribute("aria-label", "Dialog");
         dialog.getHeader().add(getHeaderTitle(title));
         createFooter(dialog, "Execute");
-        VerticalLayout dialogLayout = createDialogLayoutWithSuggestion(textAreaText, infoParagraphText, suggestions);
+        VerticalLayout dialogLayout = createDialogLayoutWithSuggestion(textAreaText, triple, infoParagraphText, suggestions);
         dialog.add(dialogLayout);
         dialog.setModal(false);
         dialog.setDraggable(true);
@@ -79,19 +76,43 @@ public class DialogUtil {
     }
 
 
-    private static VerticalLayout createDialogLayoutWithSuggestion(String textAreaText, String paragraphText, ArrayList<String> suggestions) {
+    private static VerticalLayout createDialogLayoutWithSuggestion(String textAreaText, Triple triple, String paragraphText, ArrayList<String> suggestions) {
         TextArea descriptionArea = new TextArea();
         descriptionArea.setValue(textAreaText);
         VerticalLayout fieldLayout = new VerticalLayout(descriptionArea);
-        Paragraph p = new Paragraph();
+
+        CheckboxGroup<String> checkboxGroup = new CheckboxGroup<>();
+        checkboxGroup.setItems(suggestions);
+
+        checkboxGroup.addSelectionListener(listener -> {
+            if (listener.getAllSelectedItems().size() > 0) {
+                StringBuilder insertQuery = new StringBuilder();
+                insertQuery.append("INSERT { \n ");
+                listener.getAllSelectedItems().forEach(type -> {
+                    insertQuery.append("\t<").append(triple.getSubject()).append(">  ").append(Constants.RDF_TYPE).append("  <").append(type).append("> . \n");
+                });
+                insertQuery.append("}\nWHERE { } \n");
+                descriptionArea.setValue(insertQuery.toString());
+            } else {
+                descriptionArea.setValue(textAreaText);
+            }
+        });
+
+        /*        Paragraph p = new Paragraph();
         for (String val : suggestions) {
             Span shape = new Span(createIcon(VaadinIcon.INFO), new Span(val));
             shape.addClassName("suggestion-span");
             shape.getElement().getThemeList().add("badge contrast pill");
             p.add(shape);
-        }
-        fieldLayout.add(p);
-        fieldLayout.add(new Paragraph("Please use the appropriate prefix like <http://dbpedia.org/resource/***> with the above suggestions."));
+
+            shape.addClickListener(spanClickEvent -> {
+                descriptionArea.setValue(descriptionArea.getValue() + " hi" + val);
+                System.out.println(textAreaText);
+                System.out.println(val);
+            });
+        }*/
+        fieldLayout.add(checkboxGroup);
+        fieldLayout.add(new Paragraph("Please select one of the above suggested type or edit the 'VALUE_TO_ADD'."));
         fieldLayout.add(descriptionArea);
         fieldLayout.setSpacing(false);
         fieldLayout.setPadding(false);
