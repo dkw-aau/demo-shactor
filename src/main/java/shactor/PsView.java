@@ -149,7 +149,7 @@ public class PsView extends LitTemplate {
         entitiesInspectionInfoParagraph.setText("Explore all entities of type " + nodeShape.getTargetClass().getLocalName() + " having property <" + propertyShape.getPath() + ">. SHACTOR allows to generate queries to delete the chosen entities.");
 
         matchedEntitiesHeading.setText(Utils.formatWithCommas(nodeShape.getSupport() - result.size()) + " entities matched " + propLocalName + " property shape:");
-        missingPropertiesHeading.setText(result.size() + " entities of type " + nodeShape.getTargetClass().getLocalName() + " are missing " + propLocalName + " property:");
+        missingPropertiesHeading.setText(Utils.formatWithCommas(result.size()) + " entities of type " + nodeShape.getTargetClass().getLocalName() + " are missing " + propLocalName + " property:");
 
         propCoverageQueryButton.addClickListener(buttonClickEvent -> {
             createDialogueToShowEntitiesHavingMissingProperty(result);
@@ -530,8 +530,7 @@ public class PsView extends LitTemplate {
 
     private void createDialogueToShowEntitiesWithPropAndObject(List<BindingSet> tripleList) {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Entities (" + tripleList.size() + ")");
-        //dialog.getFooter().add(createFilterButton(dialog));
+        dialog.setHeaderTitle("Entities Inspection");
         VerticalLayout dialogLayout = createDialogContentForShowingEntitiesWithPropAndObject(tripleList);
         dialog.add(dialogLayout);
         dialog.setDraggable(true);
@@ -542,8 +541,7 @@ public class PsView extends LitTemplate {
 
     private void createDialogueToShowEntities(List<BindingSet> tripleList) {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Entities (" + tripleList.size() + ")");
-        //dialog.getFooter().add(createFilterButton(dialog));
+        dialog.setHeaderTitle("Entities Inspection");
         VerticalLayout dialogLayout = createDialogContentForShowingEntities(tripleList);
         dialog.add(dialogLayout);
         dialog.setDraggable(true);
@@ -554,9 +552,7 @@ public class PsView extends LitTemplate {
 
     private void createDialogueToShowEntitiesHavingMissingProperty(List<BindingSet> tripleList) {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Entities (" + tripleList.size() + ")");
-
-        //dialog.getFooter().add(createFilterButton(dialog));
+        dialog.setHeaderTitle("Entities Inspection");
         VerticalLayout dialogLayout = createDialogContentForShowingEntitiesHavingMissingProperty(tripleList);
         dialog.add(dialogLayout);
         dialog.setDraggable(true);
@@ -593,14 +589,27 @@ public class PsView extends LitTemplate {
             button.setIcon(new Icon(VaadinIcon.TRASH));
         })).setHeader(setHeaderWithInfoLogo("Delete", "A SPARQL Query to remove this triple will be constructed."));
 
-
         grid.getStyle().set("width", "1500px").set("max-width", "100%");
         grid.setItems(tripleList);
 
-        VerticalLayout dialogLayout = new VerticalLayout(grid);
+        Button generateDeleteQueryButton = Utils.getPrimaryButton("Generate Query to Delete the selected Triples");
+        generateDeleteQueryButton.setAutofocus(true);
+        generateDeleteQueryButton.setVisible(false);
+
+        AtomicReference<Set<Triple>> selectedItems = new AtomicReference<>();
+        grid.addSelectionListener(selection -> {
+            selectedItems.set(selection.getAllSelectedItems());
+            generateDeleteQueryButton.setVisible(selection.getAllSelectedItems().size() > 0);
+        });
+
+        VerticalLayout dialogLayout = new VerticalLayout(grid, generateDeleteQueryButton);
         dialogLayout.setPadding(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("min-width", "1500px").set("max-width", "100%").set("height", "100%");
+
+        generateDeleteQueryButton.addClickListener(buttonClickEvent -> {
+            generateDeleteQueryForSelectedData(selectedItems.get());
+        });
 
         return dialogLayout;
     }
@@ -647,27 +656,16 @@ public class PsView extends LitTemplate {
 
         AtomicReference<Set<Triple>> selectedItems = new AtomicReference<>();
         grid.addSelectionListener(selection -> {
-            System.out.printf("Number of selected classes: %s%n", selection.getAllSelectedItems().size());
             selectedItems.set(selection.getAllSelectedItems());
-            if (checkboxGroup.getSelectedItems().size() > 0 && selection.getAllSelectedItems().size() > 0) {
-                generateInsertQueryButton.setVisible(true);
-            } else {
-                generateInsertQueryButton.setVisible(false);
-            }
+            generateInsertQueryButton.setVisible(checkboxGroup.getSelectedItems().size() > 0 && selection.getAllSelectedItems().size() > 0);
         });
 
         checkboxGroup.addSelectionListener(listener -> {
             if (selectedItems.get() != null) {
-                if (checkboxGroup.getSelectedItems().size() > 0 && selectedItems.get().size() > 0) {
-                    generateInsertQueryButton.setVisible(true);
-                } else {
-                    generateInsertQueryButton.setVisible(false);
-                }
+                generateInsertQueryButton.setVisible(checkboxGroup.getSelectedItems().size() > 0 && selectedItems.get().size() > 0);
             }
         });
         generateInsertQueryButton.addClickListener(buttonClickEvent -> {
-            System.out.println(selectedItems);
-            System.out.println(checkboxGroup.getSelectedItems());
             generateInsertQueryForSelectedData(selectedItems.get(), checkboxGroup.getSelectedItems());
         });
         return dialogLayout;
@@ -688,7 +686,7 @@ public class PsView extends LitTemplate {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_TERTIARY);
             button.addClickListener(e -> this.generateQueryToAddProperty(triple));
             button.setIcon(new Icon(VaadinIcon.PLUS));
-        })).setHeader(setHeaderWithInfoLogo("INSERT Property", "A SPARQL Query to insert property for this entity will be constructed."));
+        })).setHeader(setHeaderWithInfoLogo("Generate query to add property", "A SPARQL Query to insert property for this entity will be constructed."));
 
 
         grid.getStyle().set("width", "1500px").set("max-width", "100%");
@@ -714,16 +712,40 @@ public class PsView extends LitTemplate {
             button.addClickListener(e -> this.generateQueryToRemoveTriple(triple));
             button.setIcon(new Icon(VaadinIcon.TRASH));
         })).setHeader(setHeaderWithInfoLogo("Delete", "A SPARQL Query to remove this triple will be executed."));
-
         grid.getStyle().set("width", "2000px").set("max-width", "100%");
         grid.setItems(tripleList);
 
-        VerticalLayout dialogLayout = new VerticalLayout(grid);
+        Button generateDeleteQueryButton = Utils.getPrimaryButton("Generate Query to Delete the selected Triples");
+        generateDeleteQueryButton.setAutofocus(true);
+        generateDeleteQueryButton.setVisible(false);
+        AtomicReference<Set<Triple>> selectedItems = new AtomicReference<>();
+        grid.addSelectionListener(selection -> {
+            selectedItems.set(selection.getAllSelectedItems());
+            generateDeleteQueryButton.setVisible(selection.getAllSelectedItems().size() > 0);
+        });
+
+        VerticalLayout dialogLayout = new VerticalLayout(grid, generateDeleteQueryButton);
         dialogLayout.setPadding(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("min-width", "1500px").set("max-width", "100%").set("height", "100%");
 
+        generateDeleteQueryButton.addClickListener(buttonClickEvent -> {
+            generateDeleteQueryForSelectedData(selectedItems.get());
+        });
+
         return dialogLayout;
+    }
+
+    private void generateDeleteQueryForSelectedData(Set<Triple> triples) {
+        StringBuilder deleteQuery = new StringBuilder();
+        deleteQuery.append("DELETE \nWHERE { \n");
+        for (Triple triple : triples) {
+            deleteQuery.append("\t<").append(triple.getSubject()).append(">  <").append(triple.getPredicate()).append(">  <").append(triple.getObject()).append("> . \n");
+        }
+        deleteQuery.append("}\n");
+        String title = "SPARQL Query to delete selected triples ";
+        String description = "Here is the generated delete query for the selected triples. Please execute it on your graph to make the changes. ";
+        DialogUtil.getDialogWithHeaderAndFooter(title, deleteQuery.toString(), description);
     }
 
     private void generateInsertQueryForSelectedData(Set<Triple> triples, Set<String> entityTypes) {
@@ -763,11 +785,8 @@ public class PsView extends LitTemplate {
     }
 
     private void generateQueryToRemoveTriple(Triple triple) {
-        String delPart = "DELETE { \n <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } \n";
-        String tripleClause = " WHERE { \n  <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> \n } ";
-        String updateQuery = "\n\n" + delPart + tripleClause + "\n\n";
-
-        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to Delete Triple ", updateQuery, "Here is the delete query, you can copy this query to execute it on your graph! ");
+        String deleteQuery = "\nDELETE \nWHERE { \n\t  <" + triple.getSubject() + ">  <" + triple.getPredicate() + ">  <" + triple.getObject() + "> .\n } ";
+        DialogUtil.getDialogWithHeaderAndFooter("SPARQL Query to Delete Triple ", deleteQuery, "Here is the delete query, you can copy this query to execute it on your graph! ");
     }
 
     private void generateQueryToUpdateTriple(Triple triple) {
@@ -778,14 +797,7 @@ public class PsView extends LitTemplate {
 
         String title = "SPARQL Query to Update Entity Information ";
         String description = "Here is the update query, you can update the desired value by replacing 'VALUE_TO_REPLACE' and copy this query to execute it on your graph!";
-
-        String suggestion = RequestKnowledgeGraphAPI.getEntityInfo(triple.getSubject());
         DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description + "SHACTOR is unable to suggest more information for this particular IRI. Please look over the internet. Thanks.");
-//        if (!suggestion.isEmpty()) {
-//            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, updateQuery, description + " We suggest the following to help you update the value for entity " + triple.getSubject() + ": ", suggestion);
-//        } else {
-//            DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description + "SHACTOR is unable to suggest more information for this particular IRI. Please look over the internet. Thanks.");
-//        }
     }
 
     private String buildSyntaxForNsAndPs() {
