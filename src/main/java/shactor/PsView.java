@@ -659,8 +659,6 @@ public class PsView extends LitTemplate {
         Div divForCheckBoxItems = new Div(checkboxGroup);
         divForCheckBoxItems.setId("divForCheckBoxes");
         divForCheckBoxItems.setMinWidth("1500px");
-        divForCheckBoxItems.setHeight("100px");
-
 
         //vlForCheckBoxItems.setMaxHeight("15%");
         VerticalLayout dialogLayout = new VerticalLayout(paragraph, divForCheckBoxItems, grid, generateInsertQueryButton);

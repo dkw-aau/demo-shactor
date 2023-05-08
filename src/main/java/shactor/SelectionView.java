@@ -150,7 +150,7 @@ public class SelectionView extends LitTemplate {
         });
 
         vaadinGrid.addSelectionListener(selection -> {
-            System.out.printf("Number of selected classes: %s%n", selection.getAllSelectedItems().size());
+            //System.out.printf("Number of selected classes: %s%n", selection.getAllSelectedItems().size());
             if (selection.getAllSelectedItems().size() == classEntityCountSize) {
                 System.out.println("Extract Shapes for All Classes");
                 chosenClasses = new ArrayList<>();
@@ -185,7 +185,7 @@ public class SelectionView extends LitTemplate {
 
     private static void setGraphInfo(int entityCount, int classCount) {
         graphInfo.setVisible(true);
-        String info = "No. of entities: " + entityCount + " ; " + "No. of classes: " + classCount + ". Please select the classes from the table below for which you want to extract shapes.";
+        String info = "No. of entities: " + Utils.formatWithCommas(entityCount) + " ; " + "No. of classes: " + Utils.formatWithCommas(classCount) + ". Please select the classes from the table below for which you want to extract shapes.";
         graphInfo.setText(info);
     }
 

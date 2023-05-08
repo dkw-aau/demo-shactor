@@ -101,8 +101,6 @@ public class DialogUtil {
         Div divForCheckBoxItems = new Div(checkboxGroup);
         divForCheckBoxItems.setId("divForCheckBoxes");
         divForCheckBoxItems.setMinWidth("1200px");
-        divForCheckBoxItems.setHeight("100px");
-
         fieldLayout.add(divForCheckBoxItems);
         fieldLayout.add(new Paragraph("Please select one of the above suggested type or edit the 'VALUE_TO_ADD'."));
         fieldLayout.add(descriptionArea);
