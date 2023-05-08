@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -97,24 +98,12 @@ public class DialogUtil {
                 descriptionArea.setValue(textAreaText);
             }
         });
+        Div divForCheckBoxItems = new Div(checkboxGroup);
+        divForCheckBoxItems.setId("divForCheckBoxes");
+        divForCheckBoxItems.setMinWidth("1200px");
+        divForCheckBoxItems.setHeight("100px");
 
-        VerticalLayout vlForCheckBoxItems = new VerticalLayout(checkboxGroup);
-        vlForCheckBoxItems.setMaxHeight("15%");
-
-        /*        Paragraph p = new Paragraph();
-        for (String val : suggestions) {
-            Span shape = new Span(createIcon(VaadinIcon.INFO), new Span(val));
-            shape.addClassName("suggestion-span");
-            shape.getElement().getThemeList().add("badge contrast pill");
-            p.add(shape);
-
-            shape.addClickListener(spanClickEvent -> {
-                descriptionArea.setValue(descriptionArea.getValue() + " hi" + val);
-                System.out.println(textAreaText);
-                System.out.println(val);
-            });
-        }*/
-        fieldLayout.add(vlForCheckBoxItems);
+        fieldLayout.add(divForCheckBoxItems);
         fieldLayout.add(new Paragraph("Please select one of the above suggested type or edit the 'VALUE_TO_ADD'."));
         fieldLayout.add(descriptionArea);
         fieldLayout.setSpacing(false);

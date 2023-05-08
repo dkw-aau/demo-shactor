@@ -98,6 +98,10 @@ public class PsView extends LitTemplate {
 
     public PsView() {
         Tuple2<String, String> urlAndRepoTuple = Utils.getDatasetsEndpointDetails().get(IndexView.selectedDataset);
+        if (IndexView.category.equals(IndexView.Category.CONNECT_END_POINT)) {
+            System.out.println();
+            urlAndRepoTuple = new Tuple2<>(IndexView.graphURL, IndexView.endPointRepo);
+        }
         graphExplorer = new GraphExplorer(urlAndRepoTuple._1, urlAndRepoTuple._2);
         nodeShape = ExtractionView.getCurrNS();
         propertyShape = ExtractionView.getCurrPS();
@@ -643,7 +647,7 @@ public class PsView extends LitTemplate {
         Paragraph paragraph = new Paragraph(title);
 
         CheckboxGroup<String> checkboxGroup = new CheckboxGroup<>();
-        checkboxGroup.setItems(suggestionsWithSupport.keySet());
+        checkboxGroup.setItems(Utils.getTopKeysFromMap(suggestionsWithSupport.keySet(), 5));
 
         Button generateInsertQueryButton = Utils.getPrimaryButton("Generate Query to Insert Missing values for Selected Entities");
         //generateInsertQueryButton.setWidth("300px");
@@ -651,9 +655,15 @@ public class PsView extends LitTemplate {
         generateInsertQueryButton.setId("alignButtonCenter");
         generateInsertQueryButton.setVisible(false);
 
-        VerticalLayout vlForCheckBoxItems = new VerticalLayout(checkboxGroup);
-        vlForCheckBoxItems.setMaxHeight("15%");
-        VerticalLayout dialogLayout = new VerticalLayout(paragraph, vlForCheckBoxItems, grid, generateInsertQueryButton);
+        //VerticalLayout vlForCheckBoxItems = new VerticalLayout(checkboxGroup);
+        Div divForCheckBoxItems = new Div(checkboxGroup);
+        divForCheckBoxItems.setId("divForCheckBoxes");
+        divForCheckBoxItems.setMinWidth("1500px");
+        divForCheckBoxItems.setHeight("100px");
+
+
+        //vlForCheckBoxItems.setMaxHeight("15%");
+        VerticalLayout dialogLayout = new VerticalLayout(paragraph, divForCheckBoxItems, grid, generateInsertQueryButton);
         dialogLayout.setPadding(true);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("min-width", "1500px").set("max-width", "100%").set("height", "100%");
@@ -786,7 +796,7 @@ public class PsView extends LitTemplate {
         String title = "SPARQL Query to add *Missing* type of the IRI ";
         String description = "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!";
         if (!suggestionsWithSupport.isEmpty()) {
-            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, triple, updateQuery, description + " We suggest the following to help you find the appropriate missing value for entity " + triple.getSubject() + ": ", new ArrayList<>(suggestionsWithSupport.keySet()));
+            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, triple, updateQuery, description + " We suggest the following to help you find the appropriate missing value for entity " + triple.getSubject() + ": ", new ArrayList<>(Utils.getTopKeysFromMap(suggestionsWithSupport.keySet(), 5)));
         } else {
             DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description);
         }

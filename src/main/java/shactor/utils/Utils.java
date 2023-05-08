@@ -17,7 +17,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
-import cs.utils.ConfigManager;
 import cs.utils.Tuple2;
 
 import java.io.IOException;
@@ -201,7 +200,7 @@ public class Utils {
     public static String readKey() {
         String key = null;
         try {
-            key = new String(Files.readAllBytes(Paths.get( "google_api_key.txt")));
+            key = new String(Files.readAllBytes(Paths.get("google_api_key.txt")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -225,9 +224,22 @@ public class Utils {
     }
 
 
-
     public static String formatWithCommas(int number) {
         DecimalFormat formatter = new DecimalFormat("#,###");
         return formatter.format(number);
     }
+
+    public static List<String> getTopKeysFromMap(Set<String> keyset, int thershold) {
+        List<String> firstNKeys = new ArrayList<>();
+        int i = 0;
+        for (String key : keyset) {
+            firstNKeys.add(key);
+            i++;
+            if (i == thershold) {
+                break;
+            }
+        }
+        return firstNKeys;
+    }
+
 }
