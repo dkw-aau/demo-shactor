@@ -98,6 +98,9 @@ public class DialogUtil {
             }
         });
 
+        VerticalLayout vlForCheckBoxItems = new VerticalLayout(checkboxGroup);
+        vlForCheckBoxItems.setMaxHeight("15%");
+
         /*        Paragraph p = new Paragraph();
         for (String val : suggestions) {
             Span shape = new Span(createIcon(VaadinIcon.INFO), new Span(val));
@@ -111,7 +114,7 @@ public class DialogUtil {
                 System.out.println(val);
             });
         }*/
-        fieldLayout.add(checkboxGroup);
+        fieldLayout.add(vlForCheckBoxItems);
         fieldLayout.add(new Paragraph("Please select one of the above suggested type or edit the 'VALUE_TO_ADD'."));
         fieldLayout.add(descriptionArea);
         fieldLayout.setSpacing(false);

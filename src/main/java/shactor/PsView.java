@@ -182,10 +182,9 @@ public class PsView extends LitTemplate {
         hl.add(select);
     }
 
-    ArrayList<String> suggestionsList = new ArrayList<>();
+    HashMap<String, Integer> suggestionsWithSupport = new HashMap<>();
 
     private void setupGrid() {
-        StringBuilder suggestionBuilder = new StringBuilder();
         if (propertyShape.getHasOrList()) {
             psConstraintsGrid.setVisible(false);
             psOrItemsConstraintsGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -205,9 +204,12 @@ public class PsView extends LitTemplate {
 
             for (ShaclOrListItem val : propertyShape.getShaclOrListItems()) {
                 if (val.getDataTypeOrClass() != null && !val.getDataTypeOrClass().equals("Undefined")) {
-                    suggestionsList.add(val.getDataTypeOrClass());
+                    suggestionsWithSupport.put(val.getDataTypeOrClass(), val.getSupport());
                 }
             }
+
+            Utils.sortMapByValuesDesc(suggestionsWithSupport);
+
             psOrItemsConstraintsGrid.addColumn(new ComponentRenderer<>(Button::new, (button, shaclOrListItem) -> {
                 String objType = shaclOrListItem.getDataTypeOrClass();
                 String nodeKind = shaclOrListItem.getNodeKind();
@@ -255,7 +257,7 @@ public class PsView extends LitTemplate {
         } else {
             psOrItemsConstraintsGrid.setVisible(false);
             if (propertyShape.getDataTypeOrClass() != null) {
-                suggestionsList.add(propertyShape.getDataTypeOrClass());
+                suggestionsWithSupport.put(propertyShape.getDataTypeOrClass(), propertyShape.getSupport());
             }
             //Declare an undefined flag
             boolean flag = false;
@@ -595,7 +597,7 @@ public class PsView extends LitTemplate {
         Button generateDeleteQueryButton = Utils.getPrimaryButton("Generate Query to Delete the selected Triples");
         generateDeleteQueryButton.setAutofocus(true);
         generateDeleteQueryButton.setVisible(false);
-
+        generateDeleteQueryButton.setId("alignButtonCenter");
         AtomicReference<Set<Triple>> selectedItems = new AtomicReference<>();
         grid.addSelectionListener(selection -> {
             selectedItems.set(selection.getAllSelectedItems());
@@ -635,20 +637,23 @@ public class PsView extends LitTemplate {
         grid.getStyle().set("width", "1500px").set("max-width", "100%");
         grid.setItems(subjectList);
         String title = "IRIs having undefined type";
-        if (!suggestionsList.isEmpty()) {
+        if (!suggestionsWithSupport.isEmpty()) {
             title = "The table below shows the entities missing type information. SHACTOR suggests the following types/classes for these entities. Select entities using checkbox and select the one of the suggested type:";
         }
         Paragraph paragraph = new Paragraph(title);
 
         CheckboxGroup<String> checkboxGroup = new CheckboxGroup<>();
-        checkboxGroup.setItems(suggestionsList);
+        checkboxGroup.setItems(suggestionsWithSupport.keySet());
 
-        Button generateInsertQueryButton = Utils.getPrimaryButton("Generate insert query to insert missing value for selected entities");
+        Button generateInsertQueryButton = Utils.getPrimaryButton("Generate Query to Insert Missing values for Selected Entities");
         //generateInsertQueryButton.setWidth("300px");
         generateInsertQueryButton.setAutofocus(true);
+        generateInsertQueryButton.setId("alignButtonCenter");
         generateInsertQueryButton.setVisible(false);
 
-        VerticalLayout dialogLayout = new VerticalLayout(paragraph, checkboxGroup, grid, generateInsertQueryButton);
+        VerticalLayout vlForCheckBoxItems = new VerticalLayout(checkboxGroup);
+        vlForCheckBoxItems.setMaxHeight("15%");
+        VerticalLayout dialogLayout = new VerticalLayout(paragraph, vlForCheckBoxItems, grid, generateInsertQueryButton);
         dialogLayout.setPadding(true);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("min-width", "1500px").set("max-width", "100%").set("height", "100%");
@@ -717,7 +722,10 @@ public class PsView extends LitTemplate {
 
         Button generateDeleteQueryButton = Utils.getPrimaryButton("Generate Query to Delete the selected Triples");
         generateDeleteQueryButton.setAutofocus(true);
+        generateDeleteQueryButton.setId("alignButtonCenter");
         generateDeleteQueryButton.setVisible(false);
+
+
         AtomicReference<Set<Triple>> selectedItems = new AtomicReference<>();
         grid.addSelectionListener(selection -> {
             selectedItems.set(selection.getAllSelectedItems());
@@ -777,8 +785,8 @@ public class PsView extends LitTemplate {
         String updateQuery = "\n" + insertPart + tripleClause + "\n\n";
         String title = "SPARQL Query to add *Missing* type of the IRI ";
         String description = "Here is the insert query, you can update the desired value by replacing 'VALUE_TO_ADD' and copy this query to execute it on your graph!";
-        if (!suggestionsList.isEmpty()) {
-            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, triple, updateQuery, description + " We suggest the following to help you find the appropriate missing value for entity " + triple.getSubject() + ": ", suggestionsList);
+        if (!suggestionsWithSupport.isEmpty()) {
+            DialogUtil.getDialogWithHeaderAndFooterWithSuggestion(title, triple, updateQuery, description + " We suggest the following to help you find the appropriate missing value for entity " + triple.getSubject() + ": ", new ArrayList<>(suggestionsWithSupport.keySet()));
         } else {
             DialogUtil.getDialogWithHeaderAndFooter(title, updateQuery, description);
         }

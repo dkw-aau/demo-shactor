@@ -208,6 +208,23 @@ public class Utils {
         return key;
     }
 
+    public static List<String> sortMapByValuesDesc(HashMap<String, Integer> map) {
+        // Create a list of entries from the map
+        List<Map.Entry<String, Integer>> list = new ArrayList<>(map.entrySet());
+
+        // Sort the list in descending order based on the values
+        list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+
+        // Create a list of keys sorted by their corresponding values
+        List<String> keys = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : list) {
+            keys.add(entry.getKey());
+        }
+
+        return keys;
+    }
+
+
 
     public static String formatWithCommas(int number) {
         DecimalFormat formatter = new DecimalFormat("#,###");
