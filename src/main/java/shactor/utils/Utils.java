@@ -172,24 +172,23 @@ public class Utils {
         selectField.setWidth("50%");
         selectField.setLabel("Select from existing datasets");
         selectField.setItems(getDatasetsAddresses().keySet());
-        selectField.setValue("DBpedia-CityData");
+        selectField.setValue("DBpedia");
         return selectField;
     }
 
     public static HashMap<String, String> getDatasetsAddresses() {
         HashMap<String, String> map = new HashMap<>();
-        map.put("DBpedia-CityData", "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt");
+        //map.put("DBpedia-CityData", "/Users/kashifrabbani/Documents/GitHub/data/CityDBpedia.nt");
         map.put("LUBM-Mini", "/Users/kashifrabbani/Documents/GitHub/lubm-uba/output/lubm-sf-1.nt");
         map.put("DBpedia", "/home/ubuntu/datasets/dbpedia_ml.nt");
         map.put("LUBM", "/home/ubuntu/datasets/lubm.n3");
         map.put("YAGO-4", "/home/ubuntu/datasets/yago.n3");
-        map.put("WATDIV", "/home/ubuntu/datasets/WATDIV.n3");
         return map;
     }
 
     public static HashMap<String, Tuple2<String, String>> getDatasetsEndpointDetails() {
         HashMap<String, Tuple2<String, String>> map = new HashMap<>();
-        map.put("DBpedia-CityData", new Tuple2<>("http://10.92.0.34:7200/", "DBpediaCityData"));
+        //map.put("DBpedia-CityData", new Tuple2<>("http://10.92.0.34:7200/", "DBpediaCityData"));
         map.put("LUBM-Mini", new Tuple2<>("http://10.92.0.34:7200/", "LUBM-ScaleFactor-1"));
         map.put("DBpedia", new Tuple2<>("http://10.92.0.34:7200/", "DBPEDIA_ML"));
         map.put("LUBM", new Tuple2<>("http://10.92.0.34:7200/", "LUBM"));
