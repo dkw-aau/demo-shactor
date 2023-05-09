@@ -243,16 +243,28 @@ public class ChartsUtil {
         plotOptionsPie.setSize("60%");
     }
 
+    public static Data getDatasetsStats(String datasetName) {
+        HashMap<String, Data> datasetNameToStats = new HashMap<>();
+        datasetNameToStats.put("DBpedia", new Data(52281114, 19357319, 15269876, 15141546, 5823566, 1323, 427));  //("Triples", "Objects", "Literals", "Subjects", "Entities", "Properties", "Classes");
+        datasetNameToStats.put("LUBM", new Data(91000000, 12000000, 5500000, 10000000, 1000000, 20, 22));
+        datasetNameToStats.put("YAGO-4", new Data(21000000, 126000000, 11100000, 5000000, 17000000, 8902, 153));
+        datasetNameToStats.put("DBpedia-CityData", new Data(400275, 150906, 247806, 21696, 20583, 113, 24));
+        datasetNameToStats.put("LUBM-Mini", new Data(100649, 13989, 33079, 17221, 17246, 24, 14));
+
+        datasetNameToStats.put("ZERO", new Data(100, 100, 100, 100, 100, 100, 100));
+        return datasetNameToStats.get(datasetName);
+    }
+
     /*
     https://vaadin.com/directory/component/so-charts
      */
-    public static SOChart buildBarChartUsingDbpediaStats() {
+    public static SOChart buildBarChartUsingDatasetsStats(String datasetName) {
         // Creating a chart display area
         SOChart soChart = new SOChart();
         soChart.setSize("650px", "300px");
         CategoryData labels = new CategoryData("Triples", "Objects", "Literals", "Subjects", "Entities", "Properties", "Classes");
-        Data data = new Data(52281114, 19357319, 15269876, 15141546, 5823566, 1323, 427);
-        BarChart bc = new BarChart(labels, data);
+        //Data data = new Data(52281114, 19357319, 15269876, 15141546, 5823566, 1323, 427);
+        BarChart bc = new BarChart(labels, getDatasetsStats(datasetName));
         RectangularCoordinate rc = new RectangularCoordinate(new com.storedobject.chart.XAxis(DataType.CATEGORY), new com.storedobject.chart.YAxis(DataType.NUMBER));
         rc.getPosition(true).setWidth(Size.pixels(650));
         rc.getPosition(true).setLeft(Size.pixels(100));

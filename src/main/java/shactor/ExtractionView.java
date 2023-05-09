@@ -3,7 +3,6 @@ package shactor;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.Grid;
@@ -38,18 +37,15 @@ import cs.qse.querybased.nonsampling.QbParser;
 import org.apache.commons.io.FileUtils;
 import org.vaadin.olli.FileDownloadWrapper;
 import shactor.utils.ChartsUtil;
+import shactor.utils.DialogUtil;
 import shactor.utils.PruningUtil;
-import shactor.utils.Type;
 import shactor.utils.Utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static shactor.utils.ChartsUtil.*;
 import static shactor.utils.Utils.*;
@@ -64,10 +60,6 @@ public class ExtractionView extends LitTemplate {
     @Id("contentVerticalLayout")
     private VerticalLayout contentVerticalLayout;
 
-    @Id("readShapesStatsButton")
-    private Button readShapesStatsButton;
-    @Id("readShactorLogsButton")
-    private Button readShactorLogsButton;
     @Id("supportTextField")
     private TextField supportTextField;
     @Id("confidenceTextField")
@@ -80,8 +72,7 @@ public class ExtractionView extends LitTemplate {
     private Grid<PS> propertyShapesGrid;
     @Id("propertyShapesGridInfo")
     private H5 propertyShapesGridInfo;
-    @Id("downloadPrunedShapesButton")
-    private Button downloadPrunedShapesButton;
+
     @Id("downloadSelectedShapesButton")
     private Button downloadSelectedShapesButton;
 
@@ -98,8 +89,6 @@ public class ExtractionView extends LitTemplate {
     private RadioButtonGroup<String> vaadinRadioGroup;
     @Id("psVaadinRadioGroup")
     private RadioButtonGroup<String> psVaadinRadioGroup;
-    @Id("taxonomyVisualizationButton")
-    private Button taxonomyVisualizationButton;
     @Id("psGridRadioButtonInfo")
     private Paragraph psGridRadioButtonInfo;
     @Id("nsGridRadioButtonInfo")
@@ -132,15 +121,22 @@ public class ExtractionView extends LitTemplate {
     private SplitLayout splitLayout;
     @Id("graphStatsHeading")
     private Paragraph graphStatsHeading;
-
+    @Id("pruningParamsHorizontalLayout")
+    private HorizontalLayout pruningParamsHorizontalLayout;
 
     public ExtractionView() {
         chartsContainerHorizontalLayout.removeAll();
         soChartsContainerHorizontalLayout.setVisible(false);
 
         if (SelectionView.computeStats) {
-            splitLayout.setSplitterPosition(60);
-            graphStatsVerticalLayout.add(buildBarChartUsingDbpediaStats());
+            if (IndexView.category.equals(IndexView.Category.CONNECT_END_POINT)) {
+                //Utils.notifyMessage("Computer Stats over Endpoint (TODO)");
+                graphStatsVerticalLayout.setVisible(false);
+                splitLayout.setSplitterPosition(100);
+            } else {
+                splitLayout.setSplitterPosition(60);
+                graphStatsVerticalLayout.add(buildBarChartUsingDatasetsStats(IndexView.selectedDataset));
+            }
         } else {
             graphStatsVerticalLayout.setVisible(false);
             splitLayout.setSplitterPosition(100);
@@ -159,37 +155,40 @@ public class ExtractionView extends LitTemplate {
         shapesGrid.setVisible(false);
         propertyShapesGrid.setVisible(false);
         propertyShapesGridInfo.setVisible(false);
-        downloadPrunedShapesButton.setVisible(false);
 
-        configureDefaultShapesDownloadButton();
-        Utils.setIconForButtonWithToolTip(readShapesStatsButton, VaadinIcon.BAR_CHART, "Read Shapes Statistics");
-        Utils.setIconForButtonWithToolTip(readShactorLogsButton, VaadinIcon.TIMER, "Read SHACTOR extraction logs");
-        Utils.setIconForButtonWithToolTip(taxonomyVisualizationButton, VaadinIcon.FILE_TREE, "Visualize Shapes Taxonomy");
 
-        readShapesStatsButton.addClickListener(buttonClickEvent -> {});
-        readShactorLogsButton.addClickListener(buttonClickEvent -> {});
+        configureButtonWithFileWrapper(VaadinIcon.BAR_CHART, "Download Shapes Statistics", SelectionView.outputDirectory + SelectionView.buildDatasetName(IndexView.category) + ".csv");
+        configureButtonWithFileWrapper(VaadinIcon.TIMER, "Download SHACTOR extraction logs", SelectionView.outputDirectory + SelectionView.buildDatasetName(IndexView.category) + "_RUNTIME_LOGS.csv");
+        configureButtonWithFileWrapper(VaadinIcon.DOWNLOAD, "Download Shapes", SelectionView.getDefaultShapesOutputFileAddress());
+        //Utils.setIconForButtonWithToolTip(readShapesStatsButton, VaadinIcon.BAR_CHART, "Download Shapes Statistics");
+        //Utils.setIconForButtonWithToolTip(readShactorLogsButton, VaadinIcon.TIMER, "Download SHACTOR extraction logs");
+        //Utils.setIconForButtonWithToolTip(taxonomyVisualizationButton, VaadinIcon.FILE_TREE, "Visualize Shapes Taxonomy");
+
+        /*
         taxonomyVisualizationButton.setVisible(false);
         taxonomyVisualizationButton.addClickListener(buttonClickEvent -> {
             RouterLink link = new RouterLink("taxonomy-view", TaxonomyView.class);
             taxonomyVisualizationButton.getUI().ifPresent(ui -> ui.getPage().open(link.getHref()));
-        });
+        });*/
 
         startPruningButton.addClickListener(buttonClickEvent -> {
             if (supportTextField.getValue().isEmpty() || confidenceTextField.getValue().isEmpty()) {
                 Utils.notify("Please enter valid values!", NotificationVariant.LUMO_ERROR, Notification.Position.TOP_CENTER);
             } else {
                 beginPruning();
+                configurePrunedShapesDownloadButton();
             }
         });
     }
 
-    private void configureDefaultShapesDownloadButton() {
+    private void configureButtonWithFileWrapper(VaadinIcon vaadinIcon, String label, String fileAddress) {
+        System.out.println(fileAddress);
         Button button = new Button();
-        Utils.setIconForButtonWithToolTip(button, VaadinIcon.DOWNLOAD, "Download Shapes");
+        Utils.setIconForButtonWithToolTip(button, vaadinIcon, label);
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         FileDownloadWrapper buttonWrapper;
         try {
-            File file = new File(SelectionView.getDefaultShapesOutputFileAddress());
+            File file = new File(fileAddress);
             ByteArrayInputStream stream = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
             buttonWrapper = new FileDownloadWrapper(new StreamResource(file.getName(), () -> stream));
         } catch (IOException e) {
@@ -198,6 +197,25 @@ public class ExtractionView extends LitTemplate {
         buttonWrapper.wrapComponent(button);
         actionButtonsHorizontalLayout.add(buttonWrapper);
     }
+
+    private void configurePrunedShapesDownloadButton() {
+        Button button = new Button();
+        button.setText("Download Reliable Shapes");
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        FileDownloadWrapper buttonWrapper;
+        try {
+            File file = new File(this.prunedFileAddress);
+            ByteArrayInputStream stream = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
+            buttonWrapper = new FileDownloadWrapper(new StreamResource(file.getName(), () -> stream));
+            buttonWrapper.getStyle().set("align-self", "end");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        buttonWrapper.wrapComponent(button);
+        pruningParamsHorizontalLayout.add(buttonWrapper);
+    }
+
+    Parser parser;
 
     private void beginPruning() {
         soChartsContainerHorizontalLayout.setVisible(true);
@@ -213,7 +231,7 @@ public class ExtractionView extends LitTemplate {
 
         switch (IndexView.category) {
             case EXISTING_FILE_BASED -> {
-                Parser parser = SelectionView.getParser();
+                parser = SelectionView.getParser();
                 this.prunedFileAddress = parser.extractSHACLShapesWithPruning(SelectionView.isFilteredClasses, confidence, support, SelectionView.chosenClasses); // extract shapes with pruning
                 nodeShapes = parser.shapesExtractor.getNodeShapes();
             }
@@ -244,7 +262,6 @@ public class ExtractionView extends LitTemplate {
         vl4.add(ChartsUtil.buildPieChart(preparePieChartDataForSupportAndConfidenceAnalysis(pruningUtil.getStatsByBoth(), support, confidence, pruningUtil)));
 
         setupNodeShapesGrid(nodeShapes, support, confidence);
-        downloadPrunedShapesButton.setVisible(true);
         setupFilterRadioGroup(vaadinRadioGroup);
         vaadinRadioGroup.setVisible(true);
         List<NS> finalNodeShapes = nodeShapes;
@@ -316,6 +333,12 @@ public class ExtractionView extends LitTemplate {
         shapesGrid.addSelectionListener(selection -> {
             System.out.printf("Number of selected classes: %s%n", selection.getAllSelectedItems().size());
             downloadSelectedShapesButton.setVisible(true);
+
+            downloadSelectedShapesButton.addClickListener(listener -> {
+                String shapes = Utils.constructModelForGivenNodeShapesAndTheirPropertyShapes(selection.getAllSelectedItems());
+                DialogUtil.getDialogWithHeaderAndFooterForShowingShapeSyntax(shapes);
+                //System.out.println(shapes);
+            });
         });
         nsSearchField.setVisible(true);
         nsSearchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));

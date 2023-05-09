@@ -17,9 +17,19 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import cs.qse.common.structure.NS;
+import cs.qse.common.structure.PS;
+import cs.qse.common.structure.ShaclOrListItem;
 import cs.utils.Tuple2;
+import de.atextor.turtle.formatter.FormattingStyle;
+import de.atextor.turtle.formatter.TurtleFormatter;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.SHACL;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -27,8 +37,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Utils {
-
-
     public static VerticalLayout getVerticalLayout() {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -186,7 +194,7 @@ public class Utils {
         map.put("DBpedia", new Tuple2<>("http://10.92.0.34:7200/", "DBPEDIA_ML"));
         map.put("LUBM", new Tuple2<>("http://10.92.0.34:7200/", "LUBM"));
         map.put("YAGO-4", new Tuple2<>("http://10.92.0.34:7200/", "Yago_EngWiki"));
-        map.put("WATDIV", new Tuple2<>("http://10.92.0.34:7200/", "WATDIV_1B"));
+        //map.put("WATDIV", new Tuple2<>("http://10.92.0.34:7200/", "WATDIV_1B"));
         return map;
     }
 
@@ -240,6 +248,99 @@ public class Utils {
             }
         }
         return firstNKeys;
+    }
+
+    public static String constructModelForGivenNodeShapesAndTheirPropertyShapes(Set<NS> nodeShapes) {
+        Model model = ModelFactory.createDefaultModel();
+        model.setNsPrefix("sh", "http://www.w3.org/ns/shacl#");
+        model.setNsPrefix("qse", "http://shaclshapes.org/");
+        for (NS ns : nodeShapes) {
+            Statement nsType = ResourceFactory.createStatement(ResourceFactory.createResource((ns.getIri().toString())), ResourceFactory.createProperty((RDF.type.toString())), ResourceFactory.createResource((SHACL.NODE_SHAPE.toString())));
+            Statement nsTarget = ResourceFactory.createStatement(ResourceFactory.createResource((ns.getIri().toString())), ResourceFactory.createProperty((SHACL.TARGET_CLASS.toString())), ResourceFactory.createResource((ns.getTargetClass().toString())));
+            model.add(nsType);
+            model.add(nsTarget);
+            for (PS ps : ns.getPropertyShapes()) {
+                Statement nsPs = ResourceFactory.createStatement(ResourceFactory.createResource((ns.getIri().toString())), ResourceFactory.createProperty((SHACL.PROPERTY.toString())), ResourceFactory.createResource((ps.getIri().toString())));
+                Statement psPath = ResourceFactory.createStatement(ResourceFactory.createResource((ps.getIri().toString())), ResourceFactory.createProperty((SHACL.PATH.toString())), ResourceFactory.createResource((ps.getPath())));
+                Statement psType = ResourceFactory.createStatement(ResourceFactory.createResource((ps.getIri().toString())), ResourceFactory.createProperty(RDF.type.toString()), ResourceFactory.createResource((SHACL.PROPERTY_SHAPE.toString())));
+                model.add(nsPs);
+                model.add(psPath);
+                model.add(psType);
+
+                if (ps.getHasOrList()) {
+                    RDFList list = model.createList(new RDFNode[]{});
+                    List<Resource> resources = new ArrayList<>();
+
+                    List<ShaclOrListItem> cleanItems = new ArrayList<>();
+                    for (ShaclOrListItem item : ps.getShaclOrListItems()) {
+                        if (item.getDataTypeOrClass() != null && !item.getDataTypeOrClass().equals("Undefined")) {
+                            cleanItems.add(item);
+                        }
+                    }
+                    if (cleanItems.size() > 1) {
+                        for (ShaclOrListItem item : cleanItems) {
+                            Resource child = model.createResource();
+                            Statement psNodeType;
+                            Statement psNodeKind;
+                            if (item.getNodeKind().equals("IRI")) {
+                                psNodeKind = ResourceFactory.createStatement(child, ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource((SHACL.IRI.toString())));
+                                psNodeType = ResourceFactory.createStatement(child, ResourceFactory.createProperty((SHACL.CLASS.toString())), ResourceFactory.createResource((item.getDataTypeOrClass())));
+                            } else {
+                                psNodeKind = ResourceFactory.createStatement(child, ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource((SHACL.LITERAL.toString())));
+                                psNodeType = ResourceFactory.createStatement(child, ResourceFactory.createProperty((SHACL.DATATYPE.toString())), ResourceFactory.createResource((item.getDataTypeOrClass())));
+                            }
+                            model.add(psNodeKind);
+                            model.add(psNodeType);
+                            resources.add(child);
+                        }
+                        for (Resource element : resources) { // add each of these resources onto the end of the list
+                            list = list.with(element);
+                        }
+                        model.add(ResourceFactory.createResource((ps.getIri().toString())), model.createProperty(SHACL.OR.toString()), list); // relate the root to the list
+                    } else {
+                        ShaclOrListItem item = cleanItems.get(0);
+                        if (item.getDataTypeOrClass() != null) {
+                            if (!item.getDataTypeOrClass().equals("Undefined")) {
+                                Statement itemNodeType = ResourceFactory.createStatement(ResourceFactory.createResource((ps.getIri().toString())), ResourceFactory.createProperty((SHACL.DATATYPE.toString())), ResourceFactory.createResource((item.getDataTypeOrClass())));
+                                model.add(itemNodeType);
+                            }
+                        }
+                        if (item.getNodeKind() != null) {
+                            if (item.getNodeKind().equals("IRI")) {
+                                Statement itemNodeKind = ResourceFactory.createStatement(ResourceFactory.createResource((ps.getIri().toString())), ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource(SHACL.IRI.toString()));
+                                model.add(itemNodeKind);
+                            }
+                            if (item.getNodeKind().equals("Literal")) {
+                                Statement itemNodeKind = ResourceFactory.createStatement(ResourceFactory.createResource((ps.getIri().toString())), ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource(SHACL.LITERAL.toString()));
+                                model.add(itemNodeKind);
+                            }
+                        }
+                    }
+                } else {
+                    if (ps.getDataTypeOrClass() != null) {
+                        if (!ps.getDataTypeOrClass().equals("Undefined")) {
+                            Statement psNodeType = ResourceFactory.createStatement(ResourceFactory.createResource((ps.getIri().toString())), ResourceFactory.createProperty((SHACL.DATATYPE.toString())), ResourceFactory.createResource((ps.getDataTypeOrClass())));
+                            model.add(psNodeType);
+                        }
+                    }
+                    if (ps.getNodeKind() != null) {
+                        if (ps.getNodeKind().equals("IRI")) {
+                            Statement psNodeKind = ResourceFactory.createStatement(ResourceFactory.createResource((ps.getIri().toString())), ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource(SHACL.IRI.toString()));
+                            model.add(psNodeKind);
+                        }
+                        if (ps.getNodeKind().equals("Literal")) {
+                            Statement psNodeKind = ResourceFactory.createStatement(ResourceFactory.createResource((ps.getIri().toString())), ResourceFactory.createProperty((SHACL.NODE_KIND.toString())), ResourceFactory.createResource(SHACL.LITERAL.toString()));
+                            model.add(psNodeKind);
+                        }
+                    }
+                }
+            }
+        }
+
+        OutputStream out = new ByteArrayOutputStream();
+        TurtleFormatter formatter = new TurtleFormatter(FormattingStyle.DEFAULT);
+        formatter.accept(model, out);
+        return out.toString();
     }
 
 }

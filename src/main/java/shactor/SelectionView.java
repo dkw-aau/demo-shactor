@@ -64,6 +64,9 @@ public class SelectionView extends LitTemplate {
 
     public static String defaultShapesOutputFileAddress = "";
     public static Boolean computeStats = false;
+
+    public static String outputDirectory = "";
+
     public SelectionView() {
         Utils.setFooterImagesPath(footerLeftImage, footerRightImage);
         graphInfo.setVisible(false);
@@ -107,6 +110,7 @@ public class SelectionView extends LitTemplate {
             File jarFile = new File(codeSource.getLocation().toURI().getPath());
             String jarDir = jarFile.getParentFile().getPath();
             Main.setDataSetNameForJar(buildDatasetName(IndexView.category));
+            outputDirectory = jarDir + "/Output/";
             Main.setOutputFilePathForJar(jarDir + "/Output/");
             Main.setConfigDirPathForJar(jarDir + "/config/");
             Main.setResourcesPathForJar(jarDir + "/resources/");
@@ -244,7 +248,7 @@ public class SelectionView extends LitTemplate {
         return defaultShapesOutputFileAddress;
     }
 
-    private static String buildDatasetName(IndexView.Category category) {
+    public static String buildDatasetName(IndexView.Category category) {
         String name = "file";
         switch (category) {
             case EXISTING_FILE_BASED -> {

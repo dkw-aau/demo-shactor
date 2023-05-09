@@ -8,11 +8,20 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.server.StreamResource;
 import cs.utils.Constants;
+import org.apache.commons.io.FileUtils;
+import org.vaadin.olli.FileDownloadWrapper;
+import shactor.SelectionView;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class DialogUtil {
@@ -27,6 +36,44 @@ public class DialogUtil {
         dialog.add(dialogLayout);
         dialog.setModal(false);
         dialog.setDraggable(true);
+        dialog.open();
+    }
+
+    public static void getDialogWithHeaderAndFooterForShowingShapeSyntax(String shapesSyntax) {
+        Dialog dialog = new Dialog();
+        dialog.getElement().setAttribute("aria-label", "Dialog");
+        dialog.getHeader().add(getHeaderTitle("SHACL Shapes"));
+        Button cancelButton = new Button("Cancel", e -> dialog.close());
+        Button button = new Button();
+        Utils.setIconForButtonWithToolTip(button, VaadinIcon.DOWNLOAD, "Download");
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        FileDownloadWrapper buttonWrapper;
+        try {
+            ByteArrayInputStream stream = new ByteArrayInputStream(shapesSyntax.getBytes());
+            buttonWrapper = new FileDownloadWrapper(new StreamResource("selectedShapes.ttl", () -> stream));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        buttonWrapper.wrapComponent(button);
+        dialog.getFooter().add(buttonWrapper, cancelButton);
+
+        TextArea syntaxArea = new TextArea();
+        syntaxArea.setValue(shapesSyntax);
+
+
+        syntaxArea.getStyle().set("resize", "vertical"); //https://cookbook.vaadin.com/resizable-components
+        syntaxArea.getStyle().set("overflow", "auto");
+        syntaxArea.setHeight("300px");
+
+        VerticalLayout fieldLayout = new VerticalLayout(syntaxArea);
+        fieldLayout.setSpacing(false);
+        fieldLayout.setPadding(false);
+        fieldLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        fieldLayout.getStyle().set("width", "1200px").set("max-width", "100%");
+
+        dialog.add(fieldLayout);
+        dialog.setModal(true);
+        dialog.setDraggable(false);
         dialog.open();
     }
 

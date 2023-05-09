@@ -11,11 +11,11 @@ import '@vaadin/charts/src/vaadin-chart.js';
 import '@vaadin/split-layout/src/vaadin-split-layout.js';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/radio-group/src/vaadin-radio-group.js';
-import '@vaadin/button/src/vaadin-button.js';
-import '@polymer/iron-icon/iron-icon.js';
 import '@vaadin/text-field/src/vaadin-text-field.js';
 import '@vaadin/vertical-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
+import '@vaadin/button/src/vaadin-button.js';
+import '@polymer/iron-icon/iron-icon.js';
 let ExtractionView = class ExtractionView extends LitElement {
     static get styles() {
         return css `
@@ -37,26 +37,13 @@ let ExtractionView = class ExtractionView extends LitElement {
     <vaadin-vertical-layout theme="spacing" style="flex-grow: 1; flex-shrink: 1; width: 60%;">
      <h4>SHACTOR (Step 3/4)</h4>
      <p style="align-self: flex-start; margin-top: 0%;">SHACTOR has extracted SHACL shapes for the chosen classes. You have the following options:</p>
-     <vaadin-horizontal-layout style="align-self: stretch;" id="actionButtonsHorizontalLayout">
-      <vaadin-button tabindex="0" id="readShapesStatsButton" style="margin-right: var(--lumo-space-l);" theme="primary">
-        Read Shapes Statistics 
-      </vaadin-button>
-      <vaadin-button tabindex="0" style="margin-right: var(--lumo-space-l);" id="readShactorLogsButton" theme="primary">
-        Read SHACTOR Logs 
-      </vaadin-button>
-      <vaadin-button theme="primary" aria-label="Add new" id="taxonomyVisualizationButton" tabindex="0">
-       <iron-icon icon="lumo:plus"></iron-icon>
-      </vaadin-button>
-     </vaadin-horizontal-layout>
+     <vaadin-horizontal-layout style="align-self: stretch;" id="actionButtonsHorizontalLayout"></vaadin-horizontal-layout>
      <h5 style="margin-bottom: 0%; align-self: stretch;">You can set the Confidence and Support thresholds to analyze shapes.</h5>
-     <vaadin-horizontal-layout style="align-self: stretch;">
+     <vaadin-horizontal-layout style="align-self: stretch;" id="pruningParamsHorizontalLayout">
       <vaadin-text-field label="Support" placeholder="10" id="supportTextField" style="margin-right: 2%; flex-grow: 0;" type="text"></vaadin-text-field>
       <vaadin-text-field label="Confidence (Percentage %)" placeholder="25" type="text" id="confidenceTextField" style="margin-right: 2%; flex-grow: 0; flex-shrink: 1; width: 20%;"></vaadin-text-field>
       <vaadin-button id="startPruningButton" style="flex-grow: 0; flex-shrink: 1; align-self: flex-end; margin-right: 2%;" tabindex="0" theme="primary">
         Analyze Shapes 
-      </vaadin-button>
-      <vaadin-button theme="primary" id="downloadPrunedShapesButton" style="align-self: flex-end; flex-shrink: 1; flex-grow: 0;" tabindex="0">
-        Download Reliable Shapes 
       </vaadin-button>
      </vaadin-horizontal-layout>
     </vaadin-vertical-layout>
