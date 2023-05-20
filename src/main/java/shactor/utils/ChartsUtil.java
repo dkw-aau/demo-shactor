@@ -228,8 +228,8 @@ public class ChartsUtil {
         int c = (int) (confidence * 100);
         String confPercent = c + "%";
         int ps_green = Integer.parseInt(pruningUtil.getStatsDefault().get("COUNT_PS")) - Integer.parseInt(statsMap.get("COUNT_PS"));
-        map.put("PS > " + "(" + support + ", " + confPercent + ") " + " = " + ps_green, ps_green);
-        map.put("PS < " + "(" + support + ", " + confPercent + ") " + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")));
+        map.put("PS < " + "(" + support + ", " + confPercent + ") " + " = " + ps_green, ps_green);
+        map.put("PS > " + "(" + support + ", " + confPercent + ") " + " = " + statsMap.get("COUNT_PS"), Integer.parseInt(statsMap.get("COUNT_PS")));
         return map;
     }
 

@@ -241,6 +241,9 @@ public class ExtractionView extends LitTemplate {
                 nodeShapes = qbParser.shapesExtractor.getNodeShapes();
             }
         }
+        //if you want to compute stats by querying the model, uncomment the following line
+        //pruningUtil.computeStats(parser.shapesExtractor, support, confidence);
+
         assert nodeShapes != null;
         pruningUtil.applyPruningFlags(nodeShapes, support, confidence);
         pruningUtil.getDefaultStats(nodeShapes);
