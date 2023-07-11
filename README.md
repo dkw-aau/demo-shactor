@@ -1,7 +1,24 @@
 ## SHACTOR: Improving the Quality of Large-Scale Knowledge Graphs with Validating Shapes
 ### Demo Paper: SIGMOD-2023
 
-Visit demo's website for more information on the demo paper: http://relweb.cs.aau.dk/qse/shactor/ 
+Read the paper: [https://dl.acm.org/doi/10.1145/3555041.3589723](https://dl.acm.org/doi/10.1145/3555041.3589723) or visit our website for more details: [https://relweb.cs.aau.dk/qse/shactor/](https://relweb.cs.aau.dk/qse/shactor/)
+
+### Citing the work
+Please cite us if you use the code in your project or publication
+
+```bibtex
+@inproceedings{DBLP:conf/sigmod/RabbaniLH23,
+  author       = {Kashif Rabbani and
+                  Matteo Lissandrini and
+                  Katja Hose},
+  title        = {{SHACTOR:} Improving the Quality of Large-Scale Knowledge Graphs with
+                  Validating Shapes},
+  booktitle    = {{SIGMOD} Conference Companion},
+  pages        = {151--154},
+  publisher    = {{ACM}},
+  year         = {2023}
+}
+```
 
 This readme contains all the necessary configuration to run the demo:
 
